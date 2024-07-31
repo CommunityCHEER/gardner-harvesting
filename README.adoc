@@ -1,4 +1,23 @@
 = CHEER Community Garden Produce Collection App
 Devin Droddy <devin.droddy@gmail.com>
+:toc:
 
-This is a mobile app made with React Native for CHEER Community Garden volunteers to record and upload information about their collected produce.
+== Purpose
+
+It's important for CHEER's Long Branch Gardners program to keep effective track of the produce collected to be able to present such data for potential grants. Additionally, gardners can receive awards for frequent participation. Originally, all of this data was collected on paper and collected by hand, then manually entered into a Google Sheet. This was cumbersome and slowly becoming messy. This app streamlines the process of data collection by providing an easy-to-use form that allows for versatile but consistently-structured uploading of harvest data, as well as a simple system for logging participation and a means of viewing past participation.
+
+== Architecture
+
+This is a React Native app built upon the cross-platform Expo framework. It uses Expo's tab-based routing and navigation system. The app is powered by a Firebase-hosted cloud backend. User data, some system data, and collected data, are all stored in a Firestore database. There is also a realtime database, where harvest data is held in parallel. While each harvest is in isolation and contains its data (garden, crop, date, etc.) on Firestore, harvests in the realtime database are hierarchically categorized by date, garden, and crop. The former is more efficient for viewing the data on a larger scale and selectively filtering (as in this app's sister project, a data visualization webapp for the director of the program), while the latter is more efficient for getting specific data on a smaller scale. In this app, there is a display of the total number harvested of the selected crop at the selected garden on the current date, which necessitates both the use of the realtime database as well as the different structure.
+
+Throughout the database, we use document references as much as possible. This allows for less copying of data and more dynamic usage of the data. Adittionally, in the realtime database, while document references are unavailable, we simply use the ID of the given item, assuming knowledge of the collection in which the specific document resides.
+
+This app also uses Firebase for user authentication. Presently, the only means of authentication are either Google or Apple OAuth. The Firebase JavaScript API provides both built-in authentication persistence and a means of utilizing React Native local storage for persistence. Authentication state is shared between tabs using React's context API.
+
+== Building
+
+I (Devin) develop on a NixOS machine, so locally building the app is a headache. Thus, I went for a simpler approach: EAS, Expo's cloud build service. It's surprisingly simple. You have to make your own account and sign into the EAS CLI, but then you just pick a target and profile and it'll build it for you. You can build locally with the same CLI, too, with one extra flag.
+
+=== Expo development builds
+
+For rapid development, Expo provides development builds, which compile any native code provided by libraries and provides a hot-reloading wrapper. You will need to run this package's `start` script to launch a server for the UI code and then connect to the server on the mobile app. https://docs.expo.dev/develop/development-builds/use-development-builds/[Read more here].
