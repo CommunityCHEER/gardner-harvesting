@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "949576645162",
+    "firebase_url": "https://cheer-app-prototype-default-rtdb.firebaseio.com",
+    "project_id": "cheer-app-prototype",
+    "storage_bucket": "cheer-app-prototype.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949576645162:android:321c6638d9fd4949ff6153",
+        "android_client_info": {
+          "package_name": "com.justdeeevin.cheerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "949576645162-oh7l6j9iprjj37snjkv8d4t4bjo2jbgu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.justdeeevin.cheerapp",
+            "certificate_hash": "78c3e96a141637d0066dcd41fc6179fefc5bbb8a"
+          }
+        },
+        {
+          "client_id": "949576645162-bhtqb4nf90f9avb9hlbngl8e9qgpifai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYoUoIPT_ncw579VHrfe5P-pYxMD-gY2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "949576645162-bhtqb4nf90f9avb9hlbngl8e9qgpifai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
