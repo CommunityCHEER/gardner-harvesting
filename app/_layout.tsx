@@ -1,7 +1,6 @@
 import { Stack } from 'expo-router/stack';
 import {
   firebaseContext,
-  loggedInContext,
   FirebaseContext,
   participationContext,
 } from '@/context';
@@ -22,16 +21,6 @@ export default function Layout() {
     realtime,
   });
   const auth = firebaseState.auth;
-
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
-    }
-  });
 
   const [participationLogged, setParticipationLogged] = useState(false);
   useEffect(() => {
@@ -58,13 +47,11 @@ export default function Layout() {
       value={[participationLogged, setParticipationLogged]}
     >
       <i18nContext.Provider value={i18n}>
-        <loggedInContext.Provider value={loggedIn}>
-          <firebaseContext.Provider value={firebaseState}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </firebaseContext.Provider>
-        </loggedInContext.Provider>
+        <firebaseContext.Provider value={firebaseState}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </firebaseContext.Provider>
       </i18nContext.Provider>
     </participationContext.Provider>
   );

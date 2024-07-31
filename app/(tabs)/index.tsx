@@ -2,7 +2,6 @@ import { Text } from 'react-native';
 import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
-import { loggedInContext } from '@/context';
 import { Link } from 'expo-router';
 import { styles } from '@/constants/style';
 import HarvestForm from '@/components/HarvestForm';
@@ -14,11 +13,11 @@ import { Participation, Garden } from '@/types/firestore';
 import { getDateString } from '@/utility/functions';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Index() {
-  const loggedIn = useContext(loggedInContext);
-
   const { db, auth } = useContext(firebaseContext);
+  const loggedIn = !!useAuthState(auth)[0];
 
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);

@@ -2,13 +2,16 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { useContext } from 'react';
 import { i18nContext } from '@/i18n';
-import { loggedInContext } from '@/context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { firebaseContext } from '@/context';
 
 export default function TabLayout() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
 
-  const loggedIn = useContext(loggedInContext);
+  const { auth } = useContext(firebaseContext);
+
+  const loggedIn = !!useAuthState(auth)[0];
 
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>

@@ -4,11 +4,7 @@ import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
-import {
-  participationContext,
-  firebaseContext,
-  loggedInContext,
-} from '@/context';
+import { participationContext, firebaseContext } from '@/context';
 import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import {
@@ -19,6 +15,7 @@ import { Calendar } from 'react-native-calendars';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { getDateString } from '@/utility/functions';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Participation() {
   const i18n = useContext(i18nContext);
@@ -50,7 +47,7 @@ export default function Participation() {
     useContext(participationContext);
 
   const { db, auth } = useContext(firebaseContext);
-  const loggedIn = useContext(loggedInContext);
+  const loggedIn = !!useAuthState(auth)[0];
 
   const logParticipation = async () => {
     setParticipationLogged(true);
