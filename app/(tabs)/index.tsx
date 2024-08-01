@@ -109,7 +109,7 @@ export default function Index() {
           </Link>
         </>
       )}
-      <Toast />
+      <Toast position="bottom" />
     </SafeAreaView>
   );
 }
