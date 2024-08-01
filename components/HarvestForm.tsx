@@ -121,6 +121,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
   );
 
   const submit = async () => {
+    Keyboard.dismiss();
+
     const realtimeHarvest: RealtimeHarvest = {
       person: auth.currentUser?.uid ?? '',
       measures: [
@@ -183,6 +185,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
           textStyle={styles.text}
           searchable={true}
           searchPlaceholder="Search..."
+          onPress={Keyboard.dismiss}
         />
       )}
       {crop && !unit && <ActivityIndicator />}

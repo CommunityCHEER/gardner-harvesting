@@ -1,4 +1,4 @@
-import { Text } from 'react-native';
+import { Keyboard, Text } from 'react-native';
 import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
@@ -79,6 +79,7 @@ export default function Index() {
             style={styles.dropdown}
             dropDownContainerStyle={styles.dropdown}
             textStyle={styles.text}
+            onPress={Keyboard.dismiss}
           />
           {harvesting && (
             <>
