@@ -32,8 +32,7 @@ export default function Layout() {
       if (
         participationCollection.docs.find(doc => {
           const data = doc.data() as Participation;
-          const loggedDate = data.date;
-          return loggedDate === getDateString();
+          return data.date === getDateString();
         })
       )
         setParticipationLogged(true);
