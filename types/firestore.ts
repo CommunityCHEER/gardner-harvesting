@@ -39,6 +39,6 @@ export interface Crop {
     [locale: string]: { value: string };
   };
   units: {
-    [locale: string]: { value: string };
+    [id: string]: { value: string };
   };
 }
