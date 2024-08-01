@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:949576645162:android:321c6638d9fd4949ff6153",
         "android_client_info": {
-          "package_name": "com.justdeeevin.cheerapp"
+          "package_name": "com.communitycheer.gardner_harvesting"
         }
       },
       "oauth_client": [
@@ -18,8 +18,8 @@
           "client_id": "949576645162-oh7l6j9iprjj37snjkv8d4t4bjo2jbgu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.justdeeevin.cheerapp",
             "certificate_hash": "78c3e96a141637d0066dcd41fc6179fefc5bbb8a"
+            "package_name": "com.communitycheer.gardner_harvesting",
           }
         },
         {
