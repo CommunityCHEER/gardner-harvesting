@@ -25,7 +25,9 @@
       "monochromeImage": "./assets/images/monochrome.png",
       "backgroundColor": "#ffffff"
     },
-    "permissions": ["android.permission.CAMERA"],
+    "permissions": [
+      "android.permission.CAMERA"
+    ],
     "package": "com.justdeeevin.cheerapp",
     "googleServicesFile": "./google-services.json"
   },
@@ -41,10 +43,29 @@
     "react-native-vision-camera",
     "@react-native-google-signin/google-signin"
   ],
-  "experiments": { "typedRoutes": true },
-  "extra": {
-    "router": { "origin": false },
-    "eas": { "projectId": "5a837642-5310-476b-9326-03de8e42f05a" }
+  "experiments": {
+    "typedRoutes": true
   },
-  "platforms": ["ios", "android"]
+  "extra": {
+    "router": {
+      "origin": false
+    }
+  },
+  "platforms": [
+    "ios",
+    "android"
+  ],
+  "expo": {
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a8e113ab-c474-4063-bd7e-7f15e8db1c66"
+      }
+    },
+    "android": {
+      "package": "com.communitycheer.gardner_harvesting"
+    }
+  }
 }
