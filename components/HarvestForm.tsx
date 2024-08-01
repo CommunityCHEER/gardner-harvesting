@@ -25,6 +25,7 @@ import {
   HarvestMeasure,
   RealtimeHarvest,
   Participation,
+  Unit,
 } from '@/types/firestore';
 import Toast from 'react-native-toast-message';
 import { ref, set } from 'firebase/database';
@@ -43,7 +44,11 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
   const [crop, setCrop] = useState<string | null>(null);
-  const [unit, setUnit] = useState<{ id: string; name: string } | null>(null);
+  const [unit, setUnit] = useState<{
+    id: string;
+    name: string;
+    fractional: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const effect = async () => {
@@ -71,11 +76,15 @@ export default function HarvestForm({ garden }: { garden: string }) {
         const unitDoc = (
           await getDoc(doc(db, 'crops', crop, 'units', 'required'))
         ).data()?.value as DocumentReference;
+        const unitData = (
+          await getDoc(doc(db, 'cropUnits', unitDoc.id))
+        ).data() as Unit;
         setUnit({
           id: unitDoc.id,
           name: (
             await getDoc(doc(db, 'cropUnits', unitDoc.id, 'name', locale))
           ).data()?.value,
+          fractional: unitData?.fractional,
         });
       }
     };
@@ -191,8 +200,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
               keyboardType="numeric"
               value={measure?.toString()}
               onChangeText={text => {
-                if (text === '.') setMeasure(text);
-                else if (
+                if (
                   !(
                     text.startsWith('.') && (text.match(/\./g) ?? []).length > 1
                   )
@@ -201,7 +209,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
                     text.replace(/,|-| /g, '').replace(
                       // matches the possible text, capturing only the desired output
                       /(\.?)\.*([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                      '$1$2$3$4'
+                      `${unit.fractional ? '$1' : ''}$2${unit.fractional ? '$3$4' : ''}`
                     )
                   );
               }}
@@ -215,8 +223,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
             <Text style={styles.text}>
               {t('totalToday')}:{' '}
               {totalToday.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                minimumFractionDigits: unit.fractional ? 2 : 0,
+                maximumFractionDigits: unit.fractional ? 2 : 0,
               })}
             </Text>
           )}

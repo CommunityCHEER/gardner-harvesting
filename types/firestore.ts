@@ -33,6 +33,12 @@ export interface Participation {
   garden: DocumentReference;
 }
 
+export interface Unit {
+  abbreviation: string;
+  fractional: boolean;
+  ezID: string;
+}
+
 export interface Crop {
   ezID: string;
   name: {
