@@ -99,6 +99,12 @@ export default function HarvestForm({ garden }: { garden: string }) {
     measureInputRef.current?.blur();
   });
 
+  useEffect(() => {
+    setCrop(null);
+    setUnit(null);
+    setMeasure('');
+  }, [garden]);
+
   const [participationLogged, setParticipationLogged] =
     useContext(participationContext);
 
