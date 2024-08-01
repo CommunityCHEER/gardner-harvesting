@@ -21,7 +21,8 @@
   },
   "android": {
     "adaptiveIcon": {
-      "foregroundImage": "./assets/images/adaptive-icon.png",
+      "foregroundImage": "./assets/images/splash.png",
+      "monochromeImage": "./assets/images/monochrome.png",
       "backgroundColor": "#ffffff"
     },
     "permissions": ["android.permission.CAMERA"],
