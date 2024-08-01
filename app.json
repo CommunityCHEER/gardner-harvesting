@@ -55,17 +55,9 @@
     "ios",
     "android"
   ],
-  "expo": {
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "a8e113ab-c474-4063-bd7e-7f15e8db1c66"
-      }
     },
-    "android": {
-      "package": "com.communitycheer.gardner_harvesting"
+    "eas": {
+      "projectId": "a8e113ab-c474-4063-bd7e-7f15e8db1c66"
     }
   }
 }
