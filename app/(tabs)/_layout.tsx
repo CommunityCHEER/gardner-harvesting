@@ -14,13 +14,20 @@ export default function TabLayout() {
   const loggedIn = !!useAuthState(auth)[0];
 
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: 'blue',
+        headerShown: false,
+        tabBarStyle: { height: 60 },
+        tabBarLabelStyle: { fontSize: 18 },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: t('harvest'),
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="shopping-basket" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome size={size} name="shopping-basket" color={color} />
           ),
         }}
       />
@@ -30,8 +37,8 @@ export default function TabLayout() {
           // Here, `undefined` makes it use the tab name as the href
           href: loggedIn ? undefined : null,
           title: t('participation'),
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="calendar-check-o" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome size={size} name="calendar-check-o" color={color} />
           ),
         }}
       />
@@ -39,8 +46,8 @@ export default function TabLayout() {
         name="user"
         options={{
           title: t('user'),
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="user" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome size={size} name="user" color={color} />
           ),
         }}
       />
