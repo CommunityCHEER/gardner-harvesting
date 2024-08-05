@@ -8,6 +8,15 @@
   "orientation": "portrait",
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/icon.png",
+  "scheme": "gardner-harvesting",
+  "extra": {
+    "router": {
+      "origin": false
+    },
+    "eas": {
+      "projectId": "a8e113ab-c474-4063-bd7e-7f15e8db1c66"
+    }
+  },
   "plugins": [
     "expo-router",
     "expo-apple-authentication",
@@ -31,27 +40,14 @@
   "android": {
     "package": "com.communitycheer.gardner_harvesting",
     "adaptiveIcon": {
-      "foregroundImage": "./assets/images/splash.png",
+      "foregroundImage": "./assets/images/adaptive_icon.png",
       "monochromeImage": "./assets/images/monochrome.png",
       "backgroundColor": "#ffffff"
     },
     "permissions": ["android.permission.CAMERA"],
     "googleServicesFile": "./google-services.json"
   },
-  "web": {
-    "bundler": "metro",
-    "output": "static",
-    "favicon": "./assets/images/favicon.png"
-  },
   "experiments": {
     "typedRoutes": true
-  },
-  "extra": {
-    "router": {
-      "origin": false
-    },
-    "eas": {
-      "projectId": "a8e113ab-c474-4063-bd7e-7f15e8db1c66"
-    }
   }
 }

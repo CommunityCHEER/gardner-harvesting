@@ -18,8 +18,8 @@
           "client_id": "949576645162-oh7l6j9iprjj37snjkv8d4t4bjo2jbgu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "certificate_hash": "78c3e96a141637d0066dcd41fc6179fefc5bbb8a"
-            "package_name": "com.communitycheer.gardner_harvesting",
+            "certificate_hash": "78c3e96a141637d0066dcd41fc6179fefc5bbb8a",
+            "package_name": "com.communitycheer.gardner_harvesting"
           }
         },
         {
@@ -46,3 +46,4 @@
   ],
   "configuration_version": "1"
 }
+
