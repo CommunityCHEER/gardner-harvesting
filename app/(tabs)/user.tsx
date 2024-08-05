@@ -59,6 +59,7 @@ export default function User() {
           userInfo = {
             firstName: firstName ?? '',
             lastName: lastName ?? '',
+            role: '',
           };
           setDoc(doc(db, 'people', fireUser.uid), userInfo);
         }

@@ -3,6 +3,7 @@ import { DocumentReference } from 'firebase/firestore';
 export interface User {
   firstName: string;
   lastName: string;
+  role: string;
 }
 
 export interface Harvest {
