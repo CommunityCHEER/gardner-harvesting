@@ -10,24 +10,26 @@ import { useState, useEffect } from 'react';
 import { getDocs, collection } from 'firebase/firestore';
 import { getDateString } from '@/utility/functions';
 import { Participation } from '@/types/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Layout() {
   const i18n = useI18n();
 
-  const [firebaseState, _setFirebaseState] = useState<FirebaseContext>({
+  const firebaseState: FirebaseContext = {
     auth: authImport,
     db,
     storage,
     realtime,
-  });
-  const auth = firebaseState.auth;
+  };
+  const auth = useAuthState(firebaseState.auth)[0];
 
   const [participationLogged, setParticipationLogged] = useState(false);
   useEffect(() => {
     const effect = async () => {
-      if (!auth.currentUser?.uid) return;
+      if (!auth?.uid) return;
+      console.warn('checking for participation');
       const participationCollection = await getDocs(
-        collection(db, 'people', auth.currentUser?.uid ?? '', 'participation')
+        collection(db, 'people', auth?.uid ?? '', 'participation')
       );
       if (
         participationCollection.docs.find(doc => {
@@ -39,7 +41,7 @@ export default function Layout() {
     };
 
     effect();
-  }, [auth.currentUser?.uid]);
+  }, [auth]);
 
   return (
     <participationContext.Provider
