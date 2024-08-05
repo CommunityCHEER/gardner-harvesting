@@ -217,8 +217,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
                   setMeasure(
                     text.replace(/,|-| /g, '').replace(
                       // matches the possible text, capturing only the desired output
-                      /(\.?)\.*([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                      `${unit.fractional ? '$1' : ''}$2${unit.fractional ? '$3$4' : ''}`
+                      /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
+                      `${unit.fractional ? '$1' : ''}${unit.fractional && text.startsWith('.') ? '$2' : '$2$3'}${unit.fractional ? '$4$5' : ''}`
                     )
                   );
               }}
