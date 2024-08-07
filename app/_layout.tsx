@@ -27,7 +27,6 @@ export default function Layout() {
   useEffect(() => {
     const effect = async () => {
       if (!auth?.uid) return;
-      console.warn('checking for participation');
       const participationCollection = await getDocs(
         collection(db, 'people', auth?.uid ?? '', 'participation')
       );
