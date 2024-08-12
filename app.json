@@ -35,7 +35,8 @@
     "infoPlist": {
       "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera"
     },
-    "usesAppleSignIn": true
+    "usesAppleSignIn": true,
+    "googleServicesFile": "./GoogleService-Info.plist"
   },
   "android": {
     "package": "com.communitycheer.gardner_harvesting",
