@@ -122,18 +122,21 @@ export default function User() {
       )}
       {fireUser && !userInfo && <ActivityIndicator />}
       {!fireUser && (
-        <GoogleSigninButton
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Dark}
-          onPress={signInGoogle}
-        />
+        <>
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={signInGoogle}
+          />
+          {/* Will not render if apple authentication isn't available :D */}
+          <Apple.AppleAuthenticationButton
+            buttonType={Apple.AppleAuthenticationButtonType.SIGN_IN}
+            style={{ width: 200, height: 44 }}
+            buttonStyle={Apple.AppleAuthenticationButtonStyle.BLACK}
+            onPress={signInApple}
+          />
+        </>
       )}
-      {/* Will not render if apple authentication isn't available :D */}
-      <Apple.AppleAuthenticationButton
-        buttonType={Apple.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={Apple.AppleAuthenticationButtonStyle.BLACK}
-        onPress={signInApple}
-      />
     </SafeAreaView>
   );
 }
