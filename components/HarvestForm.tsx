@@ -1,11 +1,5 @@
-import { useState, useEffect, useContext, useRef } from 'react';
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  Keyboard,
-  TextInput,
-} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, ActivityIndicator, Keyboard } from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
@@ -31,6 +25,13 @@ import Toast from 'react-native-toast-message';
 import { ref, set } from 'firebase/database';
 import { useList } from 'react-firebase-hooks/database';
 import { getDateString } from '@/utility/functions';
+import MeasureInput from './MeasureInput';
+
+export interface DisplayUnit {
+  id: string;
+  name: string;
+  fractional: boolean;
+}
 
 export default function HarvestForm({ garden }: { garden: string }) {
   const locales = useLocales();
@@ -44,11 +45,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
   const [crop, setCrop] = useState<string | null>(null);
-  const [unit, setUnit] = useState<{
-    id: string;
-    name: string;
-    fractional: boolean;
-  } | null>(null);
+  const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
+  const [optionalUnits, setOptionalUnits] = useState<DisplayUnit[]>([]);
 
   useEffect(() => {
     const effect = async () => {
@@ -71,38 +69,41 @@ export default function HarvestForm({ garden }: { garden: string }) {
 
   useEffect(() => {
     const effect = async () => {
-      if (!crop) setUnit(null);
-      else {
-        const unitDoc = (
-          await getDoc(doc(db, 'crops', crop, 'units', 'required'))
-        ).data()?.value as DocumentReference;
-        const unitData = (
-          await getDoc(doc(db, 'cropUnits', unitDoc.id))
-        ).data() as Unit;
-        setUnit({
-          id: unitDoc.id,
-          name: (
-            await getDoc(doc(db, 'cropUnits', unitDoc.id, 'name', locale))
-          ).data()?.value,
-          fractional: unitData?.fractional,
-        });
+      setRequiredMeasure('');
+      setOptionalMeasures([]);
+      if (!crop) {
+        setRequiredUnit(null);
+        setOptionalUnits([]);
+      } else {
+        (await getDocs(collection(db, 'crops', crop, 'units'))).forEach(
+          async document => {
+            const unitDoc = await getDoc(
+              document.data()?.value as DocumentReference
+            );
+            const unitData = unitDoc.data() as Unit;
+            const displayUnit: DisplayUnit = {
+              id: unitDoc.id,
+              name: (
+                await getDoc(doc(db, 'cropUnits', unitDoc.id, 'name', locale))
+              ).data()?.value,
+              fractional: unitData?.fractional,
+            };
+
+            if (document.id === 'required') setRequiredUnit(displayUnit);
+            else setOptionalUnits([displayUnit]);
+          }
+        );
       }
     };
 
     effect();
   }, [crop, locale]);
 
-  const [measure, setMeasure] = useState<string>('');
-
-  const measureInputRef = useRef<TextInput>(null);
-  Keyboard.addListener('keyboardDidHide', () => {
-    measureInputRef.current?.blur();
-  });
+  const [requiredMeasure, setRequiredMeasure] = useState<string>('');
+  const [optionalMeasures, setOptionalMeasures] = useState<string[]>([]);
 
   useEffect(() => {
     setCrop(null);
-    setUnit(null);
-    setMeasure('');
   }, [garden]);
 
   const [participationLogged, setParticipationLogged] =
@@ -129,14 +130,24 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const submit = async () => {
     Keyboard.dismiss();
 
+    const measures: HarvestMeasure[] = [];
+    measures.push({
+      unit: doc(db, 'cropUnits', requiredUnit?.id ?? ''),
+      measure: parseFloat(requiredMeasure),
+    });
+    optionalMeasures.forEach((measure, index) => {
+      if (measure !== '.')
+        measures.push({
+          unit: doc(db, 'cropUnits', optionalUnits[index].id),
+          measure: parseFloat(measure),
+        });
+    });
+
     const realtimeHarvest: RealtimeHarvest = {
       person: auth.currentUser?.uid ?? '',
-      measures: [
-        {
-          unit: `cropUnits/${unit?.id ?? ''}`,
-          measure: parseFloat(measure),
-        },
-      ],
+      measures: measures.map(measure => {
+        return { unit: measure.unit.path, measure: measure.measure };
+      }),
     };
 
     set(ref(realtime, `harvests/${getDateString()}/${garden}/${crop}`), [
@@ -152,13 +163,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
     };
 
     const newHarvest = await addDoc(collection(db, 'harvests'), harvest);
-    const harvestMeasure: HarvestMeasure = {
-      unit: doc(db, 'cropUnits', unit?.id ?? ''),
-      measure: parseFloat(measure),
-    };
-    addDoc(
-      collection(db, 'harvests', newHarvest.id, 'measures'),
-      harvestMeasure
+    measures.forEach(measure =>
+      addDoc(collection(db, 'harvests', newHarvest.id, 'measures'), measure)
     );
 
     if (!participationLogged) logParticipation();
@@ -174,6 +180,31 @@ export default function HarvestForm({ garden }: { garden: string }) {
       harvests.reduce((acc, harvest) => acc + harvest.measures[0].measure, 0)
     );
   }, [crop, garden, harvestsData]);
+
+  const [optionalInputs, setOptionalInputs] = useState<React.JSX.Element[]>([]);
+
+  useEffect(() => {
+    if (!crop) return;
+    let inputs: React.JSX.Element[] = [];
+
+    optionalUnits.forEach(unit => {
+      const key = inputs.length;
+      inputs.push(
+        <MeasureInput
+          key={key}
+          measure={optionalMeasures[key]}
+          setMeasure={measure => {
+            optionalMeasures[key] = measure;
+            setOptionalMeasures([...optionalMeasures]);
+          }}
+          unit={unit}
+          optional
+        />
+      );
+    });
+
+    setOptionalInputs(inputs);
+  }, [optionalUnits, optionalMeasures]);
 
   return (
     <View style={styles.centeredView}>
@@ -194,52 +225,30 @@ export default function HarvestForm({ garden }: { garden: string }) {
           onPress={Keyboard.dismiss}
         />
       )}
-      {crop && !unit && <ActivityIndicator />}
-      {unit && (
+      {crop && !requiredUnit && <ActivityIndicator />}
+      {requiredUnit && (
         <>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <TextInput
-              ref={measureInputRef}
-              keyboardType="numeric"
-              value={measure?.toString()}
-              onChangeText={text => {
-                if (
-                  !(
-                    text.startsWith('.') && (text.match(/\./g) ?? []).length > 1
-                  )
-                )
-                  setMeasure(
-                    text.replace(/,|-| /g, '').replace(
-                      // matches the possible text, capturing only the desired output
-                      /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                      `${unit.fractional ? '$1' : ''}${unit.fractional && text.startsWith('.') ? '$2' : '$2$3'}${unit.fractional ? '$4$5' : ''}`
-                    )
-                  );
-              }}
-              style={styles.input}
-            />
-            <Text style={styles.text}>{unit?.name}</Text>
-          </View>
+          <MeasureInput
+            measure={requiredMeasure}
+            setMeasure={setRequiredMeasure}
+            unit={requiredUnit}
+          />
+          {optionalInputs}
           {harvestsLoading ? (
             <ActivityIndicator />
           ) : (
             <Text style={styles.text}>
               {t('totalToday')}:{' '}
               {totalToday.toLocaleString(undefined, {
-                minimumFractionDigits: unit.fractional ? 2 : 0,
-                maximumFractionDigits: unit.fractional ? 2 : 0,
-              })}
+                minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
+                maximumFractionDigits: requiredUnit.fractional ? 2 : 0,
+              })}{' '}
+              {requiredUnit.name}
             </Text>
           )}
         </>
       )}
-      {measure && measure !== '.' && (
+      {requiredMeasure && requiredMeasure !== '.' && (
         <Button title={t('submit')} onPress={submit} />
       )}
     </View>

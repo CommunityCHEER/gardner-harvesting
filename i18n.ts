@@ -20,6 +20,7 @@ const translations = {
     totalToday: 'Total today',
     startHarvest: 'START HARVESTING',
     back: 'BACK',
+    optional: 'optional',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -38,6 +39,7 @@ const translations = {
     totalToday: 'Total hoy',
     startHarvest: 'EMPEZAR A COSECHAR',
     back: 'REGRESA',
+    optional: 'opcional',
   },
 };
 
