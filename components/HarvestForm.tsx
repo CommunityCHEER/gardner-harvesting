@@ -208,23 +208,21 @@ export default function HarvestForm({ garden }: { garden: string }) {
 
   return (
     <View style={styles.centeredView}>
-      {garden && (
-        <DropDownPicker
-          placeholder={t('selectCrop')}
-          open={cropListOpen}
-          setOpen={setCropListOpen}
-          value={crop}
-          setValue={setCrop}
-          items={crops}
-          setItems={setCrops}
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdown}
-          textStyle={styles.text}
-          searchable={true}
-          searchPlaceholder="Search..."
-          onPress={Keyboard.dismiss}
-        />
-      )}
+      <DropDownPicker
+        placeholder={t('selectCrop')}
+        open={cropListOpen}
+        setOpen={setCropListOpen}
+        value={crop}
+        setValue={setCrop}
+        items={crops}
+        setItems={setCrops}
+        style={styles.dropdown}
+        dropDownContainerStyle={styles.dropdown}
+        textStyle={styles.text}
+        searchable={true}
+        searchPlaceholder="Search..."
+        onPress={Keyboard.dismiss}
+      />
       {crop && !requiredUnit && <ActivityIndicator />}
       {requiredUnit && (
         <>
