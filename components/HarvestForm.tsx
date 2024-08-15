@@ -22,11 +22,12 @@ import {
   Unit,
 } from '@/types/firestore';
 import Toast from 'react-native-toast-message';
-import { ref, set } from 'firebase/database';
+import { ref as realtimeRef, set } from 'firebase/database';
 import { useList } from 'react-firebase-hooks/database';
 import { getDateString } from '@/utility/functions';
 import MeasureInput from './MeasureInput';
 import { ImagePickerAsset, launchCameraAsync } from 'expo-image-picker';
+import { ref, uploadBytes } from 'firebase/storage';
 
 export interface DisplayUnit {
   id: string;
@@ -41,7 +42,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
 
-  const { db, auth, realtime } = useContext(firebaseContext);
+  const { db, auth, realtime, storage } = useContext(firebaseContext);
 
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
@@ -125,10 +126,14 @@ export default function HarvestForm({ garden }: { garden: string }) {
   };
 
   const [harvestsData, harvestsLoading, _] = useList(
-    ref(realtime, `harvests/${getDateString()}/${garden}/${crop}`)
+    realtimeRef(realtime, `harvests/${getDateString()}/${garden}/${crop}`)
   );
 
+  const [submitting, setSubmitting] = useState(false);
+
   const submit = async () => {
+    setSubmitting(true);
+
     Keyboard.dismiss();
 
     const measures: HarvestMeasure[] = [];
@@ -151,10 +156,13 @@ export default function HarvestForm({ garden }: { garden: string }) {
       }),
     };
 
-    set(ref(realtime, `harvests/${getDateString()}/${garden}/${crop}`), [
-      realtimeHarvest,
-      ...(harvestsData?.map(harvest => harvest.val() as Harvest) ?? []),
-    ]);
+    set(
+      realtimeRef(realtime, `harvests/${getDateString()}/${garden}/${crop}`),
+      [
+        realtimeHarvest,
+        ...(harvestsData?.map(harvest => harvest.val() as Harvest) ?? []),
+      ]
+    );
 
     const harvest: Harvest = {
       date: getDateString(),
@@ -169,6 +177,23 @@ export default function HarvestForm({ garden }: { garden: string }) {
     );
 
     if (!participationLogged) logParticipation();
+
+    if (!image) {
+      setSubmitting(false);
+      return;
+    }
+
+    const imageRef = ref(storage, `harvests/${newHarvest.id}`);
+    const res = await fetch(image?.uri as string);
+    const blob = await res.blob();
+    uploadBytes(imageRef, blob)
+      .then(() => setSubmitting(false))
+      .catch(handleSubmitError);
+  };
+
+  const handleSubmitError = (error: any) => {
+    setSubmitting(false);
+    Toast.show({ type: 'Error submitting harvest', text1: error.message });
   };
 
   const [totalToday, setTotalToday] = useState(0);
@@ -267,9 +292,13 @@ export default function HarvestForm({ garden }: { garden: string }) {
           )}
         </>
       )}
-      {requiredMeasure && requiredMeasure !== '.' && (
-        <Button title={t('submit')} onPress={submit} />
-      )}
+      {requiredMeasure &&
+        requiredMeasure !== '.' &&
+        (submitting ? (
+          <ActivityIndicator />
+        ) : (
+          <Button title={t('submit')} onPress={submit} />
+        ))}
     </View>
   );
 }
