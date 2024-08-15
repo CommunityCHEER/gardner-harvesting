@@ -219,7 +219,15 @@ export default function HarvestForm({ garden }: { garden: string }) {
           setImage(result.assets[0]);
         }}
       />
-      {image && <Image src={image.uri} style={styles.image} />}
+      {image && (
+        <Image
+          src={image.uri}
+          style={{
+            aspectRatio: image.width / image.height,
+            height: Math.min(image.height / 15, 300),
+          }}
+        />
+      )}
       <DropDownPicker
         placeholder={t('selectCrop')}
         open={cropListOpen}
