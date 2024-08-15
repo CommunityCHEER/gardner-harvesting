@@ -214,6 +214,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
       <Button
         title={t('takePhoto')}
         onPress={async () => {
+          Keyboard.dismiss();
           const result = await launchCameraAsync();
           if (result.canceled) return;
           setImage(result.assets[0]);
