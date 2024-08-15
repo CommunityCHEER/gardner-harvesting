@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, ActivityIndicator, Keyboard, Image } from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
@@ -26,6 +26,7 @@ import { ref, set } from 'firebase/database';
 import { useList } from 'react-firebase-hooks/database';
 import { getDateString } from '@/utility/functions';
 import MeasureInput from './MeasureInput';
+import { ImagePickerAsset, launchCameraAsync } from 'expo-image-picker';
 
 export interface DisplayUnit {
   id: string;
@@ -206,8 +207,19 @@ export default function HarvestForm({ garden }: { garden: string }) {
     setOptionalInputs(inputs);
   }, [optionalUnits, optionalMeasures]);
 
+  const [image, setImage] = useState<ImagePickerAsset>();
+
   return (
     <View style={styles.centeredView}>
+      <Button
+        title={t('takePhoto')}
+        onPress={async () => {
+          const result = await launchCameraAsync();
+          if (result.canceled) return;
+          setImage(result.assets[0]);
+        }}
+      />
+      {image && <Image src={image.uri} style={styles.image} />}
       <DropDownPicker
         placeholder={t('selectCrop')}
         open={cropListOpen}

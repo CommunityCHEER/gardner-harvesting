@@ -21,7 +21,7 @@
     "expo-router",
     "expo-apple-authentication",
     "expo-localization",
-    "react-native-vision-camera",
+    "expo-image-picker",
     "@react-native-google-signin/google-signin"
   ],
   "splash": {

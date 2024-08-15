@@ -22,4 +22,6 @@ export const styles = StyleSheet.create({
   text: {
     fontSize: 20,
   },
+
+  image: { width: 280, height: 200 },
 });
