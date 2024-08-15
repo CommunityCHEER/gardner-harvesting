@@ -32,9 +32,6 @@
   "ios": {
     "bundleIdentifier": "com.communitycheer.gardner-harvesting",
     "supportsTablet": true,
-    "infoPlist": {
-      "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera"
-    },
     "usesAppleSignIn": true,
     "googleServicesFile": "./GoogleService-Info.plist"
   },
@@ -45,7 +42,6 @@
       "monochromeImage": "./assets/images/monochrome.png",
       "backgroundColor": "#ffffff"
     },
-    "permissions": ["android.permission.CAMERA"],
     "googleServicesFile": "./google-services.json"
   },
   "experiments": {

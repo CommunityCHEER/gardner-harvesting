@@ -26,7 +26,11 @@ import { ref as realtimeRef, set } from 'firebase/database';
 import { useList } from 'react-firebase-hooks/database';
 import { getDateString } from '@/utility/functions';
 import MeasureInput from './MeasureInput';
-import { ImagePickerAsset, launchCameraAsync } from 'expo-image-picker';
+import {
+  ImagePickerAsset,
+  launchCameraAsync,
+  requestCameraPermissionsAsync,
+} from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
 
 export interface DisplayUnit {
@@ -136,64 +140,77 @@ export default function HarvestForm({ garden }: { garden: string }) {
 
     Keyboard.dismiss();
 
-    const measures: HarvestMeasure[] = [];
-    measures.push({
-      unit: doc(db, 'cropUnits', requiredUnit?.id ?? ''),
-      measure: parseFloat(requiredMeasure),
-    });
-    optionalMeasures.forEach((measure, index) => {
-      if (measure !== '.')
-        measures.push({
-          unit: doc(db, 'cropUnits', optionalUnits[index].id),
-          measure: parseFloat(measure),
+    try {
+      const measures: HarvestMeasure[] = [];
+      measures.push({
+        unit: doc(db, 'cropUnits', requiredUnit?.id ?? ''),
+        measure: parseFloat(requiredMeasure),
+      });
+      optionalMeasures.forEach((measure, index) => {
+        if (measure !== '.' && measure !== '')
+          measures.push({
+            unit: doc(db, 'cropUnits', optionalUnits[index].id),
+            measure: parseFloat(measure),
+          });
+      });
+
+      const realtimeHarvest: RealtimeHarvest = {
+        person: auth.currentUser?.uid ?? '',
+        measures: measures.map(measure => {
+          return { unit: measure.unit.path, measure: measure.measure };
+        }),
+      };
+
+      set(
+        realtimeRef(realtime, `harvests/${getDateString()}/${garden}/${crop}`),
+        [
+          realtimeHarvest,
+          ...(harvestsData?.map(harvest => harvest.val() as Harvest) ?? []),
+        ]
+      );
+
+      const harvest: Harvest = {
+        date: getDateString(),
+        person: doc(db, 'people', auth.currentUser?.uid ?? ''),
+        garden: doc(db, 'gardens', garden),
+        crop: doc(db, 'crops', crop ?? ''),
+      };
+
+      const newHarvest = await addDoc(collection(db, 'harvests'), harvest);
+      measures.forEach(measure =>
+        addDoc(collection(db, 'harvests', newHarvest.id, 'measures'), measure)
+      );
+
+      if (!participationLogged) logParticipation();
+
+      if (!image) {
+        setSubmitting(false);
+        return;
+      }
+
+      const imageRef = ref(storage, `harvests/${newHarvest.id}`);
+      const res = await fetch(image?.uri as string);
+      const blob = await res.blob();
+      uploadBytes(imageRef, blob)
+        .then(() => setSubmitting(false))
+        .catch(error => {
+          setSubmitting(false);
+          console.warn(error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error uploading image',
+            text2: error.message,
+          });
         });
-    });
-
-    const realtimeHarvest: RealtimeHarvest = {
-      person: auth.currentUser?.uid ?? '',
-      measures: measures.map(measure => {
-        return { unit: measure.unit.path, measure: measure.measure };
-      }),
-    };
-
-    set(
-      realtimeRef(realtime, `harvests/${getDateString()}/${garden}/${crop}`),
-      [
-        realtimeHarvest,
-        ...(harvestsData?.map(harvest => harvest.val() as Harvest) ?? []),
-      ]
-    );
-
-    const harvest: Harvest = {
-      date: getDateString(),
-      person: doc(db, 'people', auth.currentUser?.uid ?? ''),
-      garden: doc(db, 'gardens', garden),
-      crop: doc(db, 'crops', crop ?? ''),
-    };
-
-    const newHarvest = await addDoc(collection(db, 'harvests'), harvest);
-    measures.forEach(measure =>
-      addDoc(collection(db, 'harvests', newHarvest.id, 'measures'), measure)
-    );
-
-    if (!participationLogged) logParticipation();
-
-    if (!image) {
+    } catch (e: any) {
       setSubmitting(false);
-      return;
+      console.warn(e);
+      Toast.show({
+        type: 'error',
+        text1: 'Error submitting harvest',
+        text2: e.message,
+      });
     }
-
-    const imageRef = ref(storage, `harvests/${newHarvest.id}`);
-    const res = await fetch(image?.uri as string);
-    const blob = await res.blob();
-    uploadBytes(imageRef, blob)
-      .then(() => setSubmitting(false))
-      .catch(handleSubmitError);
-  };
-
-  const handleSubmitError = (error: any) => {
-    setSubmitting(false);
-    Toast.show({ type: 'Error submitting harvest', text1: error.message });
   };
 
   const [totalToday, setTotalToday] = useState(0);
@@ -240,9 +257,12 @@ export default function HarvestForm({ garden }: { garden: string }) {
         title={t('takePhoto')}
         onPress={async () => {
           Keyboard.dismiss();
-          const result = await launchCameraAsync();
-          if (result.canceled) return;
-          setImage(result.assets[0]);
+          const permissions = await requestCameraPermissionsAsync();
+          if (permissions.granted) {
+            const result = await launchCameraAsync();
+            if (result.canceled) return;
+            setImage(result.assets[0]);
+          }
         }}
       />
       {image && (
