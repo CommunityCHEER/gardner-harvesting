@@ -186,7 +186,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
       if (!participationLogged) logParticipation();
 
       if (!image) {
-        doneSubmitting();
+        finishSubmitting();
         return;
       }
 
@@ -194,7 +194,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
       const res = await fetch(image?.uri as string);
       const blob = await res.blob();
       uploadBytes(imageRef, blob)
-        .then(() => doneSubmitting())
+        .then(() => finishSubmitting())
         .catch(error => {
           setSubmitting(false);
           console.warn(error);
@@ -215,10 +215,11 @@ export default function HarvestForm({ garden }: { garden: string }) {
     }
   };
 
-  const doneSubmitting = () => {
+  const finishSubmitting = () => {
     setSubmitting(false);
     setRequiredMeasure('');
     setOptionalMeasures([]);
+    setImage(undefined);
   }
 
   const [totalToday, setTotalToday] = useState(0);
