@@ -67,6 +67,8 @@ export default function HarvestForm({ garden }: { garden: string }) {
         });
       });
 
+      crops.sort((a, b) => a.label?.localeCompare(b.label as string) as number);
+
       setCrops(crops);
     };
 
