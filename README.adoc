@@ -21,3 +21,5 @@ I (Devin) develop on a NixOS machine, so locally building the app is a headache.
 === Expo development builds
 
 For rapid development, Expo provides development builds, which compile any native code provided by libraries and provides a hot-reloading wrapper. You will need to run this package's `start` script to launch a server for the UI code and then connect to the server on the mobile app. https://docs.expo.dev/develop/development-builds/use-development-builds/[Read more here].
+
+testing getting
