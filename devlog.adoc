@@ -138,3 +138,9 @@ I decided to add a new tab to the app that's dedicated to logging attendance on 
 === Localization - 2024-07-11
 
 A number of the CHEER's volunteers primarily speak Spanish, so proper localization is necessary. I tried using https://lingui.dev/[`lingui`], but got some strange errors with imported objects beinv undefined. I couldn't find anyone else with the same issue, so I decided to go to something else. I ended up using `i18n-js` because that's what's used in the Expo tutorial. I also created a custom hook and added a piece of context so the app would re-render when the system language changes.
+
+=== Expo for a newb dinosaur - 2024-09-28 - David Droddy
+So, I want to build things myself without a service. Looks like I need Android Studio and a JDK for that. Which helped me realize that, I will have no choice but to use the Expo build service for the iOS version unless I get my hands on a mac I can use to build the iOS version.
+
+aaaaand, the Android dev environment setup didn't go well. Problems with Watchman install mainly but then a problem with the android emulator as well.
+
