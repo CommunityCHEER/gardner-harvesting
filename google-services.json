@@ -8,18 +8,26 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:949576645162:android:321c6638d9fd4949ff6153",
+        "mobilesdk_app_id": "1:949576645162:android:35afdfd6dda2ef9eff6153",
         "android_client_info": {
           "package_name": "com.communitycheer.gardner_harvesting"
         }
       },
       "oauth_client": [
         {
-          "client_id": "949576645162-oh7l6j9iprjj37snjkv8d4t4bjo2jbgu.apps.googleusercontent.com",
+          "client_id": "949576645162-lp6954vfa2ndeedb3fsqjueuqt69kbc0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "certificate_hash": "78c3e96a141637d0066dcd41fc6179fefc5bbb8a",
-            "package_name": "com.communitycheer.gardner_harvesting"
+            "package_name": "com.communitycheer.gardner_harvesting",
+            "certificate_hash": "a116bc66b851facbb67597a2a9d586e00d6d6ac3"
+          }
+        },
+        {
+          "client_id": "949576645162-usb288la8duo6mkm68d4o9f1677qm9nt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.communitycheer.gardner_harvesting",
+            "certificate_hash": "2537a2ccf1c56e1eff3cc6df59cbf6d067518850"
           }
         },
         {
@@ -38,6 +46,13 @@
             {
               "client_id": "949576645162-bhtqb4nf90f9avb9hlbngl8e9qgpifai.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "949576645162-dtp00nhppb565p16jo8b765ubooq6ot4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.communitycheer.gardner-harvesting"
+              }
             }
           ]
         }
@@ -46,4 +61,3 @@
   ],
   "configuration_version": "1"
 }
-
