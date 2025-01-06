@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Text, ActivityIndicator, TextInput } from 'react-native';
+import { Text, ActivityIndicator, TextInput, Alert } from 'react-native';
 import Button from '@/components/Button';
 import { firebaseContext } from '@/context';
 import {
@@ -108,7 +108,40 @@ export default function User() {
     setFireUser(res.user);
   };
 
+  const validateEmail = (email: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    const passwordPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*.,'"?/]).{12,50}$/;
+    return passwordPattern.test(password);
+  };
+
   const handleEmailPasswordAuth = async () => {
+    if (isSignUp) {
+      if (firstName.length < 2 || firstName.length > 50) {
+        Alert.alert('Error', 'First Name must be between 2 and 50 characters.');
+        return;
+      }
+      if (lastName.length < 2 || lastName.length > 50) {
+        Alert.alert('Error', 'Last Name must be between 2 and 50 characters.');
+        return;
+      }
+    }
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Invalid email format.');
+      return;
+    }
+    if (!validatePassword(password)) {
+      Alert.alert(
+        'Error',
+        'Password must be between 12 and 50 characters and contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 special character.'
+      );
+      return;
+    }
+
     try {
       if (isSignUp) {
         const res = await createUserWithEmailAndPassword(auth, email, password);
@@ -126,6 +159,7 @@ export default function User() {
       }
     } catch (error) {
       console.error(error);
+      Alert.alert('Error', 'Authentication failed.');
     }
   };
 
