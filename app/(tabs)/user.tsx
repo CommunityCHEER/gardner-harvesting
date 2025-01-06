@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Text, ActivityIndicator } from 'react-native';
+import { Text, ActivityIndicator, TextInput } from 'react-native';
 import Button from '@/components/Button';
 import { firebaseContext } from '@/context';
 import {
@@ -7,6 +7,8 @@ import {
   OAuthProvider,
   signInWithCredential,
   User as FireUser,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
 import {
   GoogleSignin,
@@ -31,8 +33,14 @@ export default function User() {
   const [appleUser, setAppleUser] =
     useState<Apple.AppleAuthenticationCredential>();
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+
   const i18n = useContext(i18nContext);
-  const t = i18n.t.bind(i18n);
+  const translate = i18n.t.bind(i18n);
 
   useEffect(GoogleSignin.configure, []);
 
@@ -100,6 +108,27 @@ export default function User() {
     setFireUser(res.user);
   };
 
+  const handleEmailPasswordAuth = async () => {
+    try {
+      if (isSignUp) {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        const userInfo = {
+          firstName,
+          lastName,
+          role: '',
+        };
+        await setDoc(doc(db, 'people', res.user.uid), userInfo);
+        setUserInfo(userInfo);
+        setFireUser(res.user);
+      } else {
+        const res = await signInWithEmailAndPassword(auth, email, password);
+        setFireUser(res.user);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const signOut = () => {
     auth.signOut();
     setFireUser(undefined);
@@ -114,10 +143,10 @@ export default function User() {
       {userInfo && fireUser && (
         <>
           <Text style={styles.text}>
-            {`${t('hello')} ${userInfo.firstName} ${userInfo.lastName}`}
+            {`${translate('hello')} ${userInfo.firstName} ${userInfo.lastName}`}
           </Text>
           <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
-          <Button title={t('signOut')} onPress={signOut} />
+          <Button title={translate('signOut')} onPress={signOut} />
         </>
       )}
       {fireUser && !userInfo && <ActivityIndicator />}
@@ -134,6 +163,47 @@ export default function User() {
             style={{ width: 200, height: 44 }}
             buttonStyle={Apple.AppleAuthenticationButtonStyle.BLACK}
             onPress={signInApple}
+          />
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          {isSignUp && (
+            <>
+              <TextInput
+                placeholder="First Name"
+                value={firstName}
+                onChangeText={setFirstName}
+                style={styles.input}
+              />
+              <TextInput
+                placeholder="Last Name"
+                value={lastName}
+                onChangeText={setLastName}
+                style={styles.input}
+              />
+            </>
+          )}
+          <Button
+            title={isSignUp ? translate('signUp') : translate('signIn')}
+            onPress={handleEmailPasswordAuth}
+          />
+          <Button
+            title={
+              isSignUp
+                ? translate('switchToSignIn')
+                : translate('switchToSignUp')
+            }
+            onPress={() => setIsSignUp(!isSignUp)}
           />
         </>
       )}
