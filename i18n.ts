@@ -21,6 +21,17 @@ const translations = {
     startHarvest: 'START HARVESTING',
     back: 'BACK',
     optional: 'optional',
+    signIn: 'Login',
+    switchToSignUp: 'Register',
+    switchToSignIn: 'Switch to login',
+    or: 'or',
+    signUp: 'Register',
+    firstNameLength: 'First Name must be between 2 and 50 characters.',
+    lastNameLength: 'Last Name must be between 2 and 50 characters.',
+    invalidEmail: 'Invalid email format.',
+    invalidPassword:
+      'Password must be between 12 and 50 characters and contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 special character.',
+    emailAlreadyRegistered: 'Email already registered.',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -40,6 +51,17 @@ const translations = {
     startHarvest: 'EMPEZAR A COSECHAR',
     back: 'REGRESA',
     optional: 'opcional',
+    signIn: 'Iniciar sesión',
+    switchToSignUp: 'Inscribirse',
+    switchToSignIn: 'Cambiar a iniciar sesión',
+    or: 'o',
+    signup: 'Inscribirse',
+    firstNameLength: 'El nombre debe tener entre 2 y 50 caracteres.',
+    lastNameLength: 'El apellido debe tener entre 2 y 50 caracteres.',
+    invalidEmail: 'Formato de correo electrónico no válido.',
+    invalidPassword:
+      'La contraseña debe tener entre 12 y 50 caracteres y contener al menos 1 letra mayúscula, 1 letra minúscula, 1 número y 1 carácter especial.',
+    emailAlreadyRegistered: 'Correo electrónico ya registrado.',
   },
 };
 
