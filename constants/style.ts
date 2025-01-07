@@ -18,6 +18,15 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 20,
   },
+  loginInput: {
+    width: 300,
+    margin: 8,
+    borderWidth: 1,
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    fontSize: 20,
+  },
 
   text: {
     fontSize: 20,
