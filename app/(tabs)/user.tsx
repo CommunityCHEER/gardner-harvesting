@@ -2,6 +2,11 @@ import { useState, useEffect, useContext } from 'react';
 import { Text, ActivityIndicator, TextInput, Alert } from 'react-native';
 import Button from '@/components/Button';
 import { firebaseContext } from '@/context';
+import Toast, {
+  BaseToast,
+  BaseToastProps,
+  ToastConfig,
+} from 'react-native-toast-message';
 import {
   GoogleAuthProvider,
   OAuthProvider,
@@ -41,6 +46,59 @@ export default function User() {
 
   const i18n = useContext(i18nContext);
   const translate = i18n.t.bind(i18n);
+
+  const toastProps: BaseToastProps = {
+    text1Style: {
+      fontSize: 18,
+    },
+    text2Style: {
+      fontSize: 14,
+    },
+    text1NumberOfLines: 0,
+    style: {
+      height: 'auto',
+      paddingVertical: 10,
+      paddingHorizontal: 0,
+    },
+  };
+  const toastConfig: ToastConfig = {
+    success: (props: BaseToastProps) => (
+      <BaseToast
+        {...props}
+        {...toastProps}
+        style={[
+          toastProps.style,
+          {
+            borderLeftColor: '#69C779',
+          },
+        ]}
+      />
+    ),
+    error: (props: BaseToastProps) => (
+      <BaseToast
+        {...props}
+        {...toastProps}
+        style={[
+          toastProps.style,
+          {
+            borderLeftColor: '#FE6301',
+          },
+        ]}
+      />
+    ),
+    warning: (props: BaseToastProps) => (
+      <BaseToast
+        {...props}
+        {...toastProps}
+        style={[
+          toastProps.style,
+          {
+            borderLeftColor: '#FFC107',
+          },
+        ]}
+      />
+    ),
+  };
 
   useEffect(GoogleSignin.configure, []);
 
@@ -122,23 +180,20 @@ export default function User() {
   const handleEmailPasswordAuth = async () => {
     if (isSignUp) {
       if (firstName.length < 2 || firstName.length > 50) {
-        Alert.alert('Error', 'First Name must be between 2 and 50 characters.');
+        Toast.show({ type: 'error', text1: translate('firstNameLength') });
         return;
       }
       if (lastName.length < 2 || lastName.length > 50) {
-        Alert.alert('Error', 'Last Name must be between 2 and 50 characters.');
+        Toast.show({ type: 'error', text1: translate('lastNameLength') });
         return;
       }
     }
     if (!validateEmail(email)) {
-      Alert.alert('Error', 'Invalid email format.');
+      Toast.show({ type: 'error', text1: translate('invalidEmail') });
       return;
     }
     if (!validatePassword(password)) {
-      Alert.alert(
-        'Error',
-        'Password must be between 12 and 50 characters and contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 special character.'
-      );
+      Toast.show({ type: 'error', text1: translate('invalidPassword') });
       return;
     }
 
@@ -157,9 +212,14 @@ export default function User() {
         const res = await signInWithEmailAndPassword(auth, email, password);
         setFireUser(res.user);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Alert.alert('Error', 'Authentication failed.');
+      const errorMessage = (error.message as string).includes(
+        'email-already-in-use'
+      )
+        ? translate('emailAlreadyRegistered')
+        : error.message;
+      Toast.show({ type: 'error', text1: errorMessage });
     }
   };
 
@@ -198,39 +258,41 @@ export default function User() {
             buttonStyle={Apple.AppleAuthenticationButtonStyle.BLACK}
             onPress={signInApple}
           />
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
+          <Text style={styles.text}>{`${translate('or')}`}</Text>
           {isSignUp && (
             <>
               <TextInput
                 placeholder="First Name"
                 value={firstName}
                 onChangeText={setFirstName}
-                style={styles.input}
+                style={styles.loginInput}
               />
               <TextInput
                 placeholder="Last Name"
                 value={lastName}
                 onChangeText={setLastName}
-                style={styles.input}
+                style={styles.loginInput}
               />
             </>
           )}
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.loginInput}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.loginInput}
+          />
           <Button
             title={isSignUp ? translate('signUp') : translate('signIn')}
             onPress={handleEmailPasswordAuth}
           />
+          <Text style={styles.text}>{`${translate('or')}`}</Text>
           <Button
             title={
               isSignUp
@@ -241,6 +303,7 @@ export default function User() {
           />
         </>
       )}
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 }
