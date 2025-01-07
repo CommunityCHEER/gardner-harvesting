@@ -18,13 +18,12 @@ This app also uses Firebase for user authentication. Presently, the only means o
 
 I (Devin) develop on a NixOS machine, so locally building the app is a headache. Thus, I went for a simpler approach: EAS, Expo's cloud build service. It's surprisingly simple. You have to make your own account and sign into the EAS CLI, but then you just pick a target and profile and it'll build it for you. You can build locally with the same CLI, too, with one extra flag. 
 
-in app.json I deleted the `extra -> eas` node, then, when I did `eas build...` it first prompted me to log into EAS which added the new/replacemnt entry back to app.json so that I could use my own EAS account instead of Devins.
+In app.json I (David) deleted the `extra -> eas` node, then, when I did `eas build...` it first prompted me to log into EAS which added the new/replacemnt entry back to app.json so that I could use my own EAS account instead of Devin's.
 
-use `eas build -e development -p android` to create a new EAS build
+Use `eas build -e development -p android` to create a new EAS build. This creates a build artifact that can be installed on the Android phone and used to debug the app via the local/dev eas session.
 
 EAS Credentials (in the web app console) has the Firebase app ID and that also has a SHA key that needs to be copied over from EAS to FireBase (Project Settings, Your Apps, Android Apps, Gardner Harvesting, SHA certificate fingerprints)
 
 === Expo development builds
 
 For rapid development, Expo provides development builds, which compile any native code provided by libraries and provides a hot-reloading wrapper. You will need to run this package's `start` script to launch a server for the UI code and then connect to the server on the mobile app. https://docs.expo.dev/develop/development-builds/use-development-builds/[Read more here].
-test gcm
