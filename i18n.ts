@@ -23,7 +23,7 @@ const translations = {
     optional: 'optional',
     signIn: 'Login',
     switchToSignUp: 'Register',
-    switchToSignIn: 'Switch to login',
+    switchToSignIn: 'Login',
     or: 'or',
     signUp: 'Register',
     firstNameLength: 'First Name must be between 2 and 50 characters.',
@@ -32,6 +32,7 @@ const translations = {
     invalidPassword:
       'Password must be between 12 and 50 characters and contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 special character.',
     emailAlreadyRegistered: 'Email already registered.',
+    invalidCredential: 'Invalid email or password. Please try again.',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -53,7 +54,7 @@ const translations = {
     optional: 'opcional',
     signIn: 'Iniciar sesión',
     switchToSignUp: 'Inscribirse',
-    switchToSignIn: 'Cambiar a iniciar sesión',
+    switchToSignIn: 'Iniciar sesión',
     or: 'o',
     signup: 'Inscribirse',
     firstNameLength: 'El nombre debe tener entre 2 y 50 caracteres.',
@@ -62,6 +63,8 @@ const translations = {
     invalidPassword:
       'La contraseña debe tener entre 12 y 50 caracteres y contener al menos 1 letra mayúscula, 1 letra minúscula, 1 número y 1 carácter especial.',
     emailAlreadyRegistered: 'Correo electrónico ya registrado.',
+    invalidCredential:
+      'Correo electrónico o contraseña no válidos. Por favor, inténtelo de nuevo.',
   },
 };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Text, ActivityIndicator, TextInput, Alert } from 'react-native';
+import { Text, ActivityIndicator, TextInput } from 'react-native';
 import Button from '@/components/Button';
 import { firebaseContext } from '@/context';
 import Toast, {
@@ -218,6 +218,8 @@ export default function User() {
         'email-already-in-use'
       )
         ? translate('emailAlreadyRegistered')
+        : (error.message as string).includes('invalid-credential')
+        ? translate('invalidCredential')
         : error.message;
       Toast.show({ type: 'error', text1: errorMessage });
     }
