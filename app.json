@@ -2,11 +2,8 @@
   "name": "Gardner Harvesting",
   "description": "App for tracking and logging participation in CHEER's Long Branch Gardner Program, as well as uploading harvest data.",
   "slug": "gardner-harvesting",
-  "version": "1.0.0",
-  "platforms": [
-    "ios",
-    "android"
-  ],
+  "version": "1.2.0",
+  "platforms": ["ios", "android"],
   "githubUrl": "https://github.com/CommunityCHEER/gardner-harvesting",
   "orientation": "portrait",
   "userInterfaceStyle": "automatic",
@@ -22,10 +19,8 @@
   },
   "plugins": [
     "expo-router",
-    "expo-apple-authentication",
     "expo-localization",
     "expo-image-picker",
-    "@react-native-google-signin/google-signin",
     "expo-font"
   ],
   "splash": {
@@ -36,7 +31,6 @@
   "ios": {
     "bundleIdentifier": "com.communitycheer.gardner-harvesting",
     "supportsTablet": true,
-    "usesAppleSignIn": true,
     "googleServicesFile": "./GoogleService-Info.plist"
   },
   "android": {
@@ -47,9 +41,11 @@
       "backgroundColor": "#ffffff"
     },
     "googleServicesFile": "./google-services.json",
-    "permissions": [
-      "android.permission.RECORD_AUDIO"
-    ]
+    "blockedPermissions": [
+      "android.permission.RECORD_AUDIO",
+      "android.permission.READ_MEDIA_VIDEO"
+    ],
+    "versionCode": 6
   },
   "experiments": {
     "typedRoutes": true
