@@ -4,7 +4,7 @@ Devin Droddy <devin.droddy@gmail.com>
 
 == Purpose
 
-It's important for CHEER's Long Branch Gardners program to keep effective track of the produce collected to be able to present such data for potential grants. Additionally, gardners can receive awards for frequent participation. Originally, all of this data was collected on paper and collected by hand, then manually entered into a Google Sheet. This was cumbersome and slowly becoming messy. This app streamlines the process of data collection by providing an easy-to-use form that allows for versatile but consistently-structured uploading of harvest data, as well as a simple system for logging participation and a means of viewing past participation.
+It's important for CHEER's Long Branch Gardeners program to keep effective track of the produce collected to be able to present such data for potential grants. Additionally, gardeners can receive awards for frequent participation. Originally, all of this data was collected on paper and collected by hand, then manually entered into a Google Sheet. This was cumbersome and slowly becoming messy. This app streamlines the process of data collection by providing an easy-to-use form that allows for versatile but consistently-structured uploading of harvest data, as well as a simple system for logging participation and a means of viewing past participation.
 
 == Architecture
 
@@ -22,7 +22,7 @@ In app.json I (David) deleted the `extra -> eas` node, then, when I did `eas bui
 
 Use `eas build -e development -p android` to create a new EAS build. This creates a build artifact that can be installed on the Android phone and used to debug the app via the local/dev eas session.
 
-EAS Credentials (in the web app console) has the Firebase app ID and that also has a SHA key that needs to be copied over from EAS to FireBase (Project Settings, Your Apps, Android Apps, Gardner Harvesting, SHA certificate fingerprints)
+EAS Credentials (in the web app console) has the Firebase app ID and that also has a SHA key that needs to be copied over from EAS to FireBase (Project Settings, Your Apps, Android Apps, Gardener Harvesting, SHA certificate fingerprints)
 
 === Expo development builds
 

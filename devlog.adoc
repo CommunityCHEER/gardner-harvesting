@@ -127,7 +127,7 @@ I changed the behavior of the app upon launching. I added a welcome screen that 
 
 == Attendance
 
-Gardners who attend frequently are rewarded with credits they can use at certain farmers' markets. Thus, it's important to track attendance separately from harvests.
+Gardeners who attend frequently are rewarded with credits they can use at certain farmers' markets. Thus, it's important to track attendance separately from harvests.
 
 === Attendance tracking - 2024-07-24
 

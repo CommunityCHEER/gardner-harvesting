@@ -1,6 +1,6 @@
 {
-  "name": "Gardner Harvesting",
-  "description": "App for tracking and logging participation in CHEER's Long Branch Gardner Program, as well as uploading harvest data.",
+  "name": "Gardener Harvesting",
+  "description": "App for tracking and logging participation in CHEER's Long Branch Gardener Program, as well as uploading harvest data.",
   "slug": "gardner-harvesting",
   "version": "1.2.0",
   "platforms": ["ios", "android"],
