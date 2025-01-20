@@ -11,6 +11,7 @@ import {
   User as FireUser,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User as UserInfo } from '@/types/firestore';
@@ -30,6 +31,7 @@ export default function User() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   const i18n = useContext(i18nContext);
   const translate = i18n.t.bind(i18n);
@@ -148,6 +150,7 @@ export default function User() {
         setFireUser(res.user);
       } else {
         const res = await signInWithEmailAndPassword(auth, email, password);
+
         setFireUser(res.user);
       }
     } catch (error: any) {
@@ -160,6 +163,21 @@ export default function User() {
         ? translate('invalidCredential')
         : error.message;
       Toast.show({ type: 'error', text1: errorMessage });
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!validateEmail(resetEmail)) {
+      Toast.show({ type: 'error', text1: translate('invalidEmail') });
+      return;
+    }
+    try {
+      auth.languageCode = i18n.locale; // Set the language code
+      await sendPasswordResetEmail(auth, resetEmail);
+      Toast.show({ type: 'success', text1: translate('resetEmailSent') });
+    } catch (error: any) {
+      console.error(error);
+      Toast.show({ type: 'error', text1: error.message });
     }
   };
 
@@ -186,13 +204,13 @@ export default function User() {
           {isSignUp && (
             <>
               <TextInput
-                placeholder="First Name"
+                placeholder={translate('firstName')}
                 value={firstName}
                 onChangeText={setFirstName}
                 style={styles.loginInput}
               />
               <TextInput
-                placeholder="Last Name"
+                placeholder={translate('lastName')}
                 value={lastName}
                 onChangeText={setLastName}
                 style={styles.loginInput}
@@ -200,13 +218,13 @@ export default function User() {
             </>
           )}
           <TextInput
-            placeholder="Email"
+            placeholder={translate('email')}
             value={email}
             onChangeText={setEmail}
             style={styles.loginInput}
           />
           <TextInput
-            placeholder="Password"
+            placeholder={translate('password')}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -224,6 +242,18 @@ export default function User() {
                 : translate('switchToSignUp')
             }
             onPress={() => setIsSignUp(!isSignUp)}
+          />
+          <Text style={styles.text}>{`${translate('or')}`}</Text>
+          <Text style={styles.text}>{`${translate('qForgotPassword')}`}</Text>
+          <TextInput
+            placeholder={translate('email')}
+            value={resetEmail}
+            onChangeText={setResetEmail}
+            style={styles.loginInput}
+          />
+          <Button
+            title={translate('resetPassword')}
+            onPress={handlePasswordReset}
           />
         </>
       )}
