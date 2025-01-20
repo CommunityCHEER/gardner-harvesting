@@ -33,6 +33,14 @@ const translations = {
       'Password must be between 12 and 50 characters and contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 special character.',
     emailAlreadyRegistered: 'Email already registered.',
     invalidCredential: 'Invalid email or password. Please try again.',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    email: 'Email',
+    password: 'Password',
+    resetPassword: 'Request password reset',
+    qForgotPassword: 'Forgot your password?',
+    resetEmailSent:
+      'If we have an account with that email, a password reset email will be sent. Don`t forget to check your spam folder!',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -65,6 +73,14 @@ const translations = {
     emailAlreadyRegistered: 'Correo electrónico ya registrado.',
     invalidCredential:
       'Correo electrónico o contraseña no válidos. Por favor, inténtelo de nuevo.',
+    firstName: 'Nombre de pila',
+    lastName: 'Apellido',
+    email: 'Correo electrónico',
+    password: 'Contraseña',
+    resetPassword: 'Solicitar cambio de contraseña',
+    qForgotPassword: '¿Olvidaste tu contraseña?',
+    resetEmailSent:
+      'Si tenemos una cuenta con ese correo electrónico, se enviará un correo electrónico para restablecer la contraseña. ¡No olvides revisar tu carpeta de correo no deseado!',
   },
 };
 

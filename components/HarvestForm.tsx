@@ -220,7 +220,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
     setRequiredMeasure('');
     setOptionalMeasures([]);
     setImage(undefined);
-  }
+  };
 
   const [totalToday, setTotalToday] = useState(0);
 
