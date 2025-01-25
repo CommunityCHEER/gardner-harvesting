@@ -57,17 +57,16 @@ export default function HarvestForm({ garden }: { garden: string }) {
   useEffect(() => {
     const effect = async () => {
       const cropsCollection = await getDocs(collection(db, 'crops'));
-      const crops: ItemType<string>[] = [];
-      cropsCollection.forEach(async document => {
-        crops.push({
+      const crops: ItemType<string>[] = await Promise.all(
+        cropsCollection.docs.map(async document => ({
           value: document.id,
-          label: (
-            await getDoc(doc(db, 'crops', document.id, 'name', locale))
-          ).data()?.value,
-        });
-      });
+          label:
+            (await getDoc(doc(db, 'crops', document.id, 'name', locale))).data()
+              ?.value || '',
+        }))
+      );
 
-      crops.sort((a, b) => a.label?.localeCompare(b.label as string) as number);
+      crops.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
 
       setCrops(crops);
     };
