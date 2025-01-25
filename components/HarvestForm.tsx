@@ -65,12 +65,9 @@ export default function HarvestForm({ garden }: { garden: string }) {
               ?.value || '',
         }))
       );
-
       crops.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-
       setCrops(crops);
     };
-
     effect();
   }, [locale]);
 

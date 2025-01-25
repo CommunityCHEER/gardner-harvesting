@@ -1,5 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
-import { Text, ActivityIndicator, TextInput } from 'react-native';
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  ActivityIndicator,
+  TextInput,
+} from 'react-native';
 import Button from '@/components/Button';
 import { firebaseContext } from '@/context';
 import Toast, {
@@ -189,75 +196,87 @@ export default function User() {
 
   return (
     <SafeAreaView style={styles.centeredView}>
-      {userInfo && fireUser && (
-        <>
-          <Text style={styles.text}>
-            {`${translate('hello')} ${userInfo.firstName} ${userInfo.lastName}`}
-          </Text>
-          <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
-          <Button title={translate('signOut')} onPress={signOut} />
-        </>
-      )}
-      {!userInfo && fireUser && <ActivityIndicator />}
-      {!fireUser && (
-        <>
-          {isSignUp && (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
+      >
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          {userInfo && fireUser && (
             <>
+              <Text style={styles.text}>
+                {`${translate('hello')} ${userInfo.firstName} ${
+                  userInfo.lastName
+                }`}
+              </Text>
+              <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
+              <Button title={translate('signOut')} onPress={signOut} />
+            </>
+          )}
+          {!userInfo && fireUser && <ActivityIndicator />}
+          {!fireUser && (
+            <>
+              {isSignUp && (
+                <>
+                  <TextInput
+                    placeholder={translate('firstName')}
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    style={styles.loginInput}
+                  />
+                  <TextInput
+                    placeholder={translate('lastName')}
+                    value={lastName}
+                    onChangeText={setLastName}
+                    style={styles.loginInput}
+                  />
+                </>
+              )}
               <TextInput
-                placeholder={translate('firstName')}
-                value={firstName}
-                onChangeText={setFirstName}
+                placeholder={translate('email')}
+                value={email}
+                onChangeText={setEmail}
                 style={styles.loginInput}
               />
               <TextInput
-                placeholder={translate('lastName')}
-                value={lastName}
-                onChangeText={setLastName}
+                placeholder={translate('password')}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
                 style={styles.loginInput}
+              />
+              <Button
+                title={isSignUp ? translate('signUp') : translate('signIn')}
+                onPress={handleEmailPasswordAuth}
+              />
+              <Text style={styles.text}>{`${translate('or')}`}</Text>
+              <Button
+                title={
+                  isSignUp
+                    ? translate('switchToSignIn')
+                    : translate('switchToSignUp')
+                }
+                onPress={() => setIsSignUp(!isSignUp)}
+              />
+              <Text style={styles.text}>{`${translate('or')}`}</Text>
+              <Text style={styles.text}>{`${translate(
+                'qForgotPassword'
+              )}`}</Text>
+              <TextInput
+                placeholder={translate('email')}
+                value={resetEmail}
+                onChangeText={setResetEmail}
+                style={styles.loginInput}
+              />
+              <Button
+                title={translate('resetPassword')}
+                onPress={handlePasswordReset}
               />
             </>
           )}
-          <TextInput
-            placeholder={translate('email')}
-            value={email}
-            onChangeText={setEmail}
-            style={styles.loginInput}
-          />
-          <TextInput
-            placeholder={translate('password')}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.loginInput}
-          />
-          <Button
-            title={isSignUp ? translate('signUp') : translate('signIn')}
-            onPress={handleEmailPasswordAuth}
-          />
-          <Text style={styles.text}>{`${translate('or')}`}</Text>
-          <Button
-            title={
-              isSignUp
-                ? translate('switchToSignIn')
-                : translate('switchToSignUp')
-            }
-            onPress={() => setIsSignUp(!isSignUp)}
-          />
-          <Text style={styles.text}>{`${translate('or')}`}</Text>
-          <Text style={styles.text}>{`${translate('qForgotPassword')}`}</Text>
-          <TextInput
-            placeholder={translate('email')}
-            value={resetEmail}
-            onChangeText={setResetEmail}
-            style={styles.loginInput}
-          />
-          <Button
-            title={translate('resetPassword')}
-            onPress={handlePasswordReset}
-          />
-        </>
-      )}
-      <Toast config={toastConfig} />
+          <Toast config={toastConfig} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
