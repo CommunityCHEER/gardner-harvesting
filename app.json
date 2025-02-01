@@ -45,7 +45,7 @@
       "android.permission.RECORD_AUDIO",
       "android.permission.READ_MEDIA_VIDEO"
     ],
-    "versionCode": 7
+    "versionCode": 8
   },
   "experiments": {
     "typedRoutes": true
