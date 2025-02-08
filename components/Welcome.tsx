@@ -28,7 +28,7 @@ export default function Welcome() {
     <View>
       {fullName ? (
         <Text style={{ fontSize: 40, fontWeight: 'bold' }}>
-          {t('hello')}, {fullName}.
+          {t('hello')}, {fullName}
         </Text>
       ) : (
         <ActivityIndicator />

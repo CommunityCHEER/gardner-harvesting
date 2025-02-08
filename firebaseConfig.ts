@@ -5,6 +5,7 @@ import {
   getAuth,
   initializeAuth,
   inMemoryPersistence,
+  Auth,
 } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getDatabase } from 'firebase/database';
@@ -22,7 +23,7 @@ export const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 
-let auth;
+let auth: Auth;
 if (Platform.OS === 'web') {
   auth = getAuth(app);
   auth.setPersistence(inMemoryPersistence);
