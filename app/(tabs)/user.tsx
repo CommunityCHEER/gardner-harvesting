@@ -102,9 +102,13 @@ export default function User() {
         let userInfo = (
           await getDoc(doc(db, 'people', fireUser.uid))
         ).data() as UserInfo | undefined;
+        const idToken = await fireUser.getIdTokenResult();
         if (!userInfo) {
           setDoc(doc(db, 'people', fireUser.uid), userInfo);
         }
+        if (userInfo && idToken.claims.admin) userInfo.admin = true;
+        if (userInfo && idToken.claims.gardener) userInfo.gardener = true;
+        if (userInfo && idToken.claims.developer) userInfo.developer = true;
         setUserInfo(userInfo);
       }
     };
@@ -193,6 +197,17 @@ export default function User() {
     setFireUser(undefined);
     setUserInfo(undefined);
   };
+  const getUserRoleText = (claims: UserInfo) => {
+    if (claims.developer) {
+      return translate('youAreDeveloper');
+    } else if (claims.admin) {
+      return translate('youAreAdmin');
+    } else if (claims.gardener) {
+      return translate('youAreGardener');
+    } else {
+      return translate('youHaveNoRole');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.centeredView}>
@@ -210,6 +225,7 @@ export default function User() {
                 }`}
               </Text>
               <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
+              <Text style={styles.text}>{`${getUserRoleText(userInfo)}`}</Text>
               <Button title={translate('signOut')} onPress={signOut} />
             </>
           )}

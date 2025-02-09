@@ -41,6 +41,10 @@ const translations = {
     qForgotPassword: 'Forgot your password?',
     resetEmailSent:
       'If we have an account with that email, a password reset email will be sent. Don`t forget to check your spam folder!',
+    youAreDeveloper: 'You are a developer',
+    youAreGardener: 'You are a gardener',
+    youAreAdmin: 'You are an admin',
+    youHaveNoRole: 'You have not been assigned a role',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -81,6 +85,10 @@ const translations = {
     qForgotPassword: '¿Olvidaste tu contraseña?',
     resetEmailSent:
       'Si tenemos una cuenta con ese correo electrónico, se enviará un correo electrónico para restablecer la contraseña. ¡No olvides revisar tu carpeta de correo no deseado!',
+    youAreDeveloper: 'Eres un desarrollador',
+    youAreGardener: 'Eres un jardinero',
+    youAreAdmin: 'Eres un administrador',
+    youHaveNoRole: 'No se te ha asignado un rol',
   },
 };
 

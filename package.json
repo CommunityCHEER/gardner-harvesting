@@ -4,6 +4,7 @@
   "version": "1.2.0",
   "scripts": {
     "devbuild": "eas build -p android --profile development",
+    "prodbuild": "eas build -p android --profile production",
     "start": "bunx tsc && expo start --tunnel",
     "start:web": "npx expo export --platform web && npx serve dist",
     "deploy:web": "npx expo export --platform web && npx firebase deploy --only hosting",

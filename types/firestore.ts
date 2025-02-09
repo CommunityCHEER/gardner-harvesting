@@ -4,6 +4,9 @@ export interface User {
   firstName: string;
   lastName: string;
   role: string;
+  admin: boolean;
+  gardener: boolean;
+  developer: boolean;
 }
 
 export interface Harvest {
