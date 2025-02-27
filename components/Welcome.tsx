@@ -1,9 +1,17 @@
-import { ActivityIndicator, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Text,
+  View,
+} from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { i18nContext } from '@/i18n';
 import { firebaseContext } from '@/context';
 import { doc, getDoc } from 'firebase/firestore';
 import { User } from '@/types/firestore';
+import { styles } from '@/constants/style';
 
 export default function Welcome() {
   const i18n = useContext(i18nContext);

@@ -153,6 +153,9 @@ export default function User() {
           firstName,
           lastName,
           role: '',
+          admin: false,
+          gardener: false,
+          developer: false,
         };
 
         await setDoc(doc(db, 'people', res.user.uid), userInfo);

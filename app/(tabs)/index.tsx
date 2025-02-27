@@ -1,4 +1,4 @@
-import { Keyboard, Text } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Text } from 'react-native';
 import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
@@ -34,7 +34,9 @@ export default function Index() {
         const garden = doc.data() as Garden;
         gardens.push({
           value: doc.id,
-          label: `${garden.streetName}${garden.houseNumber ? ', ' + garden.houseNumber + ' ' : ''}${garden.nickname ? '(' + garden.nickname + ')' : ''}`,
+          label: `${garden.streetName}${
+            garden.houseNumber ? ', ' + garden.houseNumber + ' ' : ''
+          }${garden.nickname ? '(' + garden.nickname + ')' : ''}`,
         });
       });
 
@@ -65,52 +67,63 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.centeredView}>
-      {loggedIn ? (
-        <>
-          {!harvesting && <Welcome />}
-          <DropDownPicker
-            placeholder={t('selectGarden')}
-            open={gardenListOpen}
-            setOpen={setGardenListOpen}
-            value={garden}
-            setValue={setGarden}
-            items={gardens}
-            setItems={setGardens}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdown}
-            textStyle={styles.text}
-            onPress={Keyboard.dismiss}
-          />
-          {harvesting && (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
+      >
+        <SafeAreaView style={styles.centeredView}>
+          {loggedIn ? (
             <>
-              <HarvestForm garden={garden ?? ''} />
-              <Button title={t('back')} onPress={() => setHarvesting(false)} />
-            </>
-          )}
-          {!harvesting && garden && (
-            <>
-              <Button
-                title={t('startHarvest')}
-                onPress={() => setHarvesting(true)}
+              {!harvesting && <Welcome />}
+              <DropDownPicker
+                placeholder={t('selectGarden')}
+                open={gardenListOpen}
+                setOpen={setGardenListOpen}
+                value={garden}
+                setValue={setGarden}
+                items={gardens}
+                setItems={setGardens}
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropdown}
+                textStyle={styles.text}
+                onPress={Keyboard.dismiss}
               />
-              {!participationLogged && (
-                <Button
-                  title={t('logParticipation')}
-                  onPress={logParticipation}
-                />
+              {harvesting && (
+                <>
+                  <HarvestForm garden={garden ?? ''} />
+                  <Button
+                    title={t('back')}
+                    onPress={() => setHarvesting(false)}
+                  />
+                </>
+              )}
+              {!harvesting && garden && (
+                <>
+                  <Button
+                    title={t('startHarvest')}
+                    onPress={() => setHarvesting(true)}
+                  />
+                  {!participationLogged && (
+                    <Button
+                      title={t('logParticipation')}
+                      onPress={logParticipation}
+                    />
+                  )}
+                </>
               )}
             </>
+          ) : (
+            <>
+              <Text style={styles.text}>{t('signInWarning')}</Text>
+              <Link href="/user" asChild>
+                <Button title={t('goToUser')} />
+              </Link>
+            </>
           )}
-        </>
-      ) : (
-        <>
-          <Text style={styles.text}>{t('signInWarning')}</Text>
-          <Link href="/user" asChild>
-            <Button title={t('goToUser')} />
-          </Link>
-        </>
-      )}
-      <Toast position="bottom" />
+          <Toast position="bottom" />
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

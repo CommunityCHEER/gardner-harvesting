@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ActivityIndicator, Keyboard, Image } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Keyboard,
+  Image,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
@@ -257,73 +266,81 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const [image, setImage] = useState<ImagePickerAsset>();
 
   return (
-    <View style={styles.centeredView}>
-      <Button
-        title={t('takePhoto')}
-        onPress={async () => {
-          Keyboard.dismiss();
-          const permissions = await requestCameraPermissionsAsync();
-          if (permissions.granted) {
-            const result = await launchCameraAsync();
-            if (result.canceled) return;
-            setImage(result.assets[0]);
-          }
-        }}
-      />
-      {image && (
-        <Image
-          src={image.uri}
-          style={{
-            aspectRatio: image.width / image.height,
-            height: Math.min(image.height / 15, 300),
-          }}
-        />
-      )}
-      <DropDownPicker
-        placeholder={t('selectCrop')}
-        open={cropListOpen}
-        setOpen={setCropListOpen}
-        value={crop}
-        setValue={setCrop}
-        items={crops}
-        setItems={setCrops}
-        style={styles.dropdown}
-        dropDownContainerStyle={styles.dropdown}
-        textStyle={styles.text}
-        searchable={true}
-        searchPlaceholder="Search..."
-        onPress={Keyboard.dismiss}
-      />
-      {crop && !requiredUnit && <ActivityIndicator />}
-      {requiredUnit && (
-        <>
-          <MeasureInput
-            measure={requiredMeasure}
-            setMeasure={setRequiredMeasure}
-            unit={requiredUnit}
+    <SafeAreaView style={styles.centeredView}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
+      >
+        <View style={styles.centeredView}>
+          <Button
+            title={t('takePhoto')}
+            onPress={async () => {
+              Keyboard.dismiss();
+              const permissions = await requestCameraPermissionsAsync();
+              if (permissions.granted) {
+                const result = await launchCameraAsync();
+                if (result.canceled) return;
+                setImage(result.assets[0]);
+              }
+            }}
           />
-          {optionalInputs}
-          {harvestsLoading ? (
-            <ActivityIndicator />
-          ) : (
-            <Text style={styles.text}>
-              {t('totalToday')}:{' '}
-              {totalToday.toLocaleString(undefined, {
-                minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
-                maximumFractionDigits: requiredUnit.fractional ? 2 : 0,
-              })}{' '}
-              {requiredUnit.name}
-            </Text>
+          {image && (
+            <Image
+              src={image.uri}
+              style={{
+                aspectRatio: image.width / image.height,
+                height: Math.min(image.height / 15, 300),
+              }}
+            />
           )}
-        </>
-      )}
-      {requiredMeasure &&
-        requiredMeasure !== '.' &&
-        (submitting ? (
-          <ActivityIndicator />
-        ) : (
-          <Button title={t('submit')} onPress={submit} />
-        ))}
-    </View>
+          <DropDownPicker
+            placeholder={t('selectCrop')}
+            open={cropListOpen}
+            setOpen={setCropListOpen}
+            value={crop}
+            setValue={setCrop}
+            items={crops}
+            setItems={setCrops}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdown}
+            textStyle={styles.text}
+            searchable={true}
+            searchPlaceholder="Search..."
+            onPress={Keyboard.dismiss}
+          />
+          {crop && !requiredUnit && <ActivityIndicator />}
+          {requiredUnit && (
+            <>
+              <MeasureInput
+                measure={requiredMeasure}
+                setMeasure={setRequiredMeasure}
+                unit={requiredUnit}
+              />
+              {optionalInputs}
+              {harvestsLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={styles.text}>
+                  {t('totalToday')}:{' '}
+                  {totalToday.toLocaleString(undefined, {
+                    minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
+                    maximumFractionDigits: requiredUnit.fractional ? 2 : 0,
+                  })}{' '}
+                  {requiredUnit.name}
+                </Text>
+              )}
+            </>
+          )}
+          {requiredMeasure &&
+            requiredMeasure !== '.' &&
+            (submitting ? (
+              <ActivityIndicator />
+            ) : (
+              <Button title={t('submit')} onPress={submit} />
+            ))}
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
