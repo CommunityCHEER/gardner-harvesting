@@ -45,6 +45,10 @@ const translations = {
     youAreGardener: 'You are a gardener',
     youAreAdmin: 'You are an admin',
     youHaveNoRole: 'You have not been assigned a role',
+    deleteAccount: 'Remove Account',
+    accountDeleted: 'Account removed',
+    noClaimsForGardens: 'You do not have permission to see the gardens list.',
+    refreshClaims: 'Click to check for updated permissions',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -89,6 +93,10 @@ const translations = {
     youAreGardener: 'Eres un jardinero',
     youAreAdmin: 'Eres un administrador',
     youHaveNoRole: 'No se te ha asignado un rol',
+    deleteAccount: 'Eliminar cuenta',
+    accountDeleted: 'Cuenta eliminada',
+    noClaimsForGardens: 'No tienes permiso para ver la lista de jardines.',
+    refreshClaims: 'Haz clic para comprobar los permisos actualizados',
   },
 };
 

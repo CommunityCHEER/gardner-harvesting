@@ -25,6 +25,7 @@ import { User as UserInfo } from '@/types/firestore';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { deleteUser } from 'firebase/auth';
 
 export default function User() {
   const { auth, db } = useContext(firebaseContext);
@@ -119,13 +120,11 @@ export default function User() {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   };
-
   const validatePassword = (password: string) => {
     const passwordPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*.,'"?/]).{12,50}$/;
     return passwordPattern.test(password);
   };
-
   const handleEmailPasswordAuth = async () => {
     if (isSignUp) {
       if (firstName.length < 2 || firstName.length > 50) {
@@ -179,7 +178,6 @@ export default function User() {
       Toast.show({ type: 'error', text1: errorMessage });
     }
   };
-
   const handlePasswordReset = async () => {
     if (!validateEmail(resetEmail)) {
       Toast.show({ type: 'error', text1: translate('invalidEmail') });
@@ -189,6 +187,18 @@ export default function User() {
       auth.languageCode = i18n.locale; // Set the language code
       await sendPasswordResetEmail(auth, resetEmail);
       Toast.show({ type: 'success', text1: translate('resetEmailSent') });
+    } catch (error: any) {
+      console.error(error);
+      Toast.show({ type: 'error', text1: error.message });
+    }
+  };
+  const handleDeleteAccount = async () => {
+    if (!fireUser) return;
+
+    try {
+      await deleteUser(fireUser);
+      Toast.show({ type: 'success', text1: translate('accountDeleted') });
+      signOut();
     } catch (error: any) {
       console.error(error);
       Toast.show({ type: 'error', text1: error.message });
@@ -230,6 +240,10 @@ export default function User() {
               <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
               <Text style={styles.text}>{`${getUserRoleText(userInfo)}`}</Text>
               <Button title={translate('signOut')} onPress={signOut} />
+              <Button
+                title={translate('deleteAccount')}
+                onPress={handleDeleteAccount}
+              />
             </>
           )}
           {!userInfo && fireUser && <ActivityIndicator />}
