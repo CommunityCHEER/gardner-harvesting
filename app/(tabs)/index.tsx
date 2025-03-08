@@ -26,6 +26,21 @@ export default function Index() {
   const [gardenListOpen, setGardenListOpen] = useState(false);
   const [garden, setGarden] = useState<string | null>(null);
 
+  const [claims, setClaims] = useState<any>(null);
+  const [claimsChecks, setClaimsChecks] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchClaims = async () => {
+      if (claimsChecks > 0) {
+        await auth.currentUser?.getIdToken(true);
+      }
+      const token = await auth.currentUser?.getIdTokenResult();
+      setClaims(token?.claims);
+    };
+
+    fetchClaims();
+  }, [claimsChecks]);
+
   useEffect(() => {
     const effect = async () => {
       const gardensCollection = await getDocs(collection(db, 'gardens'));
@@ -44,7 +59,7 @@ export default function Index() {
     };
 
     effect();
-  }, []);
+  }, [claims]);
 
   const [harvesting, setHarvesting] = useState(false);
   const [participationLogged, setParticipationLogged] =
@@ -89,6 +104,28 @@ export default function Index() {
                 textStyle={styles.text}
                 onPress={Keyboard.dismiss}
               />
+              {gardens.length === 0 && (
+                <>
+                  <Text style={styles.text}>{t('noClaimsForGardens')}</Text>
+                  {claims && (
+                    <Text style={styles.text}>
+                      {claims.developer && t('youAreDeveloper')}
+                      {claims.admin && t('youAreAdmin')}
+                      {claims.gardener && t('youAreGardener')}
+                      {!claims.developer &&
+                        !claims.admin &&
+                        !claims.gardener &&
+                        t('youHaveNoRole')}
+                    </Text>
+                  )}
+                  <Button
+                    title={t('refreshClaims')}
+                    onPress={() =>
+                      setClaimsChecks(prevClaimsChecks => prevClaimsChecks + 1)
+                    }
+                  />
+                </>
+              )}
               {harvesting && (
                 <>
                   <HarvestForm garden={garden ?? ''} />
