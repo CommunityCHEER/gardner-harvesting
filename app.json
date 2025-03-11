@@ -33,7 +33,9 @@
     "supportsTablet": true,
     "googleServicesFile": "./GoogleService-Info.plist",
     "infoPlist": {
-      "ITSAppUsesNonExemptEncryption": false
+      "ITSAppUsesNonExemptEncryption": false,
+      "NSCameraUsageDescription": "Camera usage is 100% optional. If you would like to upload a photo of your harvest, we need permission to access your camera.",
+      "NSPhotoLibraryUsageDescription": "Photo library usage is 100% optional. If you would like to upload a photo of your harvest, we need permission to access your photo library."
     }
   },
   "android": {
