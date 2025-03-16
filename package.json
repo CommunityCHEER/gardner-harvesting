@@ -3,6 +3,10 @@
   "main": "expo-router/entry",
   "version": "1.2.0",
   "scripts": {
+    "buildAndroid": "eas build --platform android --profile production",
+    "buildIos": "eas build --platform ios --profile production",
+    "submitAndroid": "eas submit -p android --latest --profile production",
+    "submitIos": "eas submit --platform ios --latest --profile production",
     "devbuild": "eas build -p android --profile development",
     "prodbuild": "eas build -p android --profile production",
     "start": "bunx tsc && expo start --tunnel",
@@ -13,11 +17,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint",
-    "buildAndroid": "eas build --platform android --profile production",
-    "buildIos": "eas build --platform ios --profile production",
-    "submitAndroid": "eas submit -p android --latest --profile production",
-    "submitIos": "eas submit --platform ios --latest --profile production"
+    "lint": "expo lint"
   },
   "jest": {
     "preset": "jest-expo"

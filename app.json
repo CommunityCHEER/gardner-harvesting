@@ -2,7 +2,7 @@
   "name": "Gardener Harvesting",
   "description": "App for tracking and logging participation in CHEER's Long Branch Gardener Program, as well as uploading harvest data.",
   "slug": "gardner-harvesting",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "platforms": ["ios", "android"],
   "githubUrl": "https://github.com/CommunityCHEER/gardner-harvesting",
   "orientation": "portrait",
