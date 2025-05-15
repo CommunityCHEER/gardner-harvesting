@@ -290,7 +290,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
               src={image.uri}
               style={{
                 aspectRatio: image.width / image.height,
-                height: Math.min(image.height / 15, 300),
+                height: Math.min(image.height / 60, 75),
               }}
             />
           )}
