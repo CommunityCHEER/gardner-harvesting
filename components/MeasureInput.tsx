@@ -39,9 +39,17 @@ export default function MeasureInput({
           if (!(text.startsWith('.') && (text.match(/\./g) ?? []).length > 1))
             setMeasure(
               text.replace(/,|-| /g, '').replace(
-                // matches the possible text, capturing only the desired output
+                // Checks if the input starts with a dot and contains more than one dot
+                // if so, it ignores the input (prevents invalid leading decimals)
+                // Otherwise, it
+                // removes commas, dashes, and spaces
+                // uses a regex to extract and format the number,
+                // allowing for up to 2 decimal places if the unit allows it
+                // calls setMeasure with the cleaned and formatted value
                 /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                `${unit.fractional ? '$1' : ''}${unit.fractional && text.startsWith('.') ? '$2' : '$2$3'}${unit.fractional ? '$4$5' : ''}`
+                `${unit.fractional ? '$1' : ''}${
+                  unit.fractional && text.startsWith('.') ? '$2' : '$2$3'
+                }${unit.fractional ? '$4$5' : ''}`
               )
               // .replace(/[^0-9.]/g, '')
             );
