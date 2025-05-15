@@ -103,6 +103,7 @@ export default function Index() {
                 dropDownContainerStyle={styles.dropdown}
                 textStyle={styles.text}
                 onPress={Keyboard.dismiss}
+                listMode="MODAL"
               />
               {gardens.length === 0 && (
                 <>

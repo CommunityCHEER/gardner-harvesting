@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
@@ -266,13 +267,13 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const [image, setImage] = useState<ImagePickerAsset>();
 
   return (
-    <SafeAreaView style={styles.centeredView}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64}
       >
-        <View style={styles.centeredView}>
+        <View style={{ flex: 1, alignItems: 'center' }}>
           <Button
             title={t('takePhoto')}
             onPress={async () => {
@@ -308,6 +309,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
             searchable={true}
             searchPlaceholder="Search..."
             onPress={Keyboard.dismiss}
+            listMode="MODAL"
           />
           {crop && !requiredUnit && <ActivityIndicator />}
           {requiredUnit && (
