@@ -20,7 +20,7 @@ export default function Index() {
   const loggedIn = !!useAuthState(auth)[0];
 
   const i18n = useContext(i18nContext);
-  const t = i18n.t.bind(i18n);
+  const translate = i18n.t.bind(i18n);
 
   const [gardens, setGardens] = useState<ItemType<string>[]>([]);
   const [gardenListOpen, setGardenListOpen] = useState(false);
@@ -75,7 +75,7 @@ export default function Index() {
       collection(db, 'people', auth.currentUser?.uid ?? '', 'participation'),
       participation
     ).then(() => {
-      Toast.show({ type: 'info', text1: t('participationLogged') });
+      Toast.show({ type: 'info', text1: translate('participationLogged') });
       setParticipationLogged(true);
     });
   };
@@ -92,7 +92,7 @@ export default function Index() {
             <>
               {!harvesting && <Welcome />}
               <DropDownPicker
-                placeholder={t('selectGarden')}
+                placeholder={translate('selectGarden')}
                 open={gardenListOpen}
                 setOpen={setGardenListOpen}
                 value={garden}
@@ -105,22 +105,22 @@ export default function Index() {
                 onPress={Keyboard.dismiss}
                 listMode="MODAL"
               />
-              {gardens.length === 0 && (
+              {(!claims || (!claims.developer && !claims.admin && !claims.gardener)) && (
                 <>
-                  <Text style={styles.text}>{t('noClaimsForGardens')}</Text>
+                  <Text style={styles.text}>{translate('noClaimsForGardens')}</Text>
                   {claims && (
                     <Text style={styles.text}>
-                      {claims.developer && t('youAreDeveloper')}
-                      {claims.admin && t('youAreAdmin')}
-                      {claims.gardener && t('youAreGardener')}
+                      {claims.developer && translate('youAreDeveloper')}
+                      {claims.admin && translate('youAreAdmin')}
+                      {claims.gardener && translate('youAreGardener')}
                       {!claims.developer &&
                         !claims.admin &&
                         !claims.gardener &&
-                        t('youHaveNoRole')}
+                        translate('youHaveNoRole')}
                     </Text>
                   )}
                   <Button
-                    title={t('refreshClaims')}
+                    title={translate('refreshClaims')}
                     onPress={() =>
                       setClaimsChecks(prevClaimsChecks => prevClaimsChecks + 1)
                     }
@@ -131,7 +131,7 @@ export default function Index() {
                 <>
                   <HarvestForm garden={garden ?? ''} />
                   <Button
-                    title={t('back')}
+                    title={translate('back')}
                     onPress={() => setHarvesting(false)}
                   />
                 </>
@@ -139,12 +139,12 @@ export default function Index() {
               {!harvesting && garden && (
                 <>
                   <Button
-                    title={t('startHarvest')}
+                    title={translate('startHarvest')}
                     onPress={() => setHarvesting(true)}
                   />
                   {!participationLogged && (
                     <Button
-                      title={t('logParticipation')}
+                      title={translate('logParticipation')}
                       onPress={logParticipation}
                     />
                   )}
@@ -153,9 +153,9 @@ export default function Index() {
             </>
           ) : (
             <>
-              <Text style={styles.text}>{t('signInWarning')}</Text>
+              <Text style={styles.text}>{translate('signInWarning')}</Text>
               <Link href="/user" asChild>
-                <Button title={t('goToUser')} />
+                <Button title={translate('goToUser')} />
               </Link>
             </>
           )}
