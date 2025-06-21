@@ -28,13 +28,18 @@ export default function Index() {
 
   const [claims, setClaims] = useState<any>(null);
   const [claimsChecks, setClaimsChecks] = useState<number>(0);
+  const [claimsLoading, setClaimsLoading] = useState(false);
 
   useEffect(() => {
     const fetchClaims = async () => {
-      if(!loggedIn || !auth.currentUser) return;
-
-      const token = await auth.currentUser.getIdTokenResult(claimsChecks > 0);
-      setClaims(token.claims);
+      if (!loggedIn || !auth.currentUser) return;
+      setClaimsLoading(true);
+      try {
+        const token = await auth.currentUser.getIdTokenResult(claimsChecks > 0);
+        setClaims(token.claims);
+      } finally {
+        setClaimsLoading(false);
+      }
     };
 
     fetchClaims();
@@ -129,6 +134,7 @@ export default function Index() {
                     onPress={() =>
                       setClaimsChecks(prevClaimsChecks => prevClaimsChecks + 1)
                     }
+                    disabled={claimsLoading}
                   />
                 </>
               )}
