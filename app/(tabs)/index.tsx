@@ -31,18 +31,19 @@ export default function Index() {
 
   useEffect(() => {
     const fetchClaims = async () => {
-      if (claimsChecks > 0) {
-        await auth.currentUser?.getIdToken(true);
-      }
-      const token = await auth.currentUser?.getIdTokenResult();
-      setClaims(token?.claims);
+      if(!loggedIn || !auth.currentUser) return;
+
+      const token = await auth.currentUser.getIdTokenResult(claimsChecks > 0);
+      setClaims(token.claims);
     };
 
     fetchClaims();
   }, [claimsChecks]);
 
   useEffect(() => {
-    const effect = async () => {
+    const fetchGardens = async () => {
+      if (!loggedIn || !auth.currentUser) return;
+
       const gardensCollection = await getDocs(collection(db, 'gardens'));
       const gardens: ItemType<string>[] = [];
       gardensCollection.forEach(doc => {
@@ -58,21 +59,25 @@ export default function Index() {
       setGardens(gardens);
     };
 
-    effect();
+    fetchGardens();
   }, [claims]);
 
   const [harvesting, setHarvesting] = useState(false);
-  const [participationLogged, setParticipationLogged] =
-    useContext(participationContext);
+  const [participationLogged, setParticipationLogged] = useContext(participationContext);
 
   const logParticipation = () => {
+    if (!loggedIn || !auth.currentUser || !garden) {
+      Toast.show({ type: 'error', text1: translate('signInWarning') });
+      return;
+    }
+
     const participation: Participation = {
       date: getDateString(),
-      garden: doc(db, 'gardens', garden ?? ''),
+      garden: doc(db, 'gardens', garden),
     };
 
     addDoc(
-      collection(db, 'people', auth.currentUser?.uid ?? '', 'participation'),
+      collection(db, 'people', auth.currentUser.uid, 'participation'),
       participation
     ).then(() => {
       Toast.show({ type: 'info', text1: translate('participationLogged') });
@@ -88,7 +93,7 @@ export default function Index() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
       >
         <SafeAreaView style={styles.centeredView}>
-          {loggedIn ? (
+          {loggedIn && !!auth.currentUser ? (
             <>
               {!harvesting && <Welcome />}
               <DropDownPicker
