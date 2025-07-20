@@ -295,6 +295,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
               }}
             />
           )}
+          {crops.length > 0 && (
           <DropDownPicker
             placeholder={t('selectCrop')}
             open={cropListOpen}
@@ -311,6 +312,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
             onPress={Keyboard.dismiss}
             listMode="MODAL"
           />
+          )}
           {crop && !requiredUnit && <ActivityIndicator />}
           {requiredUnit && (
             <>

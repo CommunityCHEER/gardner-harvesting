@@ -49,6 +49,7 @@ const translations = {
     accountDeleted: 'Account removed',
     noClaimsForGardens: 'You do not have permission to see the gardens list.',
     refreshClaims: 'Click to check for updated permissions',
+    ounces: 'ounces',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -97,6 +98,7 @@ const translations = {
     accountDeleted: 'Cuenta eliminada',
     noClaimsForGardens: 'No tienes permiso para ver la lista de jardines.',
     refreshClaims: 'Haz clic para comprobar los permisos actualizados',
+    ounces: 'onzas',
   },
 };
 
