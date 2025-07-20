@@ -101,6 +101,7 @@ export default function Index() {
           {loggedIn && !!auth.currentUser ? (
             <>
               {!harvesting && <Welcome />}
+              {gardens.length > 0 && (
               <DropDownPicker
                 placeholder={translate('selectGarden')}
                 open={gardenListOpen}
@@ -115,6 +116,7 @@ export default function Index() {
                 onPress={Keyboard.dismiss}
                 listMode="MODAL"
               />
+              )}
               {(!claims || (!claims.developer && !claims.admin && !claims.gardener)) && (
                 <>
                   <Text style={styles.text}>{translate('noClaimsForGardens')}</Text>
