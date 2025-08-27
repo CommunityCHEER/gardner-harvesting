@@ -1,8 +1,9 @@
 import { View, Text, TextInput, Keyboard } from 'react-native';
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useEffect, useState } from 'react';
 import { DisplayUnit } from './HarvestForm';
 import { styles } from '@/constants/style';
 import { i18nContext } from '@/i18n';
+
 
 export default function MeasureInput({
   measure,
@@ -18,30 +19,67 @@ export default function MeasureInput({
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
 
-  console.log('unit:', JSON.stringify(unit));
-
-  // Determine if the unit can have a sub-unit (only pounds supports this right now)
   const hasSubUnit = unit.id === 'pounds';
-  console.log('hasSubUnit:', hasSubUnit);
   const subUnit = hasSubUnit ? 'ounces' : null;
-  console.log('subUnit:', subUnit);
   const subUnitName = hasSubUnit && subUnit ? t(subUnit) : null;
-  console.log('subUnitName:', subUnitName);
-  const unitMeasure = hasSubUnit
-    ? measure?.split('.')[0] || '0'
-    : measure;
-  console.log('unitMeasure:', unitMeasure);
-  const subUnitMeasure = hasSubUnit
-    ? Number(measure?.split('.')[1] || '0') * 16
-    : null;
-  console.log('subUnitMeasure:', subUnitMeasure);
 
+  // Helper: Convert float pounds string to {pounds, ounces}
+  function parsePoundsOunces(measureStr: string): { pounds: string; ounces: string } {
+    if (!hasSubUnit) return { pounds: measureStr, ounces: '0' };
+    const floatVal = parseFloat(measureStr || '0');
+    const pounds = Math.floor(floatVal);
+    const ounces = Math.round((floatVal - pounds) * 16);
+    return { pounds: pounds.toString(), ounces: ounces.toString() };
+  }
+
+  // Helper: Convert {pounds, ounces} to float pounds string
+  function combinePoundsOunces(pounds: string, ounces: string): string {
+    const lbs = parseInt(pounds || '0', 10);
+    const oz = parseInt(ounces || '0', 10);
+    if (isNaN(lbs) && isNaN(oz)) return '';
+    const total = lbs + oz / 16;
+    // Remove trailing .0 if possible
+    return total % 1 === 0 ? total.toString() : total.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  // UI state for pounds/ounces
+  const [{ pounds, ounces }, setPO] = useState(() => parsePoundsOunces(measure));
+
+  // Keep UI state in sync with measure prop
+  useEffect(() => {
+    setPO(parsePoundsOunces(measure));
+  }, [measure]);
+
+  // Refs for blurring
   const measureInputRef = useRef<TextInput>(null);
   const subUnitInputRef = useRef<TextInput>(null);
-  Keyboard.addListener('keyboardDidHide', () => {
-    measureInputRef.current?.blur();
-    subUnitInputRef.current?.blur();
-  });
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidHide', () => {
+      measureInputRef.current?.blur();
+      subUnitInputRef.current?.blur();
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Handlers
+  const handlePoundsChange = (text: string) => {
+    // Only allow digits
+    const cleaned = text.replace(/[^0-9]/g, '');
+    setPO(po => ({ ...po, pounds: cleaned }));
+    if (hasSubUnit) {
+      setMeasure(combinePoundsOunces(cleaned, ounces));
+    } else {
+      setMeasure(cleaned);
+    }
+  };
+
+  const handleOuncesChange = (text: string) => {
+    // Only allow whole numbers
+    let cleaned = text.replace(/[^0-9]/g, '');
+    // Allow any number of ounces (including > 15)
+    setPO(po => ({ ...po, ounces: cleaned }));
+    setMeasure(combinePoundsOunces(pounds, cleaned));
+  };
 
   return (
     <View
@@ -54,25 +92,8 @@ export default function MeasureInput({
       <TextInput
         ref={measureInputRef}
         inputMode="numeric"
-        value={unitMeasure.toString()}
-        onChangeText={text => {
-          if (!(text.startsWith('.') && (text.match(/\./g) ?? []).length > 1))
-            setMeasure(
-              text.replace(/,|-| /g, '').replace(
-                // Checks if the input starts with a dot and contains more than one dot
-                // if so, it ignores the input (prevents invalid leading decimals)
-                // Otherwise, it
-                // removes commas, dashes, and spaces
-                // uses a regex to extract and format the number,
-                // allowing for up to 2 decimal places if the unit allows it
-                // calls setMeasure with the cleaned and formatted value
-                /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                `${unit.fractional && !hasSubUnit ? '$1' : ''}${
-                  unit.fractional && !hasSubUnit && text.startsWith('.') ? '$2' : '$2$3'
-                }${unit.fractional && !hasSubUnit ? '$4$5' : ''}`
-              )
-            );
-        }}
+        value={pounds}
+        onChangeText={handlePoundsChange}
         style={styles.input}
       />
       <Text style={styles.text}>
@@ -83,25 +104,10 @@ export default function MeasureInput({
           <TextInput
             ref={subUnitInputRef}
             inputMode="numeric"
-            value={subUnitMeasure?.toString() || '0'}
-                    onChangeText={text => {
-              if (!(text.startsWith('.') && (text.match(/\./g) ?? []).length > 1))
-                setMeasure(
-                  text.replace(/,|-| /g, '').replace(
-                    // Checks if the input starts with a dot and contains more than one dot
-                    // if so, it ignores the input (prevents invalid leading decimals)
-                    // Otherwise, it
-                    // removes commas, dashes, and spaces
-                    // uses a regex to extract and format the number,
-                    // allowing for up to 2 decimal places if the unit allows it
-                    // calls setMeasure with the cleaned and formatted value
-                    /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-                    '$2$3'
-                  )
-                );
-            }}
+            value={ounces}
+            onChangeText={handleOuncesChange}
             style={styles.input}
-            />
+          />
           <Text style={styles.text}>
             {subUnitName} {optional && `(${t('optional')})`}
           </Text>
