@@ -39,7 +39,8 @@
     }
   },
   "android": {
-    "package": "com.communitycheer.gardner_harvesting",
+  "package": "com.communitycheer.gardner_harvesting",
+  "targetSdkVersion": 35,
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/adaptive_icon.png",
       "monochromeImage": "./assets/images/monochrome.png",
