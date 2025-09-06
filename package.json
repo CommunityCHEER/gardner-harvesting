@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.2.0",
   "scripts": {
-    "devbuild": "eas build -e development -p android",
+    "devbuild": "npx eas build -e development -p android",
     "start": "npx tsc && expo start --tunnel",
     "start:web": "npx expo export --platform web && npx serve dist",
     "deploy:web": "npx expo export --platform web && npx firebase deploy --only hosting",
