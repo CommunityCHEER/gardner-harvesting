@@ -164,14 +164,37 @@ Example snippet (Realtime append):
   `await push(ref(db, path), newEntry)`
 
 ## Backlog (prioritized)
-1) Apply quick fixes above
-2) Commit rules and wire CI deploy
-3) Data fetch optimization for names/units
-4) Tests + Actions workflow
-5) Config hardening and secrets hygiene
-6) Converters + a11y polish
-7) Image validation
-8) i18n parity check script
+1) Quick fixes bundle — realtime append + total, participation idempotency, web auth persistence, Welcome effect, i18n key parity
+  - Quick fix: Yes
+  - References: Risks and Issues → “Realtime list overwrite”, “Duplicate participation”, “Web auth persistence…”, “Welcome effect runs on every render”, “i18n key mismatch”; Step-by-step Hardening Plan → items 1, 2, 3; Concrete Code Changes → all bullets in that section.
+
+2) Security rules versioning and CI deploy
+  - Quick fix: No (medium effort)
+  - References: Security Posture; Step-by-step Hardening Plan → item 5; Firestore/Realtime Rules Sketch.
+
+3) Data fetch optimization for localized names/units (remove N+1 reads)
+  - Quick fix: No (requires small schema or client caching change)
+  - References: Performance Notes → “Locale-specific names fetched individually”; Step-by-step Hardening Plan → item 4; Data Model (observed) → Crop/Unit structure.
+
+4) Tests + GitHub Actions workflow
+  - Quick fix: No (small but foundational)
+  - References: Step-by-step Hardening Plan → item 6; package.json → jest preset; Maintainability Observations.
+
+5) Configuration hardening and secrets hygiene
+  - Quick fix: No (medium; needs Expo config + Firebase console settings)
+  - References: Security Posture; Step-by-step Hardening Plan → item 7; firebaseConfig.ts; README notes on EAS/Firebase linkage.
+
+6) Type safety (Firestore DataConverters) + accessibility polish
+  - Quick fix: No (incremental refactor)
+  - References: Maintainability Observations → casts and Button a11y; Step-by-step Hardening Plan → item 8.
+
+7) Image upload validation (content type, size) + stricter Storage rules
+  - Quick fix: No (small code + rules changes)
+  - References: Risks and Issues → “Image uploads lack metadata/contentType validation”; Security Posture; Firestore/Realtime Rules Sketch → Storage guidance; `components/HarvestForm.tsx` upload path.
+
+8) i18n parity check script and process
+  - Quick fix: Yes
+  - References: Maintainability Observations → i18n key mismatch; `i18n.ts`; Concrete Code Changes → “i18n: add signUp to Spanish keys”.
 
 ## Appendix: Key Files and Responsibilities
 - `firebaseConfig.ts`: Firebase initialization and persistence
