@@ -47,6 +47,3 @@ Any assumptions you made due to missing or ambiguous details.
 - Prefer concrete evidence (file paths, symbols, interfaces, endpoints).
 - If the spec is ambiguous, ask concise clarifying questions.
 - Keep the report actionable and prioritized.
- 
-## Package Manager Policy
-- Enforce Yarn Berry (PnP) usage. Flag any `npm`/`pnpm` steps or references to `node_modules`/`package-lock.json` as violations and propose Yarn equivalents.

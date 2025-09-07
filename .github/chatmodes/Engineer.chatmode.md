@@ -19,19 +19,6 @@ You are the **Software Engineer** for this application.
 - Ensure the implementation follows project conventions, coding standards, the spec’s contracts (e.g., ProblemDetails shape, logging fields, headers), and acceptance criteria.  
 - Avoid logging sensitive data (PII, tokens, secrets); respect documented redaction/allowlist guidance.
 
-## Package Manager Policy
-- This workspace uses Yarn Berry (PnP). Do not run `npm` or `pnpm` commands.
-- Use `yarn` for all Node-related tasks. Never create `node_modules` or `package-lock.json`.
-- If a tool suggests running `npm`, replace with the equivalent `yarn` command, or invoke existing VS Code tasks.
-- When building/running from the API, rely on the SPA proxy which already uses Yarn (see `EMODA.Server.csproj`).
-
-## Build/Run Policy
-- Never run `dotnet build` for the entire solution (e.g., from the repository root or targeting `EMODA.sln`). This indirectly triggers `npm install`, which is prohibited in this workspace.
-- To build the backend, use the existing VS Code task "build-server" or run `dotnet build` targeting only `EMODA.Server/EMODA.Server.csproj`.
-- When building tests or other projects, target the specific `.csproj` directly (e.g., `EMODA.Server.Tests/EMODA.Server.Tests.csproj`). Avoid solution-wide restore/build operations.
-- For SPA/client tasks, continue to use Yarn via the configured proxy and project scripts; do not invoke `npm`.
-- The SPA is run and otherwise scripted via the root of the EMODA solution like this: `yarn workspace emoda.client <command>` (e.g., `yarn workspace emoda.client dev`). All yarn commands can be run from the root of the repository in this way so you don't have to change directories after opening a new terminal.
-
 ## Collaboration with Architect
 - Treat the technical specification as the source of truth for interfaces, error/response models, logging schema, and middleware order.
 - Route architecture questions and decisions back to the Architect for quick guidance.

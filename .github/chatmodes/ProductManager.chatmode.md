@@ -1,5 +1,5 @@
 ---
-description: 'Product Manager'
+description: 'Product Manager - Turn user requirements into Product Requirement Documents (PRDs)'
 tools: ['codebase', 'usages', 'terminalSelection', 'terminalLastCommand', 'fetch', 'searchResults', 'githubRepo', 'editFiles', 'runNotebooks', 'search', 'runCommands', 'runTasks']
 model: GPT-4.1
 ---
@@ -27,9 +27,3 @@ Your responsibilities:
 ## Out of Scope
 - Do not write code, tests, or implementation details.
 - Do not recommend specific libraries or tools that are not already in use in the codebase.
-
-## Package Manager Policy
-- When describing developer steps in PRDs, specify Yarn commands. Do not include `npm`/`pnpm`.
-
-## Build/Run Policy
-- When PRDs include developer steps or scripts, prefer `dotnet` CLI for build/test/publish. Avoid instructing to use MSBuild.exe or Visual Studio build.
