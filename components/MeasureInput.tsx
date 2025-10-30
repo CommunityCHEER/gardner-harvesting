@@ -63,13 +63,22 @@ export default function MeasureInput({
 
   // Handlers
   const handlePoundsChange = (text: string) => {
-    // Only allow digits
-    const cleaned = text.replace(/[^0-9]/g, '');
-    setPO(po => ({ ...po, pounds: cleaned }));
     if (hasSubUnit) {
+      // For pounds with ounces subunit: only allow whole numbers
+      const cleaned = text.replace(/[^0-9]/g, '');
+      setPO(po => ({ ...po, pounds: cleaned }));
       setMeasure(combinePoundsOunces(cleaned, ounces));
     } else {
-      setMeasure(cleaned);
+      // For non-pound units: allow decimals if unit.fractional is true
+      if (!(text.startsWith('.') && (text.match(/\./g) ?? []).length > 1)) {
+        const formatted = text.replace(/,|-| /g, '').replace(
+          /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
+          `${unit.fractional ? '$1' : ''}${
+            unit.fractional && text.startsWith('.') ? '$2' : '$2$3'
+          }${unit.fractional ? '$4$5' : ''}`
+        );
+        setMeasure(formatted);
+      }
     }
   };
 
