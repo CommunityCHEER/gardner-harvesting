@@ -13,7 +13,10 @@
       "channel": "preview"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "ios": {
+        "cocoapods": "1.15.2"
+      }
     }
   },
   "submit": {
