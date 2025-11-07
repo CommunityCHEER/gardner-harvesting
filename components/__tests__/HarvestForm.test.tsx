@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { KeyboardAvoidingView } from 'react-native';
 import HarvestForm from '../HarvestForm';
 import { i18nContext } from '@/i18n';
 import { firebaseContext, participationContext } from '@/context';
@@ -109,6 +110,17 @@ describe('HarvestForm Note Feature', () => {
   });
 
   describe('Note Modal', () => {
+    test('should use KeyboardAvoidingView in modal', () => {
+      const { getByText, UNSAFE_root } = renderHarvestForm();
+      
+      fireEvent.press(getByText('Add Note'));
+      
+      // Check that KeyboardAvoidingView exists in the modal
+      const keyboardAvoidingViews = UNSAFE_root.findAllByType(KeyboardAvoidingView);
+      // Should have at least 2: one in main form, one in modal
+      expect(keyboardAvoidingViews.length).toBeGreaterThanOrEqual(2);
+    });
+
     test('should display full-screen text input when modal is open', () => {
       const { getByText, getByPlaceholderText } = renderHarvestForm();
       

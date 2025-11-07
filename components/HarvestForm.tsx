@@ -284,32 +284,38 @@ export default function HarvestForm({ garden }: { garden: string }) {
         onRequestClose={() => setNoteModalVisible(false)}
       >
         <SafeAreaView style={[styles.container, { padding: 20 }]}>
-          <View style={{ flex: 1 }}>
-            <TextInput
-              style={[
-                styles.text,
-                {
-                  borderWidth: 1,
-                  borderColor: '#ccc',
-                  borderRadius: 8,
-                  padding: 10,
-                  minHeight: 200,
-                  textAlignVertical: 'top',
-                },
-              ]}
-              multiline
-              placeholder="Enter note..."
-              value={note}
-              onChangeText={setNote}
-              autoFocus
-            />
-          </View>
-          <View style={{ marginBottom: 20 }}>
-            <Button
-              title={t('saveNote')}
-              onPress={() => setNoteModalVisible(false)}
-            />
-          </View>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+          >
+            <View style={{ flex: 1 }}>
+              <TextInput
+                style={[
+                  styles.text,
+                  {
+                    borderWidth: 1,
+                    borderColor: '#ccc',
+                    borderRadius: 8,
+                    padding: 10,
+                    minHeight: 200,
+                    textAlignVertical: 'top',
+                  },
+                ]}
+                multiline
+                placeholder="Enter note..."
+                value={note}
+                onChangeText={setNote}
+                autoFocus
+              />
+            </View>
+            <View style={{ marginBottom: 20 }}>
+              <Button
+                title={t('saveNote')}
+                onPress={() => setNoteModalVisible(false)}
+              />
+            </View>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
       <KeyboardAvoidingView
