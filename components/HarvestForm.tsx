@@ -273,7 +273,10 @@ export default function HarvestForm({ garden }: { garden: string }) {
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64}
       >
-        <View style={{ flex: 1, alignItems: 'center' }}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}
+        >
           <Button
             title={t('takePhoto')}
             onPress={async () => {
@@ -341,9 +344,11 @@ export default function HarvestForm({ garden }: { garden: string }) {
             (submitting ? (
               <ActivityIndicator />
             ) : (
-              <Button title={t('submit')} onPress={submit} />
+              <View style={{ marginBottom: 16 }}>
+                <Button title={t('submit')} onPress={submit} />
+              </View>
             ))}
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
