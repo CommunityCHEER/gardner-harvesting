@@ -100,7 +100,7 @@ export default function MeasureInput({
     >
       <TextInput
         ref={measureInputRef}
-        inputMode="numeric"
+        inputMode={hasSubUnit || !unit.fractional ? "numeric" : "decimal"}
         value={pounds}
         onChangeText={handlePoundsChange}
         style={styles.input}
