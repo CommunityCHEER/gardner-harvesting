@@ -14,6 +14,7 @@ export interface Harvest {
   person: DocumentReference;
   garden: DocumentReference;
   crop: DocumentReference;
+  note?: string;
 }
 
 export interface HarvestMeasure {

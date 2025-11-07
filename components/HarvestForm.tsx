@@ -9,6 +9,9 @@ import {
   SafeAreaView,
   Platform,
   ScrollView,
+  Modal,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
@@ -58,11 +61,22 @@ export default function HarvestForm({ garden }: { garden: string }) {
 
   const { db, auth, realtime, storage } = useContext(firebaseContext);
 
+  // Crop-related state
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
   const [crop, setCrop] = useState<string | null>(null);
   const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
   const [optionalUnits, setOptionalUnits] = useState<DisplayUnit[]>([]);
+
+  // Measure state
+  const [requiredMeasure, setRequiredMeasure] = useState<string>('');
+  const [optionalMeasures, setOptionalMeasures] = useState<string[]>([]);
+
+  // UI state
+  const [submitting, setSubmitting] = useState(false);
+  const [image, setImage] = useState<ImagePickerAsset>();
+  const [note, setNote] = useState<string>('');
+  const [noteModalVisible, setNoteModalVisible] = useState(false);
 
   useEffect(() => {
     const effect = async () => {
@@ -113,9 +127,6 @@ export default function HarvestForm({ garden }: { garden: string }) {
     effect();
   }, [crop, locale]);
 
-  const [requiredMeasure, setRequiredMeasure] = useState<string>('');
-  const [optionalMeasures, setOptionalMeasures] = useState<string[]>([]);
-
   useEffect(() => {
     setCrop(null);
   }, [garden]);
@@ -140,8 +151,6 @@ export default function HarvestForm({ garden }: { garden: string }) {
   const [harvestsData, harvestsLoading, _] = useList(
     realtimeRef(realtime, `harvests/${getDateString()}/${garden}/${crop}`)
   );
-
-  const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
     setSubmitting(true);
@@ -182,6 +191,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
         person: doc(db, 'people', auth.currentUser?.uid ?? ''),
         garden: doc(db, 'gardens', garden),
         crop: doc(db, 'crops', crop ?? ''),
+        ...(note && { note }),
       };
 
       const newHarvest = await addDoc(collection(db, 'harvests'), harvest);
@@ -226,6 +236,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
     setRequiredMeasure('');
     setOptionalMeasures([]);
     setImage(undefined);
+    setNote('');
   };
 
   const [totalToday, setTotalToday] = useState(0);
@@ -264,10 +275,43 @@ export default function HarvestForm({ garden }: { garden: string }) {
     setOptionalInputs(inputs);
   }, [optionalUnits, optionalMeasures]);
 
-  const [image, setImage] = useState<ImagePickerAsset>();
-
   return (
     <SafeAreaView style={styles.container}>
+      <Modal
+        visible={noteModalVisible}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setNoteModalVisible(false)}
+      >
+        <SafeAreaView style={[styles.container, { padding: 20 }]}>
+          <View style={{ flex: 1 }}>
+            <TextInput
+              style={[
+                styles.text,
+                {
+                  borderWidth: 1,
+                  borderColor: '#ccc',
+                  borderRadius: 8,
+                  padding: 10,
+                  minHeight: 200,
+                  textAlignVertical: 'top',
+                },
+              ]}
+              multiline
+              placeholder="Enter note..."
+              value={note}
+              onChangeText={setNote}
+              autoFocus
+            />
+          </View>
+          <View style={{ marginBottom: 20 }}>
+            <Button
+              title={t('saveNote')}
+              onPress={() => setNoteModalVisible(false)}
+            />
+          </View>
+        </SafeAreaView>
+      </Modal>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -287,6 +331,13 @@ export default function HarvestForm({ garden }: { garden: string }) {
                 if (result.canceled) return;
                 setImage(result.assets[0]);
               }
+            }}
+          />
+          <Button
+            title={note ? t('editNote') : t('addNote')}
+            onPress={() => {
+              Keyboard.dismiss();
+              setNoteModalVisible(true);
             }}
           />
           {image && (

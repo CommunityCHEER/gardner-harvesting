@@ -6,6 +6,9 @@ const translations = {
   en: {
     takePhoto: 'TAKE PHOTO',
     submit: 'SUBMIT',
+    addNote: 'ADD NOTE',
+    editNote: 'EDIT NOTE',
+    saveNote: 'SAVE NOTE',
     hello: 'Hello',
     signOut: 'SIGN OUT',
     user: 'User',
@@ -54,6 +57,9 @@ const translations = {
   es: {
     takePhoto: 'TOMAR FOTO',
     submit: 'ENTREGAR',
+    addNote: 'AGREGAR NOTA',
+    editNote: 'EDITAR NOTA',
+    saveNote: 'GUARDAR NOTA',
     hello: 'Hola',
     signOut: 'DESCONECTAR',
     user: 'Usuario',
