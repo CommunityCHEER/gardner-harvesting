@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chatmode Definition Schema",
+  "type": "object",
+  "required": ["description", "version", "model"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "description": {"type": "string"},
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "model": {
+      "type": "string",
+      "enum": [
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash"
+      ]
+    },
+    "tools": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "additionalProperties": true
+}
