@@ -305,6 +305,7 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-Wl,-segprot,__DATA_CONST,rx,rx",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.communitycheer.gardner-harvesting";
 				PRODUCT_NAME = "GardenerHarvesting";
@@ -332,6 +333,7 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-Wl,-segprot,__DATA_CONST,rx,rx",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.communitycheer.gardner-harvesting";
 				PRODUCT_NAME = "GardenerHarvesting";

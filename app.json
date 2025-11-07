@@ -21,7 +21,16 @@
     "expo-router",
     "expo-localization",
     "expo-image-picker",
-    "expo-font"
+    "expo-font",
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "useLegacyPackaging": false,
+          "enableProguardInReleaseBuilds": true
+        }
+      }
+    ]
   ],
   "splash": {
     "image": "./assets/images/splash.png",
