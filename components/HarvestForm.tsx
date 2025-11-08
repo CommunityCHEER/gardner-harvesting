@@ -316,12 +316,12 @@ export default function HarvestForm({
         presentationStyle="fullScreen"
         onRequestClose={() => setNoteModalVisible(false)}
       >
-        <SafeAreaView style={[styles.container, { padding: 20 }]}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1 }}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-          >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
+          <SafeAreaView style={[styles.container, { padding: 20 }]}>
             <View style={{ flex: 1 }}>
               <TextInput
                 style={[
@@ -348,8 +348,8 @@ export default function HarvestForm({
                 onPress={() => setNoteModalVisible(false)}
               />
             </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+          </SafeAreaView>
+        </KeyboardAvoidingView>
       </Modal>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
