@@ -33,9 +33,9 @@ export default function Welcome() {
   });
 
   return (
-    <View>
+    <View style={{ alignItems: 'center', padding: 20 }}>
       {fullName ? (
-        <Text style={{ fontSize: 40, fontWeight: 'bold' }}>
+        <Text style={{ fontSize: 40, fontWeight: 'bold', textAlign: 'center' }}>
           {t('hello')}, {fullName}
         </Text>
       ) : (

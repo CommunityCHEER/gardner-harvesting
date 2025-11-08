@@ -1,4 +1,4 @@
-import { Text, Keyboard } from 'react-native';
+import { Text, Keyboard, View } from 'react-native';
 import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
@@ -97,7 +97,7 @@ export default function Index() {
         <>
           {!harvesting && !garden && <Welcome />}
           {(!claims || (!claims.developer && !claims.admin && !claims.gardener)) && (
-            <>
+            <View style={styles.centeredView}>
               <Text style={styles.text}>{translate('noClaimsForGardens')}</Text>
               {claims && (
                 <Text style={styles.text}>
@@ -117,7 +117,7 @@ export default function Index() {
                 }
                 disabled={claimsLoading}
               />
-            </>
+            </View>
           )}
           {harvesting && (
             <HarvestForm
@@ -130,7 +130,7 @@ export default function Index() {
             />
           )}
           {!harvesting && garden && (
-            <>
+            <View style={styles.centeredView}>
               {gardens.length > 0 && (
                 <DropDownPicker
                   placeholder={translate('selectGarden')}
@@ -157,7 +157,7 @@ export default function Index() {
                   onPress={logParticipation}
                 />
               )}
-            </>
+            </View>
           )}
           {!harvesting && !garden && gardens.length > 0 && (
             <DropDownPicker
@@ -177,12 +177,12 @@ export default function Index() {
           )}
         </>
       ) : (
-        <>
+        <View style={styles.centeredView}>
           <Text style={styles.text}>{translate('signInWarning')}</Text>
           <Link href="/user" asChild>
             <Button title={translate('goToUser')} />
           </Link>
-        </>
+        </View>
       )}
       <VersionDisplay />
       <Toast position="bottom" />
