@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, Dispatch, SetStateAction } from 'react';
 import {
   View,
   Text,
@@ -52,7 +52,23 @@ export interface DisplayUnit {
   fractional: boolean;
 }
 
-export default function HarvestForm({ garden }: { garden: string }) {
+export interface HarvestFormProps {
+  garden: string | null;
+  setGarden: Dispatch<SetStateAction<string | null>>;
+  gardens: ItemType<string>[];
+  gardenListOpen: boolean;
+  setGardenListOpen: Dispatch<SetStateAction<boolean>>;
+  onBack: () => void;
+}
+
+export default function HarvestForm({
+  garden,
+  setGarden,
+  gardens,
+  gardenListOpen,
+  setGardenListOpen,
+  onBack,
+}: HarvestFormProps) {
   const locales = useLocales();
   const locale = locales[0].languageCode ?? '';
 
@@ -135,6 +151,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
     useContext(participationContext);
 
   const logParticipation = async () => {
+    if (!garden) return;
     setParticipationLogged(true);
     const participation: Participation = {
       date: getDateString(),
@@ -153,6 +170,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
   );
 
   const submit = async () => {
+    if (!garden) return;
     setSubmitting(true);
 
     Keyboard.dismiss();
@@ -327,6 +345,21 @@ export default function HarvestForm({ garden }: { garden: string }) {
           style={styles.container}
           contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}
         >
+          {gardens.length > 0 && (
+            <DropDownPicker
+              placeholder={t('selectGarden')}
+              open={gardenListOpen}
+              setOpen={setGardenListOpen}
+              value={garden}
+              setValue={setGarden}
+              items={gardens}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdown}
+              textStyle={styles.text}
+              onPress={Keyboard.dismiss}
+              listMode="MODAL"
+            />
+          )}
           <Button
             title={t('takePhoto')}
             onPress={async () => {
@@ -405,6 +438,7 @@ export default function HarvestForm({ garden }: { garden: string }) {
                 <Button title={t('submit')} onPress={submit} />
               </View>
             ))}
+          <Button title={t('back')} onPress={onBack} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

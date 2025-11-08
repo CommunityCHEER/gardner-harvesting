@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Text } from 'react-native';
+import { Text, Keyboard } from 'react-native';
 import Button from '@/components/Button';
 import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
@@ -91,90 +91,99 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView style={styles.centeredView}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
-      >
-        <SafeAreaView style={styles.centeredView}>
-          {loggedIn && !!auth.currentUser ? (
+    <SafeAreaView style={styles.container}>
+      {loggedIn && !!auth.currentUser ? (
+        <>
+          {!harvesting && !garden && <Welcome />}
+          {(!claims || (!claims.developer && !claims.admin && !claims.gardener)) && (
             <>
-              {!harvesting && <Welcome />}
-              {gardens.length > 0 && (
-              <DropDownPicker
-                placeholder={translate('selectGarden')}
-                open={gardenListOpen}
-                setOpen={setGardenListOpen}
-                value={garden}
-                setValue={setGarden}
-                items={gardens}
-                setItems={setGardens}
-                style={styles.dropdown}
-                dropDownContainerStyle={styles.dropdown}
-                textStyle={styles.text}
-                onPress={Keyboard.dismiss}
-                listMode="MODAL"
+              <Text style={styles.text}>{translate('noClaimsForGardens')}</Text>
+              {claims && (
+                <Text style={styles.text}>
+                  {claims.developer && translate('youAreDeveloper')}
+                  {claims.admin && translate('youAreAdmin')}
+                  {claims.gardener && translate('youAreGardener')}
+                  {!claims.developer &&
+                    !claims.admin &&
+                    !claims.gardener &&
+                    translate('youHaveNoRole')}
+                </Text>
+              )}
+              <Button
+                title={translate('refreshClaims')}
+                onPress={() =>
+                  setClaimsChecks(prevClaimsChecks => prevClaimsChecks + 1)
+                }
+                disabled={claimsLoading}
               />
-              )}
-              {(!claims || (!claims.developer && !claims.admin && !claims.gardener)) && (
-                <>
-                  <Text style={styles.text}>{translate('noClaimsForGardens')}</Text>
-                  {claims && (
-                    <Text style={styles.text}>
-                      {claims.developer && translate('youAreDeveloper')}
-                      {claims.admin && translate('youAreAdmin')}
-                      {claims.gardener && translate('youAreGardener')}
-                      {!claims.developer &&
-                        !claims.admin &&
-                        !claims.gardener &&
-                        translate('youHaveNoRole')}
-                    </Text>
-                  )}
-                  <Button
-                    title={translate('refreshClaims')}
-                    onPress={() =>
-                      setClaimsChecks(prevClaimsChecks => prevClaimsChecks + 1)
-                    }
-                    disabled={claimsLoading}
-                  />
-                </>
-              )}
-              {harvesting && (
-                <>
-                  <HarvestForm garden={garden ?? ''} />
-                  <Button
-                    title={translate('back')}
-                    onPress={() => setHarvesting(false)}
-                  />
-                </>
-              )}
-              {!harvesting && garden && (
-                <>
-                  <Button
-                    title={translate('startHarvest')}
-                    onPress={() => setHarvesting(true)}
-                  />
-                  {!participationLogged && (
-                    <Button
-                      title={translate('logParticipation')}
-                      onPress={logParticipation}
-                    />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Text style={styles.text}>{translate('signInWarning')}</Text>
-              <Link href="/user" asChild>
-                <Button title={translate('goToUser')} />
-              </Link>
             </>
           )}
-          <Toast position="bottom" />
-        </SafeAreaView>
-      </KeyboardAvoidingView>
+          {harvesting && (
+            <HarvestForm
+              garden={garden}
+              setGarden={setGarden}
+              gardens={gardens}
+              gardenListOpen={gardenListOpen}
+              setGardenListOpen={setGardenListOpen}
+              onBack={() => setHarvesting(false)}
+            />
+          )}
+          {!harvesting && garden && (
+            <>
+              {gardens.length > 0 && (
+                <DropDownPicker
+                  placeholder={translate('selectGarden')}
+                  open={gardenListOpen}
+                  setOpen={setGardenListOpen}
+                  value={garden}
+                  setValue={setGarden}
+                  items={gardens}
+                  setItems={setGardens}
+                  style={styles.dropdown}
+                  dropDownContainerStyle={styles.dropdown}
+                  textStyle={styles.text}
+                  onPress={Keyboard.dismiss}
+                  listMode="MODAL"
+                />
+              )}
+              <Button
+                title={translate('startHarvest')}
+                onPress={() => setHarvesting(true)}
+              />
+              {!participationLogged && (
+                <Button
+                  title={translate('logParticipation')}
+                  onPress={logParticipation}
+                />
+              )}
+            </>
+          )}
+          {!harvesting && !garden && gardens.length > 0 && (
+            <DropDownPicker
+              placeholder={translate('selectGarden')}
+              open={gardenListOpen}
+              setOpen={setGardenListOpen}
+              value={garden}
+              setValue={setGarden}
+              items={gardens}
+              setItems={setGardens}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdown}
+              textStyle={styles.text}
+              onPress={Keyboard.dismiss}
+              listMode="MODAL"
+            />
+          )}
+        </>
+      ) : (
+        <>
+          <Text style={styles.text}>{translate('signInWarning')}</Text>
+          <Link href="/user" asChild>
+            <Button title={translate('goToUser')} />
+          </Link>
+        </>
+      )}
+      <Toast position="bottom" />
     </SafeAreaView>
   );
 }
