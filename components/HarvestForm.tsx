@@ -93,6 +93,21 @@ export default function HarvestForm({
   const [image, setImage] = useState<ImagePickerAsset>();
   const [note, setNote] = useState<string>('');
   const [noteModalVisible, setNoteModalVisible] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     const effect = async () => {
@@ -344,8 +359,9 @@ export default function HarvestForm({
         <ScrollView
           style={styles.container}
           contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}
+          keyboardShouldPersistTaps='handled'
         >
-          {gardens.length > 0 && (
+          {!keyboardVisible && gardens.length > 0 && (
             <DropDownPicker
               placeholder={t('selectGarden')}
               open={gardenListOpen}
@@ -360,25 +376,27 @@ export default function HarvestForm({
               listMode="MODAL"
             />
           )}
-          <Button
-            title={t('takePhoto')}
-            onPress={async () => {
-              Keyboard.dismiss();
-              const permissions = await requestCameraPermissionsAsync();
-              if (permissions.granted) {
-                const result = await launchCameraAsync();
-                if (result.canceled) return;
-                setImage(result.assets[0]);
-              }
-            }}
-          />
-          <Button
-            title={note ? t('editNote') : t('addNote')}
-            onPress={() => {
-              Keyboard.dismiss();
-              setNoteModalVisible(true);
-            }}
-          />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+            <Button
+              title={t('takePhoto')}
+              onPress={async () => {
+                Keyboard.dismiss();
+                const permissions = await requestCameraPermissionsAsync();
+                if (permissions.granted) {
+                  const result = await launchCameraAsync();
+                  if (result.canceled) return;
+                  setImage(result.assets[0]);
+                }
+              }}
+            />
+            <Button
+              title={note ? t('editNote') : t('addNote')}
+              onPress={() => {
+                Keyboard.dismiss();
+                setNoteModalVisible(true);
+              }}
+            />
+          </View>
           {image && (
             <Image
               src={image.uri}
@@ -388,7 +406,7 @@ export default function HarvestForm({
               }}
             />
           )}
-          {crops.length > 0 && (
+          {!keyboardVisible && crops.length > 0 && (
           <DropDownPicker
             placeholder={t('selectCrop')}
             open={cropListOpen}
@@ -434,11 +452,14 @@ export default function HarvestForm({
             (submitting ? (
               <ActivityIndicator />
             ) : (
-              <View style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+                <Button title={t('back')} onPress={onBack} />
                 <Button title={t('submit')} onPress={submit} />
               </View>
             ))}
-          <Button title={t('back')} onPress={onBack} />
+          {(!requiredMeasure || requiredMeasure === '.') && (
+            <Button title={t('back')} onPress={onBack} />
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
