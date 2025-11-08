@@ -62,13 +62,5 @@ target 'GardenerHarvesting' do
         end
       end
     end
-
-    # Add support for 16 KB page size iOS devices
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
-        config.build_settings['OTHER_LDFLAGS'] << '-Wl,-segprot,__DATA_CONST,rx,rx'
-      end
-    end
   end
 end

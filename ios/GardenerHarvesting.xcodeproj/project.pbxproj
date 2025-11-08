@@ -14,8 +14,8 @@
 		96905EF65AED1B983A6B3ABC /* libPods-GardenerHarvesting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-GardenerHarvesting.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		6783AE5194174CA2B1CE9A16 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E4CCC1CC48D8432FB67A3E1D /* GoogleService-Info.plist */; };
-		7E8377B93FAF4E8894D5CE29 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D208828108477483181411 /* noop-file.swift */; };
+		EAD61BDA994A4EC18818F52D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */; };
+		B2CD49A20140427696F745F5 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E2DB2A994F4AEB9C245A95 /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,9 +32,9 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-GardenerHarvesting/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		E4CCC1CC48D8432FB67A3E1D /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "GardenerHarvesting/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
-		D1D208828108477483181411 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GardenerHarvesting/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
-		3289AA86746C475089454B9A /* GardenerHarvesting-Bridging-Header.h */ = {isa = PBXFileReference; name = "GardenerHarvesting-Bridging-Header.h"; path = "GardenerHarvesting/GardenerHarvesting-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "GardenerHarvesting/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		94E2DB2A994F4AEB9C245A95 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GardenerHarvesting/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		E08841A30C3E4BB0AC560C04 /* GardenerHarvesting-Bridging-Header.h */ = {isa = PBXFileReference; name = "GardenerHarvesting-Bridging-Header.h"; path = "GardenerHarvesting/GardenerHarvesting-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +59,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				E4CCC1CC48D8432FB67A3E1D /* GoogleService-Info.plist */,
-				D1D208828108477483181411 /* noop-file.swift */,
-				3289AA86746C475089454B9A /* GardenerHarvesting-Bridging-Header.h */,
+				1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */,
+				94E2DB2A994F4AEB9C245A95 /* noop-file.swift */,
+				E08841A30C3E4BB0AC560C04 /* GardenerHarvesting-Bridging-Header.h */,
 			);
 			name = GardenerHarvesting;
 			sourceTree = "<group>";
@@ -201,8 +201,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				6783AE5194174CA2B1CE9A16 /* GoogleService-Info.plist in Resources */,
-				6EFC02292A53472D91574271 /* GardenerHarvesting-Bridging-Header.h in Resources */,
+				EAD61BDA994A4EC18818F52D /* GoogleService-Info.plist in Resources */,
+				7279B5927D4441B5BFF5918F /* GardenerHarvesting-Bridging-Header.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,7 +278,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				7E8377B93FAF4E8894D5CE29 /* noop-file.swift in Sources */,
+				B2CD49A20140427696F745F5 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,7 +305,6 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
-					"-Wl,-segprot,__DATA_CONST,rx,rx",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.communitycheer.gardner-harvesting";
 				PRODUCT_NAME = "GardenerHarvesting";
@@ -333,7 +332,6 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
-					"-Wl,-segprot,__DATA_CONST,rx,rx",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.communitycheer.gardner-harvesting";
 				PRODUCT_NAME = "GardenerHarvesting";
