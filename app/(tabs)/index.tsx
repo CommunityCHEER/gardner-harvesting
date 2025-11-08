@@ -6,6 +6,7 @@ import { Link } from 'expo-router';
 import { styles } from '@/constants/style';
 import HarvestForm from '@/components/HarvestForm';
 import Welcome from '@/components/Welcome';
+import VersionDisplay from '@/components/VersionDisplay';
 import Toast from 'react-native-toast-message';
 import { participationContext, firebaseContext } from '@/context';
 import { addDoc, collection, getDocs, doc } from 'firebase/firestore';
@@ -183,6 +184,7 @@ export default function Index() {
           </Link>
         </>
       )}
+      <VersionDisplay />
       <Toast position="bottom" />
     </SafeAreaView>
   );

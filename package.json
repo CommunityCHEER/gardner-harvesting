@@ -5,8 +5,8 @@
   "scripts": {
     "devbuild": "npx eas build -e development -p android",
     "start": "npx tsc && expo start --tunnel",
-    "start:web": "npx expo export --platform web && npx serve dist",
-    "deploy:web": "npx expo export --platform web && npx firebase deploy --only hosting",
+    "start:web": "EXPO_PUBLIC_GIT_HASH=$(git rev-parse --short HEAD) npx expo export --platform web && npx serve dist",
+    "deploy:web": "EXPO_PUBLIC_GIT_HASH=$(git rev-parse --short HEAD) npx expo export --platform web && npx firebase deploy --only hosting",
     "buildAndroid": "npx eas build --platform android --profile production",
     "buildIos": "npx eas build --platform ios --profile production",
     "submitAndroid": "npx eas submit -p android --latest --profile production",
