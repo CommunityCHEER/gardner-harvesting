@@ -376,27 +376,29 @@ export default function HarvestForm({
               listMode="MODAL"
             />
           )}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
-            <Button
-              title={t('takePhoto')}
-              onPress={async () => {
-                Keyboard.dismiss();
-                const permissions = await requestCameraPermissionsAsync();
-                if (permissions.granted) {
-                  const result = await launchCameraAsync();
-                  if (result.canceled) return;
-                  setImage(result.assets[0]);
-                }
-              }}
-            />
-            <Button
-              title={note ? t('editNote') : t('addNote')}
-              onPress={() => {
-                Keyboard.dismiss();
-                setNoteModalVisible(true);
-              }}
-            />
-          </View>
+          {crop && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+              <Button
+                title={t('takePhoto')}
+                onPress={async () => {
+                  Keyboard.dismiss();
+                  const permissions = await requestCameraPermissionsAsync();
+                  if (permissions.granted) {
+                    const result = await launchCameraAsync();
+                    if (result.canceled) return;
+                    setImage(result.assets[0]);
+                  }
+                }}
+              />
+              <Button
+                title={note ? t('editNote') : t('addNote')}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setNoteModalVisible(true);
+                }}
+              />
+            </View>
+          )}
           {image && (
             <Image
               src={image.uri}

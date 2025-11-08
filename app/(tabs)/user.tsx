@@ -8,6 +8,7 @@ import {
   TextInput,
 } from 'react-native';
 import Button from '@/components/Button';
+import PasswordInput from '@/components/PasswordInput';
 import { firebaseContext } from '@/context';
 import Toast, {
   BaseToast,
@@ -271,11 +272,10 @@ export default function User() {
                 onChangeText={setEmail}
                 style={styles.loginInput}
               />
-              <TextInput
+              <PasswordInput
                 placeholder={translate('password')}
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
                 style={styles.loginInput}
               />
               <Button
