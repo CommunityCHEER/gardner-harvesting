@@ -1,0 +1,59 @@
+
+> cheer-app@1.2.3 start:web
+> EXPO_PUBLIC_GIT_HASH=$(git rev-parse --short HEAD) npx expo export --platform web && npx serve dist --port 8082
+
+Starting Metro Bundler
+Web Bundled 3231ms node_modules/expo-router/entry.js (1197 modules)
+
+› Assets (56):
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.3a2ba31570920eeb9b1d217cabe58315.ttf (70.3 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.31b5ffea3daddc69dd01a1f3d6cf63c5.ttf (66.2 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/EvilIcons.140c53a7643ea949007aa9a282153849.ttf (13.5 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.a76d309774d33d9856f650bed4292a23.ttf (56.2 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome.b06871f281fee6b241d60582ae9369b9.ttf (166 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Brands.3b89dd103490708d19a95adcae52210e.ttf (134 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Regular.1f77739ca9ff2188b539c36f30ffa2be.ttf (33.7 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Solid.605ed7926cf39a2ad5ec2d1f9d391d3d.ttf (203 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Brands.56c8d80832e37783f12c05db7c8849e2.ttf (209 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Regular.370dd5af19f8364907b6e2c41f45dbbf.ttf (68 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Solid.adec7d6f310bc577f05e8fe06a5daccf.ttf (424 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Fontisto.b49ae8ab2dbccb02c4d11caaacf09eab.ttf (314 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Foundation.e20945d7c929279ef7a6f1db184a4470.ttf (57 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.6148e7019854f3bde85b633cb88f3c25.ttf (443 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.b62641afc9ab487008e996a5c5865e56.ttf (1.15 MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.4e85bc9ebe07e0340c9c4fc2f6c38908.ttf (357 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Octicons.f7c53c47a66934504fcbc7cc164895a7.ttf (49.4 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/SimpleLineIcons.d2285965fe34b05465047401b8595dd0.ttf (54.1 kB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Zocial.1681f34aaca71b8dfb70756bca331eb2.ttf (25.8 kB)
+node_modules/expo-router/assets/error.d1ea1496f9057eb392d5bbf3732a61b7.png (469 B)
+node_modules/expo-router/assets/file.19eeb73b9593a38f8e9f418337fc7d10.png (138 B)
+node_modules/expo-router/assets/forward.d8b800c443b8972542883e0b9de2bdc6.png (188 B)
+node_modules/expo-router/assets/pkg.ab19f4cbc543357183a20571f68380a3.png (364 B)
+node_modules/expo-router/assets/sitemap.412dd9275b6b48ad28f5e3d81bb1f626.png (465 B)
+node_modules/expo-router/assets/unmatched.20e71bdf79e3a97bf55fd9e164041578.png (4.75 kB)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon-mask.0a328cd9c1afd0afe8e3b1ec5165b1b4.png (653 B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png (207 B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55.png (4 variations | 425 B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7.png (4 variations | 235 B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/search-icon.286d67d3f74808a60a78d3ebf1a5fb57.png (928 B)
+node_modules/react-native-calendars/src/calendar/img/next.5cd69239c26b01e3a70a5b852b034f8e.png (180 B)
+node_modules/react-native-calendars/src/calendar/img/previous.87e5b6811f7ec9c6b4991b334b565992.png (186 B)
+node_modules/react-native-calendars/src/img/down.5d3a5c3005bed13682ef9f27207b2019.png (5 variations | 401 B)
+node_modules/react-native-calendars/src/img/up.09f8dc4c9ffd6c59e9884027c5008080.png (5 variations | 409 B)
+node_modules/react-native-dropdown-picker/src/themes/dark/icons/arrow-down.f8663b8d0a57ee5a52fdb473d37f98a5.png (15.4 kB)
+node_modules/react-native-dropdown-picker/src/themes/dark/icons/arrow-up.662cbd22bcf245bf15010a10234b86c4.png (15.5 kB)
+node_modules/react-native-dropdown-picker/src/themes/dark/icons/close.4536835ca8247ef876a38684c5e44ea0.png (15.4 kB)
+node_modules/react-native-dropdown-picker/src/themes/dark/icons/tick.ef62f02808d00936e74a17c215b8dedf.png (15.8 kB)
+node_modules/react-native-dropdown-picker/src/themes/light/icons/arrow-down.2a7caec15b44dc21d61ec0418f28d175.png (522 B)
+node_modules/react-native-dropdown-picker/src/themes/light/icons/arrow-up.3502dd7fb3dc2d242818428cabb8640a.png (807 B)
+node_modules/react-native-dropdown-picker/src/themes/light/icons/close.e993ca5fa1d40611dd0ba63e1bc88578.png (338 B)
+node_modules/react-native-dropdown-picker/src/themes/light/icons/tick.40f3c197e3f2478499f7208ae42a57f5.png (1.21 kB)
+
+› web bundles (1):
+_expo/static/js/web/entry-6b831a13d3bd82d7cd7aace04870b595.js (2.85 MB)
+
+› Files (2):
+index.html (1.19 kB)
+metadata.json (49 B)
+
+Exported: dist
