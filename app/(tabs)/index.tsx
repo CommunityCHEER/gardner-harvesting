@@ -21,7 +21,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
  * @returns {JSX.Element} The rendered screen.
  */
 export default function Index() {
-  const { db, auth } = useContext(firebaseContext);
+  const firebase = useContext(firebaseContext);
+  const { db, auth } = firebase;
   const loggedIn = !!useAuthState(auth)[0];
 
   const i18n = useContext(i18nContext);
@@ -131,6 +132,7 @@ export default function Index() {
               gardenListOpen={gardenListOpen}
               setGardenListOpen={setGardenListOpen}
               onBack={() => setHarvesting(false)}
+              {...firebase}
             />
           )}
           {!harvesting && garden && (

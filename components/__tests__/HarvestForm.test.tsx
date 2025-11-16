@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { KeyboardAvoidingView } from 'react-native';
 import HarvestForm from '../HarvestForm';
 import { i18nContext } from '@/i18n';
@@ -17,9 +17,40 @@ jest.mock('@/firebaseConfig', () => ({
 // Mock Firebase modules
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
-  doc: jest.fn(),
-  getDocs: jest.fn(() => Promise.resolve({ docs: [] })),
-  getDoc: jest.fn(() => Promise.resolve({ data: () => ({}) })),
+  doc: jest.fn((...args) => ({ path: args.slice(1).join('/') })),
+  getDocs: jest.fn(() =>
+    Promise.resolve({
+      docs: [
+        { id: 'crop-1', data: () => ({}) },
+        { id: 'crop-2', data: () => ({}) },
+      ],
+      forEach: callback => {
+        const units = [
+          {
+            id: 'required',
+            data: () => ({
+              value: { id: 'unit-kg', path: 'cropUnits/unit-kg' },
+            }),
+          },
+        ];
+        units.forEach(callback);
+      },
+    })
+  ),
+  getDoc: jest.fn(docRef => {
+    const path = docRef.path;
+    if (path.includes('/name/')) {
+      return Promise.resolve({ data: () => ({ value: 'Mocked Name' }) });
+    }
+    // For unit document
+    if (path.startsWith('cropUnits/')) {
+      return Promise.resolve({
+        id: 'unit-kg',
+        data: () => ({ fractional: false }),
+      });
+    }
+    return Promise.resolve({ data: () => ({}) });
+  }),
   addDoc: jest.fn(() => Promise.resolve({ id: 'test-id' })),
 }));
 jest.mock('firebase/database', () => ({
@@ -45,7 +76,29 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn(),
   default: { show: jest.fn() },
 }));
-jest.mock('react-native-dropdown-picker', () => 'DropDownPicker');
+jest.mock('react-native-dropdown-picker', () => {
+  const { View, Button } = jest.requireActual('react-native');
+  return (props: any) => {
+    const { value, items, setValue, onSelectItem } = props;
+    return (
+      <View>
+        {items.map((item: any) => (
+          <Button
+            key={item.value}
+            title={item.label}
+            onPress={() => {
+              setValue(item.value);
+              if (onSelectItem) {
+                onSelectItem(item);
+              }
+            }}
+          />
+        ))}
+      </View>
+    );
+  };
+});
+jest.mock('../MeasureInput', () => () => <></>);
 
 const mockI18n = {
   t: (key: string) => {
@@ -86,18 +139,17 @@ const renderHarvestForm = (garden: string | null = 'test-garden') => {
 
   return render(
     <i18nContext.Provider value={mockI18n as any}>
-      <firebaseContext.Provider value={mockFirebase}>
-        <participationContext.Provider value={mockParticipationContext}>
-          <HarvestForm
-            garden={garden}
-            setGarden={mockSetGarden}
-            gardens={mockGardens}
-            gardenListOpen={false}
-            setGardenListOpen={mockSetGardenListOpen}
-            onBack={mockOnBack}
-          />
-        </participationContext.Provider>
-      </firebaseContext.Provider>
+      <participationContext.Provider value={mockParticipationContext}>
+        <HarvestForm
+          garden={garden}
+          setGarden={mockSetGarden}
+          gardens={mockGardens}
+          gardenListOpen={false}
+          setGardenListOpen={mockSetGardenListOpen}
+          onBack={mockOnBack}
+          {...mockFirebase}
+        />
+      </participationContext.Provider>
     </i18nContext.Provider>
   );
 };
@@ -125,47 +177,45 @@ describe('HarvestForm Note Feature', () => {
       expect(queryByText('Take Photo')).toBeNull();
     });
 
-    test.skip('should render "Add Note" and "Take Photo" buttons after selecting a crop', async () => {
-      // TODO: Component needs refactoring for testability
-      // Current issue: Cannot easily mock internal 'crop' state
-      // Solution: Refactor component to accept initialCrop prop or extract button logic to separate component
-      // These behaviors are covered by manual/integration testing for now
+    test('should render "Add Note" and "Take Photo" buttons after selecting a crop', async () => {
+      const { getByText, findAllByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+      fireEvent.press(cropButtons[0]);
+      expect(getByText('Add Note')).toBeTruthy();
+      expect(getByText('Take Photo')).toBeTruthy();
     });
 
-    test.skip('should open note modal when "Add Note" button is pressed', async () => {
-      // TODO: Requires component refactoring (see above)
+    test('should open note modal when "Add Note" button is pressed', async () => {
+      const { getByText, getByTestId, findAllByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+      fireEvent.press(cropButtons[0]);
+      fireEvent.press(getByText('Add Note'));
+      expect(getByTestId('note-modal')).toBeTruthy();
     });
   });
 
   describe('Note Modal', () => {
-    test.skip('should use KeyboardAvoidingView in modal', async () => {
-      // TODO: Requires component refactoring for testability
-    });
-
-    test.skip('should display full-screen text input when modal is open', async () => {
-      // TODO: Requires component refactoring for testability
-    });
-
-    test.skip('should display "Save Note" button in modal', async () => {
-      // TODO: Requires component refactoring for testability
-    });
-
-    test.skip('should allow text entry in note field', async () => {
-      // TODO: Requires component refactoring for testability
-    });
-
-    test.skip('should save note and close modal when "Save Note" is pressed', async () => {
-      // TODO: Requires component refactoring for testability
+    test('should save note and close modal when "Save Note" is pressed', async () => {
+      const { getByText, getByPlaceholderText, queryByTestId, findAllByText } =
+        renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+      fireEvent.press(cropButtons[0]);
+      fireEvent.press(getByText('Add Note'));
+      fireEvent.changeText(getByPlaceholderText('Enter note...'), 'My test note');
+      fireEvent.press(getByText('Save Note'));
+      expect(queryByTestId('note-modal')).toBeNull();
     });
   });
 
   describe('Button Label Changes', () => {
-    test.skip('should change button label to "Edit Note" after note is saved', async () => {
-      // TODO: Requires component refactoring for testability
-    });
-
-    test.skip('should preserve note content when editing', async () => {
-      // TODO: Requires component refactoring for testability
+    test('should change button label to "Edit Note" after note is saved', async () => {
+      const { getByText, getByPlaceholderText, findAllByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+      fireEvent.press(cropButtons[0]);
+      fireEvent.press(getByText('Add Note'));
+      fireEvent.changeText(getByPlaceholderText('Enter note...'), 'My test note');
+      fireEvent.press(getByText('Save Note'));
+      expect(getByText('Edit Note')).toBeTruthy();
     });
   });
 

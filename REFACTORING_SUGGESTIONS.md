@@ -6,7 +6,7 @@ This document outlines several suggestions for refactoring the codebase to impro
 
 The current test suite is sparse, and some components are difficult to test. We should adopt a test-first, TDD approach for all future development.
 
-### `HarvestForm.tsx`
+### `HarvestForm.tsx` (Completed)
 
 The `HarvestForm.tsx` component is the most critical component in the app, yet it has the least test coverage. The existing test file is almost entirely skipped.
 
