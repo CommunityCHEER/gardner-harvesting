@@ -6,6 +6,23 @@
 const tintColorLight = '#5bb974';
 const tintColorDark = '#fff';
 
+/**
+ * An object containing color schemes for light and dark modes.
+ * @property {object} light - The light mode color scheme.
+ * @property {string} light.text - The text color.
+ * @property {string} light.background - The background color.
+ * @property {string} light.tint - The tint color.
+ * @property {string} light.icon - The icon color.
+ * @property {string} light.tabIconDefault - The default tab icon color.
+ * @property {string} light.tabIconSelected - The selected tab icon color.
+ * @property {object} dark - The dark mode color scheme.
+ * @property {string} dark.text - The text color.
+ * @property {string} dark.background - The background color.
+ * @property {string} dark.tint - The tint color.
+ * @property {string} dark.icon - The icon color.
+ * @property {string} dark.tabIconDefault - The default tab icon color.
+ * @property {string} dark.tabIconSelected - The selected tab icon color.
+ */
 export const Colors = {
   light: {
     text: '#11181C',

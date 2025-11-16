@@ -17,6 +17,10 @@ import { getDateString } from '@/utility/functions';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+/**
+ * A screen for logging and viewing participation in garden activities.
+ * @returns {JSX.Element} The rendered screen.
+ */
 export default function Participation() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);

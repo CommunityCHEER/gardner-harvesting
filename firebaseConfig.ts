@@ -12,15 +12,21 @@ import { getDatabase } from 'firebase/database';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * The configuration object for the Firebase app.
+ */
 export const firebaseConfig = {
-  apiKey: 'AIzaSyAql__a3U-pgQ21bTofEN_otegnM0N11lM',
-  authDomain: 'cheer-app-prototype.firebaseapp.com',
-  projectId: 'cheer-app-prototype',
-  storageBucket: 'cheer-app-prototype.appspot.com',
-  messagingSenderId: '949576645162',
-  appId: '1:949576645162:web:5ebaa19d4c8b88dcff6153',
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+/**
+ * The initialized Firebase app instance.
+ */
 export const app = initializeApp(firebaseConfig);
 
 let auth: Auth;
@@ -33,7 +39,19 @@ if (Platform.OS === 'web') {
   });
 }
 
+/**
+ * The Firebase Authentication instance.
+ */
 export { auth };
+/**
+ * The Firestore database instance.
+ */
 export const db = getFirestore(app);
+/**
+ * The Firebase Storage instance.
+ */
 export const storage = getStorage(app);
+/**
+ * The Firebase Realtime Database instance.
+ */
 export const realtime = getDatabase(app);

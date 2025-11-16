@@ -51,7 +51,7 @@ export interface DisplayUnit {
   name: string;
   fractional: boolean;
 }
-// test comment
+
 export interface HarvestFormProps {
   garden: string | null;
   setGarden: Dispatch<SetStateAction<string | null>>;
@@ -60,7 +60,6 @@ export interface HarvestFormProps {
   setGardenListOpen: Dispatch<SetStateAction<boolean>>;
   onBack: () => void;
 }
-
 export default function HarvestForm({
   garden,
   setGarden,

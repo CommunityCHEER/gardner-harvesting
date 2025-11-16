@@ -108,14 +108,24 @@ const translations = {
   },
 };
 
+/**
+ * The I18n instance used for internationalization.
+ */
 const i18n = new I18n(translations);
 
 i18n.enableFallback = true;
 
 i18n.locale = getLocales()[0].languageTag ?? 'en';
 
+/**
+ * React context for providing the I18n instance to components.
+ */
 export const i18nContext = createContext(i18n);
 
+/**
+ * A hook for accessing the I18n instance.
+ * @returns {I18n} The I18n instance.
+ */
 export function useI18n() {
   const i18n = new I18n(translations);
   i18n.enableFallback = true;
