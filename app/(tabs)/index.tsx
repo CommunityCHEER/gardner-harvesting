@@ -16,6 +16,10 @@ import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+/**
+ * The main screen of the app, where users can select a garden and start harvesting.
+ * @returns {JSX.Element} The rendered screen.
+ */
 export default function Index() {
   const { db, auth } = useContext(firebaseContext);
   const loggedIn = !!useAuthState(auth)[0];

@@ -5,6 +5,15 @@ import { styles } from '@/constants/style';
 import { i18nContext } from '@/i18n';
 
 
+/**
+ * A component for inputting a measurement, with optional sub-unit support.
+ * @param {object} props - The component props.
+ * @param {string} props.measure - The current measurement value.
+ * @param {(measure: string) => void} props.setMeasure - The function to call when the measurement changes.
+ * @param {DisplayUnit} props.unit - The unit of measurement.
+ * @param {boolean} [props.optional=false] - Whether the input is optional.
+ * @returns {JSX.Element} The rendered component.
+ */
 export default function MeasureInput({
   measure,
   setMeasure,
