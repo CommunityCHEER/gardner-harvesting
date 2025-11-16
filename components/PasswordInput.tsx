@@ -8,10 +8,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+/**
+ * Props for the PasswordInput component.
+ * @interface PasswordInputProps
+ * @extends {TextInputProps}
+ * @property {any} [style] - Custom styles to apply to the text input.
+ */
 interface PasswordInputProps extends TextInputProps {
   style?: any;
 }
 
+/**
+ * A text input component for entering passwords, with a button to toggle visibility.
+ * @param {PasswordInputProps} props - The component props.
+ * @returns {JSX.Element} The rendered component.
+ */
 export default function PasswordInput({
   style,
   ...props

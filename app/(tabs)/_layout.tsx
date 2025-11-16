@@ -5,6 +5,10 @@ import { i18nContext } from '@/i18n';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { firebaseContext } from '@/context';
 
+/**
+ * The layout component for the main tabs of the application.
+ * @returns {JSX.Element} The rendered tab layout.
+ */
 export default function TabLayout() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);

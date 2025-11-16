@@ -13,6 +13,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { User } from '@/types/firestore';
 import { styles } from '@/constants/style';
 
+/**
+ * A component that displays a welcome message to the currently logged-in user.
+ * @returns {JSX.Element} The rendered component.
+ */
 export default function Welcome() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);

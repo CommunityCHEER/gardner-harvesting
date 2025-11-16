@@ -28,6 +28,10 @@ import { styles } from '@/constants/style';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { deleteUser } from 'firebase/auth';
 
+/**
+ * A screen for user authentication, including sign-up, sign-in, and password reset.
+ * @returns {JSX.Element} The rendered screen.
+ */
 export default function User() {
   const { auth, db } = useContext(firebaseContext);
   const [userInfo, setUserInfo] = useState<UserInfo>();

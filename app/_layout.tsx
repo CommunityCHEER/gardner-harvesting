@@ -12,6 +12,11 @@ import { getDateString } from '@/utility/functions';
 import { Participation } from '@/types/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+/**
+ * The root layout component for the application.
+ * This component sets up the necessary context providers for Firebase, i18n, and participation.
+ * @returns {JSX.Element} The rendered layout.
+ */
 export default function Layout() {
   const i18n = useI18n();
 

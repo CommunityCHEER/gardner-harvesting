@@ -2,6 +2,64 @@
 Devin Droddy <devin.droddy@gmail.com>
 :toc:
 
+== Getting Started
+
+This guide will help you get the app running on your local machine for development and testing purposes.
+
+=== Prerequisites
+
+- Node.js (v18 or newer)
+- npm or yarn
+
+=== Installation
+
+1. Clone the repository:
++
+[source,bash]
+----
+git clone https://github.com/cheer-community-gardens/cheer-app.git
+----
+2. Navigate to the project directory:
++
+[source,bash]
+----
+cd cheer-app
+----
+3. Install the dependencies:
++
+[source,bash]
+----
+npm install
+----
+
+=== Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file:
+
+`EXPO_PUBLIC_FIREBASE_API_KEY`
+`EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`
+`EXPO_PUBLIC_FIREBASE_PROJECT_ID`
+`EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET`
+`EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+`EXPO_PUBLIC_FIREBASE_APP_ID`
+
+Create a `.env` file in the root of the project and add the variables above.
+
+=== Running the App
+
+To start the development server, run:
+
+[source,bash]
+----
+npm start
+----
+
+This will open the Expo developer tools in your browser. From there, you can:
+
+- Run on an Android device/emulator: `npm run android`
+- Run on an iOS device/emulator: `npm run ios`
+- Run in a web browser: `npm run web`
+
 == Purpose
 
 It's important for CHEER's Long Branch Gardeners program to keep effective track of the produce collected to be able to present such data for potential grants. Additionally, gardeners can receive awards for frequent participation. Originally, all of this data was collected on paper and collected by hand, then manually entered into a Google Sheet. This was cumbersome and slowly becoming messy. This app streamlines the process of data collection by providing an easy-to-use form that allows for versatile but consistently-structured uploading of harvest data, as well as a simple system for logging participation and a means of viewing past participation.
