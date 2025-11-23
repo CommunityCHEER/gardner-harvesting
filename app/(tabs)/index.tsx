@@ -124,7 +124,7 @@ export default function Index() {
               />
             </View>
           )}
-          {harvesting && (
+          {harvesting && db && (
             <HarvestForm
               garden={garden}
               setGarden={setGarden}
@@ -132,7 +132,10 @@ export default function Index() {
               gardenListOpen={gardenListOpen}
               setGardenListOpen={setGardenListOpen}
               onBack={() => setHarvesting(false)}
-              {...firebase}
+              db={db}
+              auth={auth}
+              realtime={firebase.realtime}
+              storage={firebase.storage}
             />
           )}
           {!harvesting && garden && (
