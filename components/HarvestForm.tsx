@@ -9,15 +9,14 @@ import {
   SafeAreaView,
   Platform,
   ScrollView,
-  Modal,
-  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
-import { firebaseContext, participationContext } from '@/context';
+import { participationContext, FirebaseContext } from '@/context';
+import useStore from '../store';
 import {
   addDoc,
   collection,
@@ -39,12 +38,10 @@ import { ref as realtimeRef, set } from 'firebase/database';
 import { useList } from 'react-firebase-hooks/database';
 import { getDateString } from '@/utility/functions';
 import MeasureInput from './MeasureInput';
-import {
-  ImagePickerAsset,
-  launchCameraAsync,
-  requestCameraPermissionsAsync,
-} from 'expo-image-picker';
+import { ImagePickerAsset } from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
+import ImagePicker from './ImagePicker';
+import NoteTaker from './NoteTaker';
 
 export interface DisplayUnit {
   id: string;
@@ -68,18 +65,17 @@ export default function HarvestForm({
   setGardenListOpen,
   onBack,
 }: HarvestFormProps) {
+  const { db, auth, realtime, storage } = useContext(FirebaseContext);
   const locales = useLocales();
   const locale = locales[0].languageCode ?? '';
 
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
 
-  const { db, auth, realtime, storage } = useContext(firebaseContext);
-
   // Crop-related state
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
-  const [crop, setCrop] = useState<string | null>(null);
+  const { crop, setCrop } = useStore();
   const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
   const [optionalUnits, setOptionalUnits] = useState<DisplayUnit[]>([]);
 
@@ -90,8 +86,6 @@ export default function HarvestForm({
   // UI state
   const [submitting, setSubmitting] = useState(false);
   const [image, setImage] = useState<ImagePickerAsset>();
-  const [note, setNote] = useState<string>('');
-  const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -218,6 +212,7 @@ export default function HarvestForm({
         ]
       );
 
+      const { note } = useStore.getState();
       const harvest: Harvest = {
         date: getDateString(),
         person: doc(db, 'people', auth.currentUser?.uid ?? ''),
@@ -268,7 +263,7 @@ export default function HarvestForm({
     setRequiredMeasure('');
     setOptionalMeasures([]);
     setImage(undefined);
-    setNote('');
+    useStore.getState().setNote('');
   };
 
   const [totalToday, setTotalToday] = useState(0);
@@ -309,47 +304,6 @@ export default function HarvestForm({
 
   return (
     <SafeAreaView style={styles.container}>
-      <Modal
-        visible={noteModalVisible}
-        animationType="slide"
-        presentationStyle="fullScreen"
-        onRequestClose={() => setNoteModalVisible(false)}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        >
-          <SafeAreaView style={[styles.container, { padding: 20 }]}>
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={[
-                  styles.text,
-                  {
-                    borderWidth: 1,
-                    borderColor: '#ccc',
-                    borderRadius: 8,
-                    padding: 10,
-                    minHeight: 200,
-                    textAlignVertical: 'top',
-                  },
-                ]}
-                multiline
-                placeholder="Enter note..."
-                value={note}
-                onChangeText={setNote}
-                autoFocus
-              />
-            </View>
-            <View style={{ marginBottom: 20 }}>
-              <Button
-                title={t('saveNote')}
-                onPress={() => setNoteModalVisible(false)}
-              />
-            </View>
-          </SafeAreaView>
-        </KeyboardAvoidingView>
-      </Modal>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -377,38 +331,16 @@ export default function HarvestForm({
           )}
           {crop && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
-              <Button
-                title={t('takePhoto')}
-                onPress={async () => {
-                  Keyboard.dismiss();
-                  const permissions = await requestCameraPermissionsAsync();
-                  if (permissions.granted) {
-                    const result = await launchCameraAsync();
-                    if (result.canceled) return;
-                    setImage(result.assets[0]);
-                  }
-                }}
+              <ImagePicker
+                onImageSelected={setImage}
+                buttonTitle={t('takePhoto')}
               />
-              <Button
-                title={note ? t('editNote') : t('addNote')}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setNoteModalVisible(true);
-                }}
-              />
+              <NoteTaker />
             </View>
-          )}
-          {image && (
-            <Image
-              src={image.uri}
-              style={{
-                aspectRatio: image.width / image.height,
-                height: Math.min(image.height / 60, 75),
-              }}
-            />
           )}
           {!keyboardVisible && crops.length > 0 && (
           <DropDownPicker
+            testID='crop-picker'
             placeholder={t('selectCrop')}
             open={cropListOpen}
             setOpen={setCropListOpen}
