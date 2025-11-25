@@ -40,7 +40,9 @@ import MeasureInput from './MeasureInput';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
 import NoteModal from './NoteModal';
+import NoteTaker from './NoteTaker';
 import ImagePicker from './ImagePicker';
+import useStore from '../store';
 
 export interface DisplayUnit {
   id: string;
@@ -306,16 +308,6 @@ export default function HarvestForm({
 
   return (
     <SafeAreaView style={styles.container}>
-      <NoteModal
-        visible={noteModalVisible}
-        note={note}
-        onClose={() => setNoteModalVisible(false)}
-        onSave={newNote => {
-          setNote(newNote);
-          setNoteModalVisible(false);
-        }}
-        saveButtonTitle={t('saveNote')}
-      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -347,17 +339,9 @@ export default function HarvestForm({
                 onImageSelected={setImage}
                 buttonTitle={t('takePhoto')}
               />
-              <Button
-                title={note ? t('editNote') : t('addNote')}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setNoteModalVisible(true);
-                }}
-              />
-              <NoteTaker />
             </View>
           )}
-          {!keyboardVisible && crops.length > 0 && (
+          {crops.length > 0 && (
           <DropDownPicker
             testID='crop-picker'
             placeholder={t('selectCrop')}
@@ -372,7 +356,6 @@ export default function HarvestForm({
             textStyle={styles.text}
             searchable={true}
             searchPlaceholder="Search..."
-            onPress={Keyboard.dismiss}
             listMode="MODAL"
           />
           )}
