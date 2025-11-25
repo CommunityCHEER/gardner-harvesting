@@ -1,7 +1,7 @@
 {
   "name": "cheer-app",
   "main": "expo-router/entry",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "scripts": {
     "expo:doctor": "npx expo-doctor",
     "start": "npx tsc && expo start --tunnel",
