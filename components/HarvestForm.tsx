@@ -40,7 +40,9 @@ import MeasureInput from './MeasureInput';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
 import NoteModal from './NoteModal';
+import NoteTaker from './NoteTaker';
 import ImagePicker from './ImagePicker';
+import useStore from '../store';
 
 export interface DisplayUnit {
   id: string;
@@ -77,7 +79,7 @@ export default function HarvestForm({
   // Crop-related state
   const [crops, setCrops] = useState<ItemType<string>[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
-  const [crop, setCrop] = useState<string | null>(null);
+  const { crop, setCrop } = useStore();
   const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
   const [optionalUnits, setOptionalUnits] = useState<DisplayUnit[]>([]);
 
@@ -88,8 +90,6 @@ export default function HarvestForm({
   // UI state
   const [submitting, setSubmitting] = useState(false);
   const [image, setImage] = useState<ImagePickerAsset>();
-  const [note, setNote] = useState<string>('');
-  const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -216,6 +216,7 @@ export default function HarvestForm({
         ]
       );
 
+      const { note } = useStore.getState();
       const harvest: Harvest = {
         date: getDateString(),
         person: doc(db, 'people', auth.currentUser?.uid ?? ''),
@@ -266,7 +267,7 @@ export default function HarvestForm({
     setRequiredMeasure('');
     setOptionalMeasures([]);
     setImage(undefined);
-    setNote('');
+    useStore.getState().setNote('');
   };
 
   const [totalToday, setTotalToday] = useState(0);
@@ -307,16 +308,6 @@ export default function HarvestForm({
 
   return (
     <SafeAreaView style={styles.container}>
-      <NoteModal
-        visible={noteModalVisible}
-        note={note}
-        onClose={() => setNoteModalVisible(false)}
-        onSave={newNote => {
-          setNote(newNote);
-          setNoteModalVisible(false);
-        }}
-        saveButtonTitle={t('saveNote')}
-      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -348,17 +339,11 @@ export default function HarvestForm({
                 onImageSelected={setImage}
                 buttonTitle={t('takePhoto')}
               />
-              <Button
-                title={note ? t('editNote') : t('addNote')}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setNoteModalVisible(true);
-                }}
-              />
             </View>
           )}
-          {!keyboardVisible && crops.length > 0 && (
+          {crops.length > 0 && (
           <DropDownPicker
+            testID='crop-picker'
             placeholder={t('selectCrop')}
             open={cropListOpen}
             setOpen={setCropListOpen}
@@ -371,7 +356,6 @@ export default function HarvestForm({
             textStyle={styles.text}
             searchable={true}
             searchPlaceholder="Search..."
-            onPress={Keyboard.dismiss}
             listMode="MODAL"
           />
           )}
