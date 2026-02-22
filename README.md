@@ -9,12 +9,12 @@ App for tracking/logging participation in CHEER's Long Branch Gardener Program a
 
 | Layer | Technology | Version |
 |---|---|---|
-| Framework | Expo (SDK 52) | ~52.0.0 |
-| React Native | react-native | 0.76.9 |
-| React | react | 18.3.1 |
-| TypeScript | typescript | ~5.3.3 |
+| Framework | Expo (SDK 53) | ~53.0.0 |
+| React Native | react-native | 0.79.6 |
+| React | react | 19.0.0 |
+| TypeScript | typescript | ~5.8.3 |
 | JS Engine | Hermes | default |
-| Router | expo-router | ~4.0.21 |
+| Router | expo-router | ~5.1.11 |
 | Backend | Firebase (Auth, Firestore, RTDB, Storage, Hosting) | ^11.2.0 |
 | i18n | i18n-js | ^4.4.3 |
 
