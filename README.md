@@ -85,25 +85,37 @@ brew install watchman
 xcode-select --install
 ```
 
-4. Verify the active Command Line Tools path:
+4. **Point `xcode-select` at the full Xcode app** (required for iOS Simulator and native builds):
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
+
+5. Verify:
 
 ```bash
 xcode-select -p
-# should print something like /Applications/Xcode.app/Contents/Developer
+# MUST print: /Applications/Xcode.app/Contents/Developer
+#
+# If it prints /Library/Developer/CommandLineTools instead, you have
+# only the standalone CLI tools selected — iOS builds will fail.
+# Re-run the sudo xcode-select -s command above after installing Xcode.app.
 ```
 
-5. In Xcode → **Settings → Locations**, confirm the **Command Line Tools** dropdown is set to the installed Xcode version.
+6. In Xcode → **Settings → Locations**, confirm the **Command Line Tools** dropdown is set to the installed Xcode version.
 
 ### CocoaPods
 
-Required for iOS native dependencies. The EAS production build pins CocoaPods 1.15.2 (see [eas.json](eas.json)), but any recent version works locally:
+Required for iOS native dependencies. The EAS production build pins CocoaPods 1.15.2 (see [eas.json](eas.json)), but any recent version works locally.
+
+**Recommended — install via Homebrew** (avoids Ruby version issues):
 
 ```bash
-sudo gem install cocoapods
+brew install cocoapods
 pod --version
 ```
 
-If you hit Ruby permission issues on macOS, consider using `rbenv` or the system Ruby with `--user-install`.
+> **Why not `gem install`?** macOS ships with Ruby 2.6, which is too old for recent CocoaPods dependencies (e.g., `ffi` requires Ruby >= 3.0). Using `brew install cocoapods` sidesteps this entirely. If you prefer the gem route, first install a modern Ruby via `brew install ruby` or `rbenv`.
 
 ### Android Studio & SDK (Android development)
 
