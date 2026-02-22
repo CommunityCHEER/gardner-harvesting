@@ -10,7 +10,7 @@ In all interactions and commit messages, be extremely concise and sacrifice gram
     *   **Automation:** PRs introducing new automation are always welcome.
     *   **Readable, self-documenting code:** Code should be easy to follow, with clear function/variable names and adherence to the single responsibility principle.
 *   **Deployment:**
-    *  Codebase is hosted on...
+    *  Codebase is hosted on GitHub.
 
 ### TDD Workflow (MANDATORY)
 
