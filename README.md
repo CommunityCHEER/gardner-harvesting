@@ -297,6 +297,15 @@ npx expo run:ios
 
 The `android/` directory is intentionally **gitignored** — it is generated on demand during the first build.
 
+**Before running**, verify an emulator is running or a device is connected:
+
+```bash
+adb devices
+# should list at least one device/emulator
+```
+
+If no devices are listed, launch an emulator first (see [Setting up an Android emulator](#setting-up-an-android-emulator-avd) below).
+
 ```bash
 npx expo run:android
 ```
@@ -310,6 +319,15 @@ Alternatively:
 
 ```bash
 npm run android
+```
+
+### Choosing an emulator or device
+
+To pick a specific target when multiple emulators/devices are connected:
+
+```bash
+npx expo run:android --device
+# presents a list of available emulators and connected devices
 ```
 
 ### Setting up an Android emulator (AVD)
@@ -357,14 +375,27 @@ npx expo run:android
 
 ### Troubleshooting
 
-To regenerate the native project from scratch:
+**App built successfully but doesn't appear on the emulator:**
+
+1. Verify the emulator is still running: `adb devices`. If it shows no devices, the emulator may have closed during the build.
+2. Check that the APK was actually produced:
+   ```bash
+   find android -name "*.apk"
+   ```
+3. If the APK exists, install it manually:
+   ```bash
+   adb install android/app/build/outputs/apk/debug/app-debug.apk
+   ```
+4. The app may not be on the home screen — swipe up to open the **app drawer** and look for **"Gardener Harvesting"**.
+
+**Regenerate the native project from scratch:**
 
 ```bash
 npx expo prebuild --clean --platform android
 npx expo run:android
 ```
 
-If Gradle errors persist, try clearing the Gradle cache:
+**Gradle errors persist — clear the build cache:**
 
 ```bash
 cd android && ./gradlew clean && cd ..
