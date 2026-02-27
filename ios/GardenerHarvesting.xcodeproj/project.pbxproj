@@ -3,40 +3,35 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1720A042A3ECF32D1A5A1FB1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7E8426861D8796560348FEDE /* PrivacyInfo.xcprivacy */; };
+		3D7EE60671618FF67448150B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D8C77243126FAB8F1A61442F /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		96905EF65AED1B983A6B3ABC /* libPods-GardenerHarvesting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-GardenerHarvesting.a */; };
-		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
-		B2CD49A20140427696F745F5 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E2DB2A994F4AEB9C245A95 /* noop-file.swift */; };
+		7CA8B311FF9C9A3039E0B4F4 /* libPods-GardenerHarvesting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DCDABD59D1D7DC6CF248D9D2 /* libPods-GardenerHarvesting.a */; };
+		80A87DE99F904F38990BE121 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 87B9BA6511884614B0C6E7DC /* GoogleService-Info.plist */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		EAD61BDA994A4EC18818F52D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */; };
+		D137BA6380CDEDD94A54EECF /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F16C6636871C4C8A5FC865 /* ExpoModulesProvider.swift */; };
+		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* GardenerHarvesting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GardenerHarvesting.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = GardenerHarvesting/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = GardenerHarvesting/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GardenerHarvesting/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = GardenerHarvesting/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = GardenerHarvesting/main.m; sourceTree = "<group>"; };
-		1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GardenerHarvesting/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-GardenerHarvesting.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GardenerHarvesting.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6C2E3173556A471DD304B334 /* Pods-GardenerHarvesting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GardenerHarvesting.debug.xcconfig"; path = "Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting.debug.xcconfig"; sourceTree = "<group>"; };
-		7A4D352CD337FB3A3BF06240 /* Pods-GardenerHarvesting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GardenerHarvesting.release.xcconfig"; path = "Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting.release.xcconfig"; sourceTree = "<group>"; };
-		7E8426861D8796560348FEDE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = GardenerHarvesting/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		94E2DB2A994F4AEB9C245A95 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "GardenerHarvesting/noop-file.swift"; sourceTree = "<group>"; };
+		4876C0684891E74F54DA1CE6 /* Pods-GardenerHarvesting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GardenerHarvesting.debug.xcconfig"; path = "Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting.debug.xcconfig"; sourceTree = "<group>"; };
+		87B9BA6511884614B0C6E7DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GardenerHarvesting/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = GardenerHarvesting/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		E08841A30C3E4BB0AC560C04 /* GardenerHarvesting-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "GardenerHarvesting-Bridging-Header.h"; path = "GardenerHarvesting/GardenerHarvesting-Bridging-Header.h"; sourceTree = "<group>"; };
+		D0F49271429589985002AB3F /* Pods-GardenerHarvesting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GardenerHarvesting.release.xcconfig"; path = "Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting.release.xcconfig"; sourceTree = "<group>"; };
+		D8C77243126FAB8F1A61442F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = GardenerHarvesting/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DCDABD59D1D7DC6CF248D9D2 /* libPods-GardenerHarvesting.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GardenerHarvesting.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-GardenerHarvesting/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GardenerHarvesting/AppDelegate.swift; sourceTree = "<group>"; };
+		F11748442D0722820044C1D9 /* GardenerHarvesting-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GardenerHarvesting-Bridging-Header.h"; path = "GardenerHarvesting/GardenerHarvesting-Bridging-Header.h"; sourceTree = "<group>"; };
+		F5F16C6636871C4C8A5FC865 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-GardenerHarvesting/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96905EF65AED1B983A6B3ABC /* libPods-GardenerHarvesting.a in Frameworks */,
+				7CA8B311FF9C9A3039E0B4F4 /* libPods-GardenerHarvesting.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,26 +49,33 @@
 		13B07FAE1A68108700A75B9A /* GardenerHarvesting */ = {
 			isa = PBXGroup;
 			children = (
+				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
+				F11748442D0722820044C1D9 /* GardenerHarvesting-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
-				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				1FBA0E353BF84E589CA229CC /* GoogleService-Info.plist */,
-				94E2DB2A994F4AEB9C245A95 /* noop-file.swift */,
-				E08841A30C3E4BB0AC560C04 /* GardenerHarvesting-Bridging-Header.h */,
-				7E8426861D8796560348FEDE /* PrivacyInfo.xcprivacy */,
+				87B9BA6511884614B0C6E7DC /* GoogleService-Info.plist */,
+				D8C77243126FAB8F1A61442F /* PrivacyInfo.xcprivacy */,
 			);
 			name = GardenerHarvesting;
+			sourceTree = "<group>";
+		};
+		26D9CFDED84C17C283EB2721 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4876C0684891E74F54DA1CE6 /* Pods-GardenerHarvesting.debug.xcconfig */,
+				D0F49271429589985002AB3F /* Pods-GardenerHarvesting.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				58EEBF8E8E6FB1BC6CAF49B5 /* libPods-GardenerHarvesting.a */,
+				DCDABD59D1D7DC6CF248D9D2 /* libPods-GardenerHarvesting.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -92,8 +94,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				D65327D7A22EEC0BE12398D9 /* Pods */,
-				D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */,
+				26D9CFDED84C17C283EB2721 /* Pods */,
+				94663E39DFFE41DF351BC253 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -108,10 +110,18 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		92DBD88DE9BF7D494EA9DA96 /* GardenerHarvesting */ = {
+		94663E39DFFE41DF351BC253 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */,
+				9743A4604C580D9DB654C036 /* GardenerHarvesting */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		9743A4604C580D9DB654C036 /* GardenerHarvesting */ = {
+			isa = PBXGroup;
+			children = (
+				F5F16C6636871C4C8A5FC865 /* ExpoModulesProvider.swift */,
 			);
 			name = GardenerHarvesting;
 			sourceTree = "<group>";
@@ -125,23 +135,6 @@
 			path = GardenerHarvesting/Supporting;
 			sourceTree = "<group>";
 		};
-		D65327D7A22EEC0BE12398D9 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				6C2E3173556A471DD304B334 /* Pods-GardenerHarvesting.debug.xcconfig */,
-				7A4D352CD337FB3A3BF06240 /* Pods-GardenerHarvesting.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
-		D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				92DBD88DE9BF7D494EA9DA96 /* GardenerHarvesting */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -150,13 +143,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "GardenerHarvesting" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				B96C9262E2EC25CA72746746 /* [Expo] Configure project */,
+				572BC5E61A70B3F6766E9953 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				652BCCAE532625F6F10DD2BD /* [CP] Embed Pods Frameworks */,
+				50CB1657EFBD2EDA1CE4E84B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -206,8 +199,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				EAD61BDA994A4EC18818F52D /* GoogleService-Info.plist in Resources */,
-				1720A042A3ECF32D1A5A1FB1 /* PrivacyInfo.xcprivacy in Resources */,
+				80A87DE99F904F38990BE121 /* GoogleService-Info.plist in Resources */,
+				3D7EE60671618FF67448150B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,7 +244,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		652BCCAE532625F6F10DD2BD /* [CP] Embed Pods Frameworks */ = {
+		50CB1657EFBD2EDA1CE4E84B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -268,6 +261,25 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		572BC5E61A70B3F6766E9953 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-GardenerHarvesting/expo-configure-project.sh\"\n";
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -315,25 +327,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GardenerHarvesting/Pods-GardenerHarvesting-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B96C9262E2EC25CA72746746 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-GardenerHarvesting/expo-configure-project.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -341,10 +334,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
-				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				B2CD49A20140427696F745F5 /* noop-file.swift in Sources */,
+				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				D137BA6380CDEDD94A54EECF /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,7 +344,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6C2E3173556A471DD304B334 /* Pods-GardenerHarvesting.debug.xcconfig */;
+			baseConfigurationReference = 4876C0684891E74F54DA1CE6 /* Pods-GardenerHarvesting.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -366,7 +357,10 @@
 				);
 				INFOPLIST_FILE = GardenerHarvesting/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -386,7 +380,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A4D352CD337FB3A3BF06240 /* Pods-GardenerHarvesting.release.xcconfig */;
+			baseConfigurationReference = D0F49271429589985002AB3F /* Pods-GardenerHarvesting.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -394,7 +388,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = GardenerHarvesting/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -459,7 +456,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -515,7 +515,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = (
