@@ -6,7 +6,7 @@ import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
 import { participationContext, firebaseContext } from '@/context';
 import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import {
   Participation as ParticipationInterface,
   Garden,
@@ -25,14 +25,14 @@ export default function Participation() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
 
-  const [gardens, setGardens] = useState<ItemType<string>[]>([]);
+  const [gardens, setGardens] = useState<DropdownItem[]>([]);
   const [gardenListOpen, setGardenListOpen] = useState(false);
   const [garden, setGarden] = useState<string | null>(null);
 
   useEffect(() => {
     const effect = async () => {
       const gardensCollection = await getDocs(collection(db, 'gardens'));
-      const gardens: ItemType<string>[] = [];
+      const gardens: DropdownItem[] = [];
       gardensCollection.forEach(doc => {
         const garden = doc.data() as Garden;
         gardens.push({
@@ -117,16 +117,14 @@ export default function Participation() {
           />
           {!participationLogged && (
             <>
-              <DropDownPicker
+              <Dropdown
                 placeholder={t('selectGarden')}
                 open={gardenListOpen}
                 setOpen={setGardenListOpen}
                 value={garden}
                 setValue={setGarden}
                 items={gardens}
-                setItems={setGardens}
                 style={styles.dropdown}
-                dropDownContainerStyle={styles.dropdown}
                 textStyle={styles.text}
               />
               {garden && (

@@ -76,9 +76,9 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn(),
   default: { show: jest.fn() },
 }));
-jest.mock('react-native-dropdown-picker', () => {
+jest.mock('@/components/Dropdown', () => {
   const { View, Button } = jest.requireActual('react-native');
-  return (props: any) => {
+  const MockDropdown = (props: any) => {
     const { value, items, setValue, onSelectItem } = props;
     return (
       <View>
@@ -97,6 +97,7 @@ jest.mock('react-native-dropdown-picker', () => {
       </View>
     );
   };
+  return { __esModule: true, default: MockDropdown, DropdownItem: {} };
 });
 jest.mock('../MeasureInput', () => () => <></>);
 

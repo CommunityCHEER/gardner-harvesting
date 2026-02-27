@@ -45,7 +45,6 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.6",
     "react-native-calendars": "^1.1306.0",
-    "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
@@ -68,5 +67,15 @@
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "firebase",
+          "js-sha256"
+        ]
+      }
+    }
+  }
 }

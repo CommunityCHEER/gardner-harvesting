@@ -12,7 +12,7 @@ import { participationContext, firebaseContext } from '@/context';
 import { addDoc, collection, getDocs, doc } from 'firebase/firestore';
 import { Participation, Garden } from '@/types/firestore';
 import { getDateString } from '@/utility/functions';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthState } from '@/hooks/useAuthState';
 
@@ -28,7 +28,7 @@ export default function Index() {
   const i18n = useContext(i18nContext);
   const translate = i18n.t.bind(i18n);
 
-  const [gardens, setGardens] = useState<ItemType<string>[]>([]);
+  const [gardens, setGardens] = useState<DropdownItem[]>([]);
   const [gardenListOpen, setGardenListOpen] = useState(false);
   const [garden, setGarden] = useState<string | null>(null);
 
@@ -56,7 +56,7 @@ export default function Index() {
       if (!loggedIn || !auth.currentUser) return;
 
       const gardensCollection = await getDocs(collection(db, 'gardens'));
-      const gardens: ItemType<string>[] = [];
+      const gardens: DropdownItem[] = [];
       gardensCollection.forEach(doc => {
         const garden = doc.data() as Garden;
         gardens.push({
@@ -140,19 +140,16 @@ export default function Index() {
           {!harvesting && garden && (
             <View style={styles.centeredView}>
               {gardens.length > 0 && (
-                <DropDownPicker
+                <Dropdown
                   placeholder={translate('selectGarden')}
                   open={gardenListOpen}
                   setOpen={setGardenListOpen}
                   value={garden}
                   setValue={setGarden}
                   items={gardens}
-                  setItems={setGardens}
                   style={styles.dropdown}
-                  dropDownContainerStyle={styles.dropdown}
                   textStyle={styles.text}
                   onPress={Keyboard.dismiss}
-                  listMode="MODAL"
                 />
               )}
               <Button
@@ -168,19 +165,16 @@ export default function Index() {
             </View>
           )}
           {!harvesting && !garden && gardens.length > 0 && (
-            <DropDownPicker
+            <Dropdown
               placeholder={translate('selectGarden')}
               open={gardenListOpen}
               setOpen={setGardenListOpen}
               value={garden}
               setValue={setGarden}
               items={gardens}
-              setItems={setGardens}
               style={styles.dropdown}
-              dropDownContainerStyle={styles.dropdown}
               textStyle={styles.text}
               onPress={Keyboard.dismiss}
-              listMode="MODAL"
             />
           )}
         </>

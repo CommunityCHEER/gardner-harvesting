@@ -14,7 +14,7 @@ import {
 import Button from '@/components/Button';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import { participationContext, FirebaseContext } from '@/context';
 import {
   addDoc,
@@ -51,7 +51,7 @@ export interface DisplayUnit {
 export interface HarvestFormProps {
   garden: string | null;
   setGarden: Dispatch<SetStateAction<string | null>>;
-  gardens: ItemType<string>[];
+  gardens: DropdownItem[];
   gardenListOpen: boolean;
   setGardenListOpen: Dispatch<SetStateAction<boolean>>;
   onBack: () => void;
@@ -75,7 +75,7 @@ export default function HarvestForm({
   const t = i18n.t.bind(i18n);
 
   // Crop-related state
-  const [crops, setCrops] = useState<ItemType<string>[]>([]);
+  const [crops, setCrops] = useState<DropdownItem[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
   const [crop, setCrop] = useState<string | null>(null);
   const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
@@ -109,7 +109,7 @@ export default function HarvestForm({
   useEffect(() => {
     const effect = async () => {
       const cropsCollection = await getDocs(collection(db, 'crops'));
-      const crops: ItemType<string>[] = await Promise.all(
+      const crops: DropdownItem[] = await Promise.all(
         cropsCollection.docs.map(async document => ({
           value: document.id,
           label:
@@ -328,7 +328,7 @@ export default function HarvestForm({
           keyboardShouldPersistTaps='handled'
         >
           {!keyboardVisible && gardens.length > 0 && (
-            <DropDownPicker
+            <Dropdown
               placeholder={t('selectGarden')}
               open={gardenListOpen}
               setOpen={setGardenListOpen}
@@ -336,10 +336,8 @@ export default function HarvestForm({
               setValue={setGarden}
               items={gardens}
               style={styles.dropdown}
-              dropDownContainerStyle={styles.dropdown}
               textStyle={styles.text}
               onPress={Keyboard.dismiss}
-              listMode="MODAL"
             />
           )}
           {crop && (
@@ -357,22 +355,19 @@ export default function HarvestForm({
               />
             </View>
           )}
-          {!keyboardVisible && crops.length > 0 && (
-            <DropDownPicker
+          {(!keyboardVisible || cropListOpen) && crops.length > 0 && (
+            <Dropdown
               placeholder={t('selectCrop')}
               open={cropListOpen}
               setOpen={setCropListOpen}
               value={crop}
               setValue={setCrop}
               items={crops}
-              setItems={setCrops}
               style={styles.dropdown}
-              dropDownContainerStyle={styles.dropdown}
               textStyle={styles.text}
               searchable={true}
               searchPlaceholder="Search..."
               onPress={Keyboard.dismiss}
-              listMode="MODAL"
             />
           )}
           {crop && !requiredUnit && <ActivityIndicator />}
