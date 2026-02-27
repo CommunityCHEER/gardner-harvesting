@@ -34,7 +34,7 @@ import {
 } from '@/types/firestore';
 import Toast from 'react-native-toast-message';
 import { ref as realtimeRef, set } from 'firebase/database';
-import { useList } from 'react-firebase-hooks/database';
+import { useList } from '@/hooks/useList';
 import { getDateString } from '@/utility/functions';
 import MeasureInput from './MeasureInput';
 import { ImagePickerAsset } from 'expo-image-picker';
@@ -358,22 +358,22 @@ export default function HarvestForm({
             </View>
           )}
           {!keyboardVisible && crops.length > 0 && (
-          <DropDownPicker
-            placeholder={t('selectCrop')}
-            open={cropListOpen}
-            setOpen={setCropListOpen}
-            value={crop}
-            setValue={setCrop}
-            items={crops}
-            setItems={setCrops}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdown}
-            textStyle={styles.text}
-            searchable={true}
-            searchPlaceholder="Search..."
-            onPress={Keyboard.dismiss}
-            listMode="MODAL"
-          />
+            <DropDownPicker
+              placeholder={t('selectCrop')}
+              open={cropListOpen}
+              setOpen={setCropListOpen}
+              value={crop}
+              setValue={setCrop}
+              items={crops}
+              setItems={setCrops}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdown}
+              textStyle={styles.text}
+              searchable={true}
+              searchPlaceholder="Search..."
+              onPress={Keyboard.dismiss}
+              listMode="MODAL"
+            />
           )}
           {crop && !requiredUnit && <ActivityIndicator />}
           {requiredUnit && (

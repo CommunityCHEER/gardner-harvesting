@@ -14,7 +14,7 @@ import { Participation, Garden } from '@/types/firestore';
 import { getDateString } from '@/utility/functions';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from '@/hooks/useAuthState';
 
 /**
  * The main screen of the app, where users can select a garden and start harvesting.
@@ -61,9 +61,8 @@ export default function Index() {
         const garden = doc.data() as Garden;
         gardens.push({
           value: doc.id,
-          label: `${garden.streetName}${
-            garden.houseNumber ? ', ' + garden.houseNumber + ' ' : ''
-          }${garden.nickname ? '(' + garden.nickname + ')' : ''}`,
+          label: `${garden.streetName}${garden.houseNumber ? ', ' + garden.houseNumber + ' ' : ''
+            }${garden.nickname ? '(' + garden.nickname + ')' : ''}`,
         });
       });
 

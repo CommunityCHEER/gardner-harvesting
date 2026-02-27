@@ -61,7 +61,7 @@ jest.mock('firebase/storage', () => ({
   ref: jest.fn(),
   uploadBytes: jest.fn(),
 }));
-jest.mock('react-firebase-hooks/database', () => ({
+jest.mock('@/hooks/useList', () => ({
   useList: jest.fn(() => [[], false, undefined]),
 }));
 jest.mock('expo-image-picker', () => ({

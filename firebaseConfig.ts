@@ -24,6 +24,12 @@ export const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'] as const;
+const missing = requiredKeys.filter(k => !firebaseConfig[k]);
+if (missing.length > 0) {
+  console.error(`Firebase config missing: ${missing.join(', ')}. Check EXPO_PUBLIC_FIREBASE_* env vars.`);
+}
+
 /**
  * The initialized Firebase app instance.
  */

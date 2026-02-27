@@ -79,7 +79,7 @@ const translations = {
     switchToSignUp: 'Inscribirse',
     switchToSignIn: 'Iniciar sesión',
     or: 'o',
-    signup: 'Inscribirse',
+    signUp: 'Inscribirse',
     firstNameLength: 'El nombre debe tener entre 2 y 50 caracteres.',
     lastNameLength: 'El apellido debe tener entre 2 y 50 caracteres.',
     invalidEmail: 'Formato de correo electrónico no válido.',
@@ -115,7 +115,7 @@ const i18n = new I18n(translations);
 
 i18n.enableFallback = true;
 
-i18n.locale = getLocales()[0].languageTag ?? 'en';
+i18n.locale = getLocales()?.[0]?.languageTag ?? 'en';
 
 /**
  * React context for providing the I18n instance to components.
@@ -129,6 +129,6 @@ export const i18nContext = createContext(i18n);
 export function useI18n() {
   const i18n = new I18n(translations);
   i18n.enableFallback = true;
-  i18n.locale = useLocales()[0].languageTag ?? 'en';
+  i18n.locale = useLocales()?.[0]?.languageTag ?? 'en';
   return i18n;
 }

@@ -34,7 +34,7 @@ export default function Welcome() {
     };
 
     effect();
-  });
+  }, []);
 
   return (
     <View style={{ alignItems: 'center', padding: 20 }}>

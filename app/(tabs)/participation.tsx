@@ -15,7 +15,7 @@ import { Calendar } from 'react-native-calendars';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { getDateString } from '@/utility/functions';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from '@/hooks/useAuthState';
 
 /**
  * A screen for logging and viewing participation in garden activities.

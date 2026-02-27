@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { getDocs, collection } from 'firebase/firestore';
 import { getDateString } from '@/utility/functions';
 import { Participation } from '@/types/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from '@/hooks/useAuthState';
 
 /**
  * The root layout component for the application.

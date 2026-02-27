@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { useContext } from 'react';
 import { i18nContext } from '@/i18n';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from '@/hooks/useAuthState';
 import { firebaseContext } from '@/context';
 
 /**
