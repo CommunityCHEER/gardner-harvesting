@@ -2,10 +2,10 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useContext, useEffect, useState } from 'react';
 import { i18nContext } from '@/i18n';
 import { firebaseContext } from '@/context';
