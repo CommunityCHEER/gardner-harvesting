@@ -699,7 +699,7 @@ Items below represent opportunities to improve security, developer experience, a
 |---|---|---|
 | No `.nvmrc` file | The project requires Node 18+ but has no `.nvmrc` or `.node-version` file to pin the version automatically for developers using nvm/fnm. | [Prerequisites](#prerequisites) |
 | Inconsistent native directory strategy | `ios/` is committed to git but `android/` is gitignored. This is a hybrid of managed and bare workflows. Consider either committing both or gitignoring both (fully managed). | [Running Android](#running-locally--android) |
-| iOS minimum version mismatch | `ios/GardenerHarvesting/Info.plist` declares `MinimumOSVersion` as 12.0, but `ios/Podfile` sets the deployment target to 15.1. These should match. | [Running iOS](#running-locally--ios) |
+| ~~iOS minimum version mismatch~~ | ~~`ios/GardenerHarvesting/Info.plist` declares `MinimumOSVersion` as 12.0, but `ios/Podfile` sets the deployment target to 15.1.~~ **Resolved** — native code regenerated via `expo prebuild --clean` for Expo 53. | [Running iOS](#running-locally--ios) |
 | Contradictory Android permissions | [app.json](app.json) lists `RECORD_AUDIO` in both `blockedPermissions` and `permissions` under the `android` key. The intent is likely to block it — remove it from `permissions`. | [Deploy Android](#building--deploying--android-via-eas) |
 | `web` missing from `platforms` | [app.json](app.json) `platforms` array lists only `["ios", "android"]` despite active web support and a deploy script. Add `"web"` for clarity. | [Running Web](#running-locally--web) |
 
@@ -708,7 +708,7 @@ Items below represent opportunities to improve security, developer experience, a
 | Issue | Details | Relevant Section |
 |---|---|---|
 | No CI/CD pipeline | There are no GitHub Actions workflows. Tests, linting, and type-checking are not automated on PR or push. | [Testing](#testing) |
-| Sparse test coverage | Only four test files exist under `components/__tests__/`. Core flows (auth, data submission) lack automated coverage. | [Testing](#testing) |
+| Growing test coverage | Seven test files exist across `components/__tests__/` and `hooks/__tests__/`. Core flows (auth, data submission) still lack full automated coverage. | [Testing](#testing) |
 | `start` script uses `--tunnel` | The default `npm start` runs `expo start --tunnel`, which routes through ngrok. This adds latency and requires a network connection. For local development, `expo start` (LAN/localhost) is sufficient. Consider renaming or adding a `start:local` script. | [Running iOS](#running-locally--ios) |
 | No unified task runner | There is no `Makefile`, `Justfile`, or similar tool to document and run common multi-step workflows (e.g., "clean build iOS", "reset and reinstall"). | [Prerequisites](#prerequisites) |
 
@@ -721,6 +721,6 @@ These are known issues already documented in project specs. They are included he
 | Web auth sessions lost on refresh | [firebaseConfig.web.ts](firebaseConfig.web.ts) uses `inMemoryPersistence`, causing auth state to be lost on every page reload. Should use `browserLocalPersistence`. | [Running Web](#running-locally--web), [quick-fixes-bundle-prd.md](docs/quick-fixes-bundle-prd.md) |
 | Realtime DB overwrite (data loss) | Concurrent harvest submissions can overwrite each other because `set()` is used instead of `push()`. | [quick-fixes-bundle-prd.md](docs/quick-fixes-bundle-prd.md) |
 | Non-idempotent participation writes | `addDoc` creates duplicates if a user logs participation multiple times on the same day. | [quick-fixes-bundle-prd.md](docs/quick-fixes-bundle-prd.md) |
-| Welcome component repeated reads | Missing effect dependencies cause the Welcome component to re-fetch user data from Firestore on every render. | [quick-fixes-bundle-techspec.md](docs/quick-fixes-bundle-techspec.md) |
-| i18n key mismatch | English uses `signUp` but Spanish uses `signup` — causes missing translations for Spanish users. | [quick-fixes-bundle-techspec.md](docs/quick-fixes-bundle-techspec.md) |
+| ~~Welcome component repeated reads~~ | ~~Missing effect dependencies cause the Welcome component to re-fetch user data from Firestore on every render.~~ **Fixed** — dependency array added. | [quick-fixes-bundle-techspec.md](docs/quick-fixes-bundle-techspec.md) |
+| ~~i18n key mismatch~~ | ~~English uses `signUp` but Spanish uses `signup` — causes missing translations for Spanish users.~~ **Fixed** — both languages now use `signUp`. | [quick-fixes-bundle-techspec.md](docs/quick-fixes-bundle-techspec.md) |
 | N+1 Firestore reads | Localized crop/unit names are fetched individually per item, causing excessive reads and latency. | [Architecture guide](docs/gardner-harvesting/gardner-harvesting.client-data-backend/current-architecture-guide-the-good-the-bad-and-the-ugly.md) |

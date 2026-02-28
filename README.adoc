@@ -17,13 +17,13 @@ This guide will help you get the app running on your local machine for developme
 +
 [source,bash]
 ----
-git clone https://github.com/cheer-community-gardens/cheer-app.git
+git clone https://github.com/CommunityCHEER/gardner-harvesting.git
 ----
 2. Navigate to the project directory:
 +
 [source,bash]
 ----
-cd cheer-app
+cd gardner-harvesting
 ----
 3. Install the dependencies:
 +
@@ -43,7 +43,9 @@ To run this project, you will need to add the following environment variables to
 `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 `EXPO_PUBLIC_FIREBASE_APP_ID`
 
-Create a `.env` file in the root of the project and add the variables above.
+Create a `.env` file in the root of the project and add the variables above. A template is provided in `.env.example`.
+
+NOTE: For EAS cloud builds, these variables must also be set in the EAS environment config (`npx eas env:list --environment production`). The `.env` file is gitignored and only used locally.
 
 === Running the App
 

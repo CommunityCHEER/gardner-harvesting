@@ -14,40 +14,30 @@ In all interactions and commit messages, be extremely concise and sacrifice gram
 
 ### TDD Workflow (MANDATORY)
 
-Before making any changes, run all existing tests to ensure a clean baseline.
+Before making any changes, run all existing tests (`npx jest`) to ensure a clean baseline.
 All code changes MUST follow the Red-Green-Refactor cycle. **No exceptions.**
+TDD details in `workflow.instructions.md`.
 
 **Rule:** Tests ALWAYS come before implementation. Period.
 
-#### TDD Workflow (MANDATORY)
-All code changes MUST follow the Red-Green-Refactor cycle. **No exceptions.**
-##### The Cycle
-1. 🔴 **RED: Write a Failing Test First**
-    *  Define expected behavior in a test
-    *  Run test and **confirm it fails** (proves test is valid)
-    *  Failure should indicate missing behavior, not syntax errors
-2. 🟢 **GREEN: Implement Minimum Code to Pass**
-    *  Write only enough code to make the test pass
-    *  Avoid adding extra features or "nice-to-haves"
-    *  Run test and **confirm it passes**
-3. 🔵 **REFACTOR: Improve Without Breaking**
-    *  Clean up implementation (extract methods, improve names, remove duplication)
-    *  Run tests after each change to ensure behavior unchanged
-    *  Keep tests passing throughout
-
-**Rule:** Tests ALWAYS come before implementation. Period.
-
-##### Process Violations
+#### Process Violations
 If TDD process is violated:
-*  ✅ Stop immediately
-*  ✅ Document violation as a finding
-*  ✅ Decide: Accept as learning experience OR revert and re-implement properly
-*  ✅ Never proceed silently when process is broken
+*  Stop immediately
+*  Document violation as a finding
+*  Decide: Accept as learning experience OR revert and re-implement properly
+*  Never proceed silently when process is broken
 
 #### Quality (First) Assurance
 *  Before making any changes, run all existing tests to ensure a clean baseline.
 *  After implementing changes, run all tests again to verify nothing is broken.
 *  If any tests that were previously passing now fail, investigate and fix the root cause.
+
+### Mobile App Guardrails
+*  **Local success ≠ device success.** Emulator/dev builds use Expo's dev environment; production builds use the project's native code. Always verify via TestFlight/internal track.
+*  **Env vars**: `.env` is gitignored. If adding/changing `EXPO_PUBLIC_*` vars, they must also be set in EAS (`npx eas env:create`).
+*  **Native code**: After Expo SDK major upgrades, regenerate native code with `npx expo prebuild --clean`. Stale native code causes black screen on devices.
+*  **Dependencies**: Do not add experimental config options (e.g., unstable Metro resolver flags) without verifying they exist in the installed version's type definitions.
+*  **No reintroduction** of replaced packages: `react-firebase-hooks`, `react-native-dropdown-picker`, `@babel/preset-typescript`.
 
 #### Rules (Validation Gates)
 *  If ever you are attempting something based on existing documentation within the workspace, and that documentation is out of date or incorrect or if I correct you and seem to contradict our documentation, please raise this as a finding in your response.
