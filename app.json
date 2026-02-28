@@ -32,7 +32,7 @@
           "useLegacyPackaging": false,
           "enableProguardInReleaseBuilds": true,
           "memoryPageSizeSupport": "16KB",
-          "compileSdkVersion": 35,
+          "compileSdkVersion": 36,
           "targetSdkVersion": 35
         }
       }
