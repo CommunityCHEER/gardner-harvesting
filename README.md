@@ -106,7 +106,7 @@ xcode-select -p
 
 ### CocoaPods
 
-Required for iOS native dependencies. The EAS production build pins CocoaPods 1.15.2 (see [eas.json](eas.json)), but any recent version works locally.
+Required for iOS native dependencies. EAS cloud builds use the CocoaPods version bundled with the build image (no pin — see [eas.json](eas.json)). Any recent version works locally.
 
 **Recommended — install via Homebrew** (avoids Ruby version issues):
 
@@ -237,6 +237,14 @@ This single command:
 1. Installs CocoaPods dependencies (runs `pod install` in `ios/`).
 2. Compiles the native Xcode project.
 3. Launches the iOS Simulator with the app.
+
+To test a **production-like build** locally (closest to what EAS builds and submits):
+
+```bash
+npx expo run:ios --configuration Release
+```
+
+> **Important:** `npx expo start` (the dev server) uses Expo's own AppDelegate and dev runtime — it does NOT exercise the project's native code the way a real build does. Always use `--configuration Release` or TestFlight to catch native-level issues before submitting.
 
 Alternatively, use the npm script:
 

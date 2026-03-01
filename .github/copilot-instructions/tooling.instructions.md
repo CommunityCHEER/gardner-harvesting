@@ -25,7 +25,8 @@ description: "Expo Build, EAS, and Native Platform Tooling Guidelines"
 - Plugins configured here: expo-router, expo-localization, expo-image-picker, expo-font, expo-build-properties
 
 ### Metro Config (metro.config.js)
-- `config.resolver.assetExts.push("cjs")` — required for Firebase compatibility
+- Expo 55+ default config already includes `cjs` in `sourceExts` and enables `unstable_enablePackageExports` — no customization needed for Firebase or other CJS packages
+- Do NOT add `cjs` to `assetExts` — this was a legacy Firebase workaround that conflicts with Expo 55's default config, causing `.cjs` files (e.g., `bignumber.cjs`) to be treated as binary assets instead of JS source, leading to runtime crashes (`Cannot read property 'ROUND_UP' of undefined`)
 - Do not add experimental/unstable Metro options without verifying they exist in the installed Metro version's type definitions
 - Check `node_modules/metro-config/src/configTypes.d.ts` before adding resolver options
 
@@ -33,27 +34,38 @@ description: "Expo Build, EAS, and Native Platform Tooling Guidelines"
 - Only preset should be `babel-preset-expo`
 - Do NOT add `@babel/preset-typescript` — it conflicts with expo's built-in TS handling and can cause runtime issues on device while appearing to work in emulator
 
-### iOS Native Code
-- **AppDelegate**: Swift-based (`AppDelegate.swift`), required for Expo 53 / RN 0.79
-- Old Objective-C AppDelegate (`AppDelegate.mm` + `AppDelegate.h` + `main.m`) was removed during Expo 53 migration
+### iOS Native Code (CNG — Continuous Native Generation)
+- The `ios/` directory is **generated** by `npx expo prebuild` — treat it as output, not hand-authored code
+- **Never hand-edit** files in `ios/` (AppDelegate, Info.plist, Podfile, xcodeproj, etc.). All changes should flow through `app.json` plugins or config. Hand edits diverge from what prebuild generates and cause crashes that are extremely hard to diagnose.
+- **AppDelegate**: Swift-based (`AppDelegate.swift`), required since Expo 53 / RN 0.79
 - To regenerate native code: `npx expo prebuild --clean --platform ios --no-install`
-- **CRITICAL**: When upgrading Expo SDK major versions, MUST regenerate native code — old native code causes black screen on real devices while appearing to work in emulator/dev builds
-- Podfile is managed by Expo prebuild; manual edits should be minimal
+- **CRITICAL**: When upgrading Expo SDK major versions, ALWAYS regenerate with `--clean` to avoid stale native code (e.g., old Obj-C AppDelegate, extra Pods references, missing RCTNewArchEnabled flag)
+- **Lesson learned**: Committed native code that diverged from prebuild output caused persistent crash/black-screen issues across multiple SDK upgrades. The fix each time was a clean regeneration.
+- **CocoaPods**: Do NOT pin a specific version in `eas.json` — let EAS use its default. Pinning caused version mismatches between local Podfile.lock and EAS builds.
+
+### Local Release Testing
+- `npx expo start` (dev server) does NOT test native code — it uses Expo's own AppDelegate and dev runtime
+- To test a production-like build locally: `npx expo run:ios --configuration Release`
+- This is the closest approximation to what EAS builds and submits to TestFlight
+- Always test with Release config before submitting to TestFlight/internal track
 
 ### Android Native Code
 - Managed by Expo prebuild
 - `google-services.json` required for Firebase
 
 ### Major Version Upgrades Checklist
-When upgrading Expo SDK (e.g., 52 to 53), React, or React Native:
+When upgrading Expo SDK (e.g., 53 to 55), React, or React Native:
 1. Run `npx expo prebuild --clean --platform ios --no-install` to regenerate native code
-2. Verify AppDelegate format matches new SDK requirements (ObjC vs Swift)
-3. Verify all `EXPO_PUBLIC_*` env vars are set in EAS for all environments
-4. Build and test via TestFlight/internal track BEFORE submitting to review
-5. Check for Apple SDK version warnings in App Store Connect
-6. Local emulator success does NOT guarantee device success — always TestFlight test
+2. Commit the regenerated `ios/` directory
+3. Test locally with `npx expo run:ios --configuration Release`
+4. Verify all `EXPO_PUBLIC_*` env vars are set in EAS for all environments
+5. Build via EAS and test via TestFlight/internal track BEFORE submitting to review
+6. Check for Apple SDK version warnings in App Store Connect
+7. Local dev server success does NOT guarantee device success — always test Release config and/or TestFlight
 
 ### Common Pitfalls (from real incidents)
-- **Black screen on TestFlight, works locally**: Usually stale native code or missing env vars
+- **Black screen on TestFlight, works locally**: Usually stale/hand-modified native code or missing env vars. Fix: `npx expo prebuild --clean`
+- **Splash screen then crash**: JS init failure — check Firebase config, env vars, and native module compatibility
 - **Crash on startup**: Check Firebase config — undefined env vars cause silent init failure
-- **Emulator works, device doesn't**: Expo dev server uses its own AppDelegate; production uses the project's native code
+- **Emulator works, device doesn't**: Expo dev server uses its own AppDelegate; production uses the project's native code. Use `--configuration Release` to catch this locally.
+- **CocoaPods version mismatch**: Pinned version in eas.json vs version that generated Podfile.lock = broken native builds. Solution: don't pin.

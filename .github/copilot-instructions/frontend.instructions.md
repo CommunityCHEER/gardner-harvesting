@@ -5,7 +5,7 @@ description: "Expo/React Native Frontend Development Guidelines"
 
 ## Frontend (Expo + React Native + TypeScript)
 
-- **Framework**: Expo SDK 53, React 19, React Native 0.79
+- **Framework**: Expo SDK 55, React 19.2, React Native 0.83
 - **Routing**: expo-router (file-based routing in `app/`)
 - **Language**: TypeScript (~5.8)
 - **State**: React Context (`context.ts`) for Firebase services and participation; local `useState` for component state
