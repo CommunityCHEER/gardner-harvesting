@@ -35,8 +35,9 @@ description: "Expo Build, EAS, and Native Platform Tooling Guidelines"
 - Do NOT add `@babel/preset-typescript` — it conflicts with expo's built-in TS handling and can cause runtime issues on device while appearing to work in emulator
 
 ### iOS Native Code (CNG — Continuous Native Generation)
-- The `ios/` directory is **generated** by `npx expo prebuild` — treat it as output, not hand-authored code
-- **Never hand-edit** files in `ios/` (AppDelegate, Info.plist, Podfile, xcodeproj, etc.). All changes should flow through `app.json` plugins or config. Hand edits diverge from what prebuild generates and cause crashes that are extremely hard to diagnose.
+- The `ios/` and `android/` directories are **generated** by `npx expo prebuild` — treat as build output, not source
+- **Both must be in `.gitignore`** — EAS Build runs prebuild itself. Committed native dirs cause `expo doctor` to fail during EAS builds and create stale-code drift.
+- **Never hand-edit** native files (AppDelegate, Info.plist, Podfile, xcodeproj, etc.). All changes should flow through `app.json` plugins or config. Hand edits diverge from what prebuild generates and cause crashes that are extremely hard to diagnose.
 - **AppDelegate**: Swift-based (`AppDelegate.swift`), required since Expo 53 / RN 0.79
 - To regenerate native code: `npx expo prebuild --clean --platform ios --no-install`
 - **CRITICAL**: When upgrading Expo SDK major versions, ALWAYS regenerate with `--clean` to avoid stale native code (e.g., old Obj-C AppDelegate, extra Pods references, missing RCTNewArchEnabled flag)
@@ -55,13 +56,20 @@ description: "Expo Build, EAS, and Native Platform Tooling Guidelines"
 
 ### Major Version Upgrades Checklist
 When upgrading Expo SDK (e.g., 53 to 55), React, or React Native:
-1. Run `npx expo prebuild --clean --platform ios --no-install` to regenerate native code
-2. Commit the regenerated `ios/` directory
+1. Audit `metro.config.js` — remove legacy workarounds that may conflict with new defaults (e.g., `assetExts.push("cjs")` broke on Expo 55)
+2. Run `npx expo prebuild --clean --platform ios --no-install` to regenerate native code locally (for local testing only — EAS generates its own)
 3. Test locally with `npx expo run:ios --configuration Release`
 4. Verify all `EXPO_PUBLIC_*` env vars are set in EAS for all environments
 5. Build via EAS and test via TestFlight/internal track BEFORE submitting to review
 6. Check for Apple SDK version warnings in App Store Connect
 7. Local dev server success does NOT guarantee device success — always test Release config and/or TestFlight
+
+### Debugging Release Crashes
+- **Reproduce locally first**: `npx expo run:ios --configuration Release` builds a production-like bundle on the simulator
+- **Read simulator logs**: `xcrun simctl spawn <UDID> log show --predicate 'process == "GardenerHarvesting" AND (messageType == error OR messageType == fault)' --last 2m --style compact`
+  - Get UDID: `xcrun simctl list devices booted`
+- **ErrorRecovery masks real errors**: Expo's `ErrorRecovery.tryRelaunchFromCache()` catches JS crashes and retries, then calls `crash()` → SIGABRT. The crash report shows `ErrorRecovery` / `RCTFatalException` but the **real error** is in earlier log lines (e.g., `TypeError: Cannot read property 'ROUND_UP' of undefined`)
+- **Cross-platform crash = JS-level issue**: If both iOS AND Android crash on the same build, eliminate all native-specific causes (AppDelegate, CocoaPods, Xcode, etc.) and focus on JS bundle / Metro config
 
 ### Common Pitfalls (from real incidents)
 - **Black screen on TestFlight, works locally**: Usually stale/hand-modified native code or missing env vars. Fix: `npx expo prebuild --clean`
@@ -69,3 +77,4 @@ When upgrading Expo SDK (e.g., 53 to 55), React, or React Native:
 - **Crash on startup**: Check Firebase config — undefined env vars cause silent init failure
 - **Emulator works, device doesn't**: Expo dev server uses its own AppDelegate; production uses the project's native code. Use `--configuration Release` to catch this locally.
 - **CocoaPods version mismatch**: Pinned version in eas.json vs version that generated Podfile.lock = broken native builds. Solution: don't pin.
+- **`expo doctor` fails on EAS build**: Native dirs (`ios/`, `android/`) committed to git while app.json has CNG config. Solution: gitignore both dirs, `git rm -r --cached ios/ android/`.

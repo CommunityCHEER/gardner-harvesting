@@ -35,7 +35,7 @@ If TDD process is violated:
 ### Mobile App Guardrails
 *  **Local success ≠ device success.** Dev server (`npx expo start`) uses Expo's own AppDelegate and runtime — it does NOT test native code. Use `npx expo run:ios --configuration Release` for production-like local testing, and always verify via TestFlight/internal track.
 *  **Env vars**: `.env` is gitignored. If adding/changing `EXPO_PUBLIC_*` vars, they must also be set in EAS (`npx eas env:create`).
-*  **Native code**: The `ios/` directory is CNG output — never hand-edit it. After Expo SDK upgrades, regenerate with `npx expo prebuild --clean`. Stale or hand-modified native code causes crash/black-screen on devices.
+*  **Native code**: `ios/` and `android/` are CNG output — both gitignored, never hand-edit. EAS runs prebuild itself. For local Release testing, generate with `npx expo prebuild --clean`. Committed native dirs cause `expo doctor` failures on EAS.
 *  **Dependencies**: Do not add experimental config options (e.g., unstable Metro resolver flags) without verifying they exist in the installed version's type definitions.
 *  **No reintroduction** of replaced packages: `react-firebase-hooks`, `react-native-dropdown-picker`, `@babel/preset-typescript`.
 
