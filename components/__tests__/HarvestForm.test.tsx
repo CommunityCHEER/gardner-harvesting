@@ -68,6 +68,11 @@ jest.mock('expo-image-picker', () => ({
   launchCameraAsync: jest.fn(),
   requestCameraPermissionsAsync: jest.fn(),
 }));
+
+const mockIdentifyCrop = jest.fn();
+jest.mock('@/services/smartHarvest', () => ({
+  identifyCrop: (...args: unknown[]) => mockIdentifyCrop(...args),
+}));
 jest.mock('expo-localization', () => ({
   useLocales: () => [{ languageCode: 'en', languageTag: 'en' }],
   getLocales: () => [{ languageCode: 'en', languageTag: 'en' }],
@@ -101,6 +106,25 @@ jest.mock('@/components/Dropdown', () => {
 });
 jest.mock('../MeasureInput', () => () => <></>);
 
+let capturedOnSmartHarvest: ((image: any) => void) | undefined;
+let capturedIdentifying: boolean | undefined;
+jest.mock('../ImagePicker', () => {
+  const { View, Text, Button } = jest.requireActual('react-native');
+  return {
+    __esModule: true,
+    default: (props: any) => {
+      capturedOnSmartHarvest = props.onSmartHarvest;
+      capturedIdentifying = props.identifying;
+      return (
+        <View>
+          <Button title={props.buttonTitle} onPress={() => props.onImageSelected?.({ uri: 'test-uri' })} />
+          {props.identifying && <Text>Identifying...</Text>}
+        </View>
+      );
+    },
+  };
+});
+
 const mockI18n = {
   t: (key: string) => {
     const translations: Record<string, string> = {
@@ -112,6 +136,7 @@ const mockI18n = {
       takePhoto: 'Take Photo',
       totalToday: 'Total Today',
       participationLogged: 'Participation Logged',
+      identifying: 'Identifying...',
     };
     return translations[key] || key;
   },
@@ -243,6 +268,122 @@ describe('HarvestForm Note Feature', () => {
     test('should change button label back to "Add Note" after submission', async () => {
       // This test will need proper Firebase mocking
       expect(true).toBe(true); // Placeholder
+    });
+  });
+});
+
+describe('HarvestForm Smart Harvest', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    capturedOnSmartHarvest = undefined;
+    capturedIdentifying = undefined;
+  });
+
+  test('should pass onSmartHarvest callback to ImagePicker when crop is selected', async () => {
+    const { findAllByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+    expect(capturedOnSmartHarvest).toBeDefined();
+    expect(typeof capturedOnSmartHarvest).toBe('function');
+  });
+
+  test('should pass identifying state to ImagePicker', async () => {
+    const { findAllByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+    expect(capturedIdentifying).toBe(false);
+  });
+
+  test('should call identifyCrop when onSmartHarvest is triggered', async () => {
+    mockIdentifyCrop.mockResolvedValue('crop-1');
+    const { findAllByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+
+    await act(async () => {
+      capturedOnSmartHarvest?.({ uri: 'file:///photo.jpg', width: 100, height: 100 });
+    });
+
+    await waitFor(() => {
+      expect(mockIdentifyCrop).toHaveBeenCalledWith(
+        'file:///photo.jpg',
+        expect.arrayContaining([
+          expect.objectContaining({ value: expect.any(String), label: expect.any(String) }),
+        ]),
+      );
+    });
+  });
+
+  test('should auto-select crop when identifyCrop returns a match', async () => {
+    mockIdentifyCrop.mockResolvedValue('crop-1');
+    const { findAllByText, findByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    // First select any crop to make ImagePicker appear
+    fireEvent.press(cropButtons[0]);
+
+    await act(async () => {
+      capturedOnSmartHarvest?.({ uri: 'file:///photo.jpg', width: 100, height: 100 });
+    });
+
+    // The crop should be auto-selected (crop-1)
+    await waitFor(() => {
+      expect(mockIdentifyCrop).toHaveBeenCalled();
+    });
+  });
+
+  test('should show identifying state while classifying', async () => {
+    let resolveIdentify: (value: string | null) => void;
+    mockIdentifyCrop.mockImplementation(
+      () => new Promise<string | null>((resolve) => { resolveIdentify = resolve; }),
+    );
+
+    const { findAllByText, queryByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+
+    await act(async () => {
+      capturedOnSmartHarvest?.({ uri: 'file:///photo.jpg', width: 100, height: 100 });
+    });
+
+    // While identifying, the identifying prop should be true
+    expect(capturedIdentifying).toBe(true);
+
+    await act(async () => {
+      resolveIdentify!('crop-1');
+    });
+
+    await waitFor(() => {
+      expect(capturedIdentifying).toBe(false);
+    });
+  });
+
+  test('should not crash when identifyCrop returns null', async () => {
+    mockIdentifyCrop.mockResolvedValue(null);
+    const { findAllByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+
+    await act(async () => {
+      capturedOnSmartHarvest?.({ uri: 'file:///photo.jpg', width: 100, height: 100 });
+    });
+
+    await waitFor(() => {
+      expect(mockIdentifyCrop).toHaveBeenCalled();
+    });
+  });
+
+  test('should handle identifyCrop error gracefully', async () => {
+    mockIdentifyCrop.mockRejectedValue(new Error('network error'));
+    const { findAllByText } = renderHarvestForm();
+    const cropButtons = await findAllByText('Mocked Name');
+    fireEvent.press(cropButtons[0]);
+
+    await act(async () => {
+      capturedOnSmartHarvest?.({ uri: 'file:///photo.jpg', width: 100, height: 100 });
+    });
+
+    await waitFor(() => {
+      expect(capturedIdentifying).toBe(false);
     });
   });
 });

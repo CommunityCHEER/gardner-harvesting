@@ -53,6 +53,7 @@ const translations = {
     noClaimsForGardens: 'You do not have permission to see the gardens list.',
     refreshClaims: 'Click to check for updated permissions',
     ounces: 'ounces',
+    identifying: 'Identifying...',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -105,6 +106,7 @@ const translations = {
     noClaimsForGardens: 'No tienes permiso para ver la lista de jardines.',
     refreshClaims: 'Haz clic para comprobar los permisos actualizados',
     ounces: 'onzas',
+    identifying: 'Identificando...',
   },
 };
 

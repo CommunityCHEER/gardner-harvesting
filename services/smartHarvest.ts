@@ -45,3 +45,15 @@ export async function classifyImage(req: ClassifyRequest): Promise<ClassifyRespo
 
     return response.json();
 }
+
+export async function identifyCrop(
+    imageUri: string,
+    crops: { value: string; label: string }[],
+): Promise<string | null> {
+    const labels = crops.map(c => c.label);
+    const { predictions } = await classifyImage({ imageUri, labels });
+    if (predictions.length === 0) return null;
+    const topLabel = predictions[0].label;
+    const match = crops.find(c => c.label === topLabel);
+    return match?.value ?? null;
+}

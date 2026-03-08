@@ -41,6 +41,7 @@ import { ImagePickerAsset } from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
 import NoteModal from './NoteModal';
 import ImagePicker from './ImagePicker';
+import { identifyCrop } from '@/services/smartHarvest';
 
 export interface DisplayUnit {
   id: string;
@@ -91,6 +92,20 @@ export default function HarvestForm({
   const [note, setNote] = useState<string>('');
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [identifying, setIdentifying] = useState(false);
+
+  const handleSmartHarvest = async (asset: ImagePickerAsset) => {
+    if (crops.length < 2) return;
+    setIdentifying(true);
+    try {
+      const matchedCrop = await identifyCrop(asset.uri, crops);
+      if (matchedCrop) setCrop(matchedCrop);
+    } catch {
+      // silently ignore — photo still captured
+    } finally {
+      setIdentifying(false);
+    }
+  };
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -344,6 +359,8 @@ export default function HarvestForm({
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
               <ImagePicker
                 onImageSelected={setImage}
+                onSmartHarvest={handleSmartHarvest}
+                identifying={identifying}
                 buttonTitle={t('takePhoto')}
               />
               <Button
