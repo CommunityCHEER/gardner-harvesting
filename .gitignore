@@ -25,3 +25,9 @@ expo-env.d.ts
 # @end expo-cli
 .firebase/hosting.ZGlzdA.cache
 .env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
