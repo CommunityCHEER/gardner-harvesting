@@ -1,14 +1,17 @@
 """Tests for smart-harvest Cloud Run service (CLIP-based crop classifier)."""
 
 import io
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
 from main import app, get_model
+
+
+MODEL_NAME = "openai/clip-vit-large-patch14"
+NUM_PROMPT_TEMPLATES = 4
 
 
 # ---------------------------------------------------------------------------
@@ -94,7 +97,7 @@ class TestClassifyValidation:
 
 class TestClassifySuccess:
     def _mock_clip(self, client, logits: list[float]):
-        """Configure mocked CLIP to return specific logits."""
+        """Configure mocked CLIP to return prompt-ensemble logits."""
         mock_model = MagicMock()
         mock_processor = MagicMock()
 
@@ -109,8 +112,13 @@ class TestClassifySuccess:
         # Model returns object with logits_per_image
         import torch
 
+        # Endpoint expects (num_labels * num_templates) logits before reshape.
+        expanded_logits = []
+        for label_logit in logits:
+            expanded_logits.extend([label_logit] * NUM_PROMPT_TEMPLATES)
+
         mock_output = MagicMock()
-        mock_output.logits_per_image = torch.tensor([logits])
+        mock_output.logits_per_image = torch.tensor([expanded_logits])
         mock_model.return_value = mock_output
 
         app.dependency_overrides[get_model] = lambda: (mock_model, mock_processor)
@@ -181,3 +189,31 @@ class TestClassifySuccess:
 
         assert resp.status_code == 200
         assert len(resp.json()["predictions"]) == 3
+
+
+# ---------------------------------------------------------------------------
+# Model loading
+# ---------------------------------------------------------------------------
+
+
+class TestModelLoading:
+    def test_get_model_uses_large_clip_checkpoint(self):
+        get_model.cache_clear()
+
+        with patch("main.CLIPModel.from_pretrained") as model_loader, patch(
+            "main.CLIPProcessor.from_pretrained"
+        ) as processor_loader:
+            model = MagicMock()
+            processor = MagicMock()
+            model_loader.return_value = model
+            processor_loader.return_value = processor
+
+            loaded_model, loaded_processor = get_model()
+
+            assert loaded_model is model
+            assert loaded_processor is processor
+            model_loader.assert_called_once_with(MODEL_NAME)
+            processor_loader.assert_called_once_with(MODEL_NAME)
+            model.eval.assert_called_once_with()
+
+        get_model.cache_clear()

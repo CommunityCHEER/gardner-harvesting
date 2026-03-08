@@ -99,9 +99,19 @@ export default function HarvestForm({
     setIdentifying(true);
     try {
       const matchedCrop = await identifyCrop(asset.uri, crops);
-      if (matchedCrop) setCrop(matchedCrop);
+      if (matchedCrop) {
+        setCrop(matchedCrop);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: t('smartHarvestFailed'),
+        });
+      }
     } catch {
-      // silently ignore — photo still captured
+      Toast.show({
+        type: 'error',
+        text1: t('smartHarvestFailed'),
+      });
     } finally {
       setIdentifying(false);
     }
@@ -355,23 +365,6 @@ export default function HarvestForm({
               onPress={Keyboard.dismiss}
             />
           )}
-          {crop && (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
-              <ImagePicker
-                onImageSelected={setImage}
-                onSmartHarvest={handleSmartHarvest}
-                identifying={identifying}
-                buttonTitle={t('takePhoto')}
-              />
-              <Button
-                title={note ? t('editNote') : t('addNote')}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setNoteModalVisible(true);
-                }}
-              />
-            </View>
-          )}
           {(!keyboardVisible || cropListOpen) && crops.length > 0 && (
             <Dropdown
               placeholder={t('selectCrop')}
@@ -386,6 +379,32 @@ export default function HarvestForm({
               searchPlaceholder="Search..."
               onPress={Keyboard.dismiss}
             />
+          )}
+          {!crop && crops.length > 0 && (
+            <>
+              <Text style={styles.text}>{t('orDivider')}</Text>
+              <ImagePicker
+                onImageSelected={setImage}
+                onSmartHarvest={handleSmartHarvest}
+                identifying={identifying}
+                buttonTitle={t('takePhoto')}
+              />
+              <Text style={[styles.text, { textAlign: 'center' }]}>{t('smartHarvestHelp')}</Text>
+            </>
+          )}
+          {!crop && (
+            <Button title={t('back')} onPress={onBack} />
+          )}
+          {crop && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+              <Button
+                title={note ? t('editNote') : t('addNote')}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setNoteModalVisible(true);
+                }}
+              />
+            </View>
           )}
           {crop && !requiredUnit && <ActivityIndicator />}
           {requiredUnit && (
@@ -420,7 +439,7 @@ export default function HarvestForm({
                 <Button title={t('submit')} onPress={submit} />
               </View>
             ))}
-          {(!requiredMeasure || requiredMeasure === '.') && (
+          {crop && (!requiredMeasure || requiredMeasure === '.') && (
             <Button title={t('back')} onPress={onBack} />
           )}
         </ScrollView>

@@ -29,6 +29,7 @@
       "expo-build-properties",
       {
         "android": {
+          "minSdkVersion": 24,
           "useLegacyPackaging": false,
           "enableProguardInReleaseBuilds": true,
           "memoryPageSizeSupport": "16KB",

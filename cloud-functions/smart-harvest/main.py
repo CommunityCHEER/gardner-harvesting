@@ -11,7 +11,7 @@ from PIL import Image
 from pydantic import BaseModel
 from transformers import CLIPModel, CLIPProcessor
 
-MODEL_NAME = "openai/clip-vit-base-patch32"
+MODEL_NAME = "openai/clip-vit-large-patch14"
 
 app = FastAPI(title="Smart Harvest Classifier")
 
@@ -75,13 +75,22 @@ async def classify(
         raise HTTPException(status_code=400, detail="Invalid image")
 
     # Run CLIP inference
-    text_prompts = [f"a photo of {l}" for l in label_list]
+    # Prompt ensembling — average scores across templates per label
+    templates = [
+        "a photo of {}",
+        "a photo of freshly harvested {}",
+        "a close-up photo of {} on a table",
+        "{}, a type of vegetable or herb",
+    ]
+    text_prompts = [t.format(l) for l in label_list for t in templates]
     inputs = processor(text=text_prompts, images=img, return_tensors="pt", padding=True)
 
     with torch.no_grad():
         outputs = model(**inputs)
 
     logits = outputs.logits_per_image[0]
+    # Reshape to (num_labels, num_templates) and average across templates
+    logits = logits.view(len(label_list), len(templates)).mean(dim=1)
     probs = torch.softmax(logits, dim=0).tolist()
 
     # Build ranked predictions

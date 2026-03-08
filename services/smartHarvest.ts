@@ -21,6 +21,10 @@ export async function classifyImage(req: ClassifyRequest): Promise<ClassifyRespo
         throw new Error('At least 2 labels required');
     }
 
+    if (__DEV__) {
+        console.info(`[SmartHarvest] classify -> ${SMART_HARVEST_URL}/classify`);
+    }
+
     const resizedUri = await resizeForUpload(req.imageUri);
 
     const form = new FormData();
@@ -50,10 +54,12 @@ export async function identifyCrop(
     imageUri: string,
     crops: { value: string; label: string }[],
 ): Promise<string | null> {
+    const CONFIDENCE_THRESHOLD = 0.15;
     const labels = crops.map(c => c.label);
     const { predictions } = await classifyImage({ imageUri, labels });
     if (predictions.length === 0) return null;
-    const topLabel = predictions[0].label;
-    const match = crops.find(c => c.label === topLabel);
+    const topPrediction = predictions[0];
+    if (topPrediction.confidence < CONFIDENCE_THRESHOLD) return null;
+    const match = crops.find(c => c.label === topPrediction.label);
     return match?.value ?? null;
 }

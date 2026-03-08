@@ -221,6 +221,26 @@ describe('identifyCrop', () => {
         expect(result).toBeNull();
     });
 
+    it('returns null when top prediction confidence is below threshold (0.15)', async () => {
+        arrangeClassify([
+            { label: 'Tomato', confidence: 0.14 },
+            { label: 'Pepper', confidence: 0.1 },
+        ]);
+
+        const result = await identifyCrop('file:///photo.jpg', crops);
+        expect(result).toBeNull();
+    });
+
+    it('returns crop value when confidence meets or exceeds threshold', async () => {
+        arrangeClassify([
+            { label: 'Tomato', confidence: 0.15 },
+            { label: 'Pepper', confidence: 0.1 },
+        ]);
+
+        const result = await identifyCrop('file:///photo.jpg', crops);
+        expect(result).toBe('crop-tomato');
+    });
+
     it('requires at least 2 crops', async () => {
         await expect(
             identifyCrop('file:///photo.jpg', [{ value: 'crop-1', label: 'One' }]),
