@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import io
-import json
 import logging
 from functools import lru_cache
 
@@ -69,17 +68,20 @@ async def classify(
     model_pair: tuple = Depends(get_model),
 ):
     # Validate labels
-    labelogger.warning("Classification request rejected: fewer than 2 labels (count=%d)", len(label_list))
+    label_list = [l.strip() for l in labels.split(",") if l.strip()]
+    if len(label_list) < 2:
+        logger.warning(
+            "Classification request rejected: fewer than 2 labels (count=%d)",
+            len(label_list),
+        )
         raise HTTPException(status_code=422, detail="At least 2 labels required")
 
     logger.info(
-        "Classification request received",
-        extra={
-            "labels_count": len(label_list),
-            "labels": label_list,
-            "top_k": top_k,
-            "filename": image.filename,
-        },
+        "Classification request received: labels_count=%d, labels=%s, top_k=%s, filename=%s",
+        len(label_list),
+        label_list,
+        top_k,
+        image.filename,
     )
 
     model, processor = model_pair
@@ -87,10 +89,10 @@ async def classify(
     # Read and open image
     raw = await image.read()
     logger.info("Image read: %d bytes", len(raw))
-    
+
     try:
         img = Image.open(io.BytesIO(raw)).convert("RGB")
-        logger.info("Image opened successfully: %s", img.size)
+        logger.info("Image opened successfully: size=%s", img.size)
     except Exception as e:
         logger.error("Failed to open image: %s", str(e))
         raise HTTPException(status_code=400, detail="Invalid image")
@@ -104,8 +106,13 @@ async def classify(
         "{}, a type of vegetable or herb",
     ]
     text_prompts = [t.format(l) for l in label_list for t in templates]
-    logger.info("Generated %d text prompts from %d labels and %d templates", len(text_prompts), len(label_list), len(templates))
-    
+    logger.info(
+        "Generated text prompts: num_prompts=%d, num_labels=%d, num_templates=%d",
+        len(text_prompts),
+        len(label_list),
+        len(templates),
+    )
+
     inputs = processor(text=text_prompts, images=img, return_tensors="pt", padding=True)
 
     logger.info("Running CLIP inference...")
@@ -117,7 +124,7 @@ async def classify(
     logits = logits.view(len(label_list), len(templates)).mean(dim=1)
     probs = torch.softmax(logits, dim=0).tolist()
 
-    logger.info("CLIP inference complete, computing predictions...")
+    logger.info("CLIP inference complete")
 
     # Build ranked predictions
     ranked = sorted(zip(label_list, probs), key=lambda x: x[1], reverse=True)
@@ -126,19 +133,13 @@ async def classify(
         ranked = ranked[:top_k]
 
     predictions = [Prediction(label=l, confidence=c) for l, c in ranked]
-    
+
+    top_pred = predictions[0] if predictions else None
     logger.info(
-        "Classification successful",
-        extra={
-            "num_predictions": len(predictions),
-            "top_prediction": {
-                "label": predictions[0].label,
-                "confidence": predictions[0].confidence,
-            } if predictions else None,
-            "all_predictions": [{"label": p.label, "confidence": p.confidence} for p in predictions],
-        },
+        "Classification successful: num_predictions=%d, top_label=%s, top_confidence=%.4f",
+        len(predictions),
+        top_pred.label if top_pred else "N/A",
+        top_pred.confidence if top_pred else 0.0,
     )
 
-    return ClassifyResponse(predictions=predictionsreturn ClassifyResponse(
-        predictions=[Prediction(label=l, confidence=c) for l, c in ranked]
-    )
+    return ClassifyResponse(predictions=predictions)
