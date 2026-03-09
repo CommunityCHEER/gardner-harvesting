@@ -42,6 +42,7 @@ import { ref, uploadBytes } from 'firebase/storage';
 import NoteModal from './NoteModal';
 import ImagePicker from './ImagePicker';
 import { identifyCrop } from '@/services/smartHarvest';
+import { logger } from '@/utility/logger';
 
 export interface DisplayUnit {
   id: string;
@@ -95,19 +96,37 @@ export default function HarvestForm({
   const [identifying, setIdentifying] = useState(false);
 
   const handleSmartHarvest = async (asset: ImagePickerAsset) => {
-    if (crops.length < 2) return;
+    if (crops.length < 2) {
+      logger.warn('HarvestForm.handleSmartHarvest', 'Insufficient crops for identification', {
+        numCrops: crops.length,
+      });
+      return;
+    }
     setIdentifying(true);
     try {
+      logger.info('HarvestForm.handleSmartHarvest', 'Starting smart harvest', {
+        numCrops: crops.length,
+      });
       const matchedCrop = await identifyCrop(asset.uri, crops);
       if (matchedCrop) {
+        logger.info('HarvestForm.handleSmartHarvest', 'Crop identified successfully', {
+          matchedCrop,
+        });
         setCrop(matchedCrop);
       } else {
+        logger.warn('HarvestForm.handleSmartHarvest', 'No crop matched', {
+          numCrops: crops.length,
+        });
         Toast.show({
           type: 'error',
           text1: t('smartHarvestFailed'),
         });
       }
-    } catch {
+    } catch (error) {
+      logger.error('HarvestForm.handleSmartHarvest', 'Crop identification failed', {
+        error: error instanceof Error ? error.message : String(error),
+        numCrops: crops.length,
+      });
       Toast.show({
         type: 'error',
         text1: t('smartHarvestFailed'),

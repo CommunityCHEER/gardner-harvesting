@@ -646,6 +646,85 @@ The app is served at the default Firebase Hosting URL for the project. Configure
 
 ---
 
+## Cloud Functions — Smart Harvest
+
+The app uses a dedicated **Cloud Run service** to classify crop images via OpenAI's CLIP model.
+
+### Quick Start
+
+**Service URL:** Deployed at `https://smart-harvest-XXX.us-central1.run.app`
+
+**Environment var in app:**
+```env
+EXPO_PUBLIC_SMART_HARVEST_URL=https://smart-harvest-XXX.us-central1.run.app
+```
+
+Configured in EAS environments (development, preview, production) via `npx eas env:create`.
+
+### Deploy / Update
+
+From the workspace root:
+
+```bash
+cd cloud-functions/smart-harvest
+
+# First deployment (creates Cloud Run service)
+gcloud run deploy smart-harvest \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --min-instances 0 \
+  --project cheer-app-prototype
+
+# Subsequent updates: same command (re-deploys with new Docker image)
+```
+
+Builds Docker image from `Dockerfile`, pushes to Google Artifact Registry, deploys to Cloud Run. Takes ~2-3 minutes first time, ~1 minute for updates.
+
+### Testing Locally
+
+```bash
+cd cloud-functions/smart-harvest
+docker build -t smart-harvest .
+docker run -p 8080:8080 smart-harvest
+```
+
+Then query via cURL:
+
+```bash
+# Health
+curl http://localhost:8080/health
+
+# Classify
+curl -X POST http://localhost:8080/classify \
+  -F "image=@path/to/photo.jpg" \
+  -F "labels=tomato,pepper,basil"
+```
+
+### Debugging Classification Failures
+
+If the app shows "unable to identify crop":
+
+1. Check app logs (in Expo console). See [`cloud-functions/smart-harvest/README.md`](cloud-functions/smart-harvest/README.md#logging--debugging) for detailed log format.
+2. Verify service health: `curl https://smart-harvest-XXX.run.app/health`
+3. Check Cloud Run logs for errors:
+   ```bash
+   gcloud logging read "resource.type='cloud_run_revision' AND resource.labels.service_name='smart-harvest'" \
+     --limit 20 --format json
+   ```
+
+### Full Documentation
+
+See [`cloud-functions/smart-harvest/README.md`](cloud-functions/smart-harvest/README.md) for:
+- API specification (GET `/health`, POST `/classify`)
+- Deployment details (costs, cold starts, environment setup)
+- Local development and testing
+- Logging and debugging strategies
+- Model performance notes and limitations
+
+---
+
 ## EAS & Firebase Linkage
 
 ### Project identifiers
