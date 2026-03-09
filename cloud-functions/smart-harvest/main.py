@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import logging
 from functools import lru_cache
+import os
 
 import torch
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
@@ -29,8 +30,10 @@ app = FastAPI(title="Smart Harvest Classifier")
 @lru_cache(maxsize=1)
 def get_model() -> tuple[CLIPModel, CLIPProcessor]:
     logger.info("Loading CLIP model: %s", MODEL_NAME)
-    model = CLIPModel.from_pretrained(MODEL_NAME)
-    processor = CLIPProcessor.from_pretrained(MODEL_NAME)
+
+    token = os.getenv("HF_TOKEN")
+    model = CLIPModel.from_pretrained(MODEL_NAME, token=token)
+    processor = CLIPProcessor.from_pretrained(MODEL_NAME, token=token)
     model.eval()
     logger.info("CLIP model loaded successfully")
     return model, processor

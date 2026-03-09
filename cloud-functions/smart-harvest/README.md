@@ -157,6 +157,94 @@ npx eas env:create --environment production \
   --type string
 ```
 
+### Operations: Logs and Runtime Diagnostics
+
+#### Option 1: Cloud Run Service Logs (Cloud Console)
+
+1. Open Cloud Run in Google Cloud Console.
+2. Select project `cheer-app-prototype`.
+3. Select region `us-central1`.
+4. Open service `smart-harvest`.
+5. Open the **Logs** tab.
+
+Use this path for quick production checks (errors, cold starts, request timing).
+
+#### Option 2: Logs Explorer (advanced filtering)
+
+Open Cloud Logging > Logs Explorer and use:
+
+```text
+resource.type="cloud_run_revision"
+resource.labels.service_name="smart-harvest"
+```
+
+Useful extra filters:
+
+```text
+severity>=ERROR
+```
+
+```text
+textPayload:"Loading CLIP model"
+```
+
+This is best for historical analysis and narrowing to specific failures.
+
+#### Option 3: CLI Logs (gcloud)
+
+```bash
+# Tail live logs
+gcloud run services logs read smart-harvest \
+  --project=cheer-app-prototype \
+  --region=us-central1 \
+  --follow
+
+# Fetch latest logs (bounded)
+gcloud run services logs read smart-harvest \
+  --project=cheer-app-prototype \
+  --region=us-central1 \
+  --limit=100
+```
+
+You can run these commands from any local directory.
+
+#### What gets logged
+
+Cloud Run captures stdout/stderr automatically. In `main.py`, Python logging is configured via `logging.basicConfig(level=logging.INFO)`, so app logs (including model load events and runtime errors) appear in Cloud Logging.
+
+### Hugging Face Token Guidance (Rate Limit Mitigation)
+
+If production is being rate limited when downloading CLIP model assets, use a Hugging Face token with least privilege.
+
+#### Recommended token type
+
+- Use **Fine-grained** token if available.
+- Grant **Read** access only.
+- Scope to repository `openai/clip-vit-large-patch14` when possible.
+- Do **not** use write scope for this service.
+
+#### Inject token into Cloud Run
+
+Minimum approach:
+
+```bash
+gcloud run services update smart-harvest \
+  --region=us-central1 \
+  --project=cheer-app-prototype \
+  --set-env-vars=HF_TOKEN=your_token_here
+```
+
+More secure approach (recommended): store token in Secret Manager and mount/inject as env var at deploy/update time.
+
+#### Application usage
+
+Code should read `HF_TOKEN` from environment and pass it to Hugging Face loading calls:
+
+- `CLIPModel.from_pretrained(..., token=HF_TOKEN)`
+- `CLIPProcessor.from_pretrained(..., token=HF_TOKEN)`
+
+This service only reads model artifacts, so read-only token scope is sufficient.
+
 ### Costs
 
 - **Compute**: ~$0.00002 per request (compute time under free tier most months).
