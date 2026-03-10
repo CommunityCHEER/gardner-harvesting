@@ -100,13 +100,11 @@ async def classify(
         logger.error("Failed to open image: %s", str(e))
         raise HTTPException(status_code=400, detail="Invalid image")
 
-    # Run CLIP inference
-    # Prompt ensembling — average scores across templates per label
+    # Run CLIP inference — batched to reduce peak memory
+    # Encode image once, then process text prompts in chunks
     templates = [
         "a photo of {}",
         "a photo of freshly harvested {}",
-        "a close-up photo of {} on a table",
-        "{}, a type of vegetable or herb",
     ]
     text_prompts = [t.format(l) for l in label_list for t in templates]
     logger.info(
@@ -116,13 +114,29 @@ async def classify(
         len(templates),
     )
 
-    inputs = processor(text=text_prompts, images=img, return_tensors="pt", padding=True)
+    # Encode image (once)
+    image_inputs = processor(images=img, return_tensors="pt")
+    image_features = model.get_image_features(pixel_values=image_inputs["pixel_values"])
+    image_features = image_features / image_features.norm(dim=-1, keepdim=True)
 
-    logger.info("Running CLIP inference...")
+    # Encode text in batches and compute similarities
+    BATCH_SIZE = 32
+    all_similarities = []
+
+    logger.info("Running CLIP inference (batch_size=%d)...", BATCH_SIZE)
     with torch.no_grad():
-        outputs = model(**inputs)
+        for i in range(0, len(text_prompts), BATCH_SIZE):
+            batch = text_prompts[i : i + BATCH_SIZE]
+            text_inputs = processor(text=batch, return_tensors="pt", padding=True)
+            text_features = model.get_text_features(
+                input_ids=text_inputs["input_ids"],
+                attention_mask=text_inputs["attention_mask"],
+            )
+            text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+            similarity = image_features @ text_features.T
+            all_similarities.append(similarity)
 
-    logits = outputs.logits_per_image[0]
+    logits = torch.cat(all_similarities, dim=1)[0] * model.logit_scale.exp()
     # Reshape to (num_labels, num_templates) and average across templates
     logits = logits.view(len(label_list), len(templates)).mean(dim=1)
     probs = torch.softmax(logits, dim=0).tolist()

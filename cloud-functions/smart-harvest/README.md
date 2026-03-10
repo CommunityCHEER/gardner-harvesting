@@ -103,6 +103,7 @@ Predictions are **always sorted by confidence (highest first)**.
 ### Prerequisites
 
 - `gcloud` CLI ([install](https://cloud.google.com/sdk/docs/install))
+- `gcloud beta` component for live log tailing (`gcloud components install beta`)
 - Docker Desktop
 - Authenticated with Google Cloud (`gcloud auth login`)
 
@@ -124,7 +125,8 @@ gcloud run deploy "$SERVICE_NAME" \
   --platform managed \
   --region "$REGION" \
   --allow-unauthenticated \
-  --min-instances 0 \
+  --memory 4Gi \
+  --min-instances 1 \
   --project "$PROJECT_ID"
 ```
 
@@ -193,17 +195,16 @@ This is best for historical analysis and narrowing to specific failures.
 #### Option 3: CLI Logs (gcloud)
 
 ```bash
-# Tail live logs
-gcloud run services logs read smart-harvest \
+# Fetch recent logs
+gcloud logging read \
+  "resource.type=cloud_run_revision AND resource.labels.service_name=smart-harvest" \
   --project=cheer-app-prototype \
-  --region=us-central1 \
-  --follow
+  --limit=50
 
-# Fetch latest logs (bounded)
-gcloud run services logs read smart-harvest \
-  --project=cheer-app-prototype \
-  --region=us-central1 \
-  --limit=100
+# Stream live logs (requires beta component: gcloud components install beta)
+gcloud beta logging tail \
+  "resource.type=cloud_run_revision AND resource.labels.service_name=smart-harvest" \
+  --project=cheer-app-prototype
 ```
 
 You can run these commands from any local directory.
@@ -248,11 +249,11 @@ This service only reads model artifacts, so read-only token scope is sufficient.
 ### Costs
 
 - **Compute**: ~$0.00002 per request (compute time under free tier most months).
-- **Memory**: 512 MB (default, suitable for CLIP model).
+- **Memory**: 4 GiB (CLIP ViT-Large model weights ~1.7 GB + inference tensors scale with label count). Batched text encoding (batch_size=32) reduces peak memory vs processing all prompts at once.
 - **Free tier limit**: ~2M requests/month or ~500K vCPU-seconds/month.
-- **Min-instances=0**: Scales to zero when idle — billed only when handling requests.
+- **Min-instances=1**: One instance stays warm to avoid cold starts (~55s model load). Incurs idle costs (~$5-10/month) but eliminates client timeouts.
 
-> **Note:** First request takes ~30-40s (model download + inference). Subsequent requests ~1-2s.
+> **Note:** With min-instances=1, the first request after deploy still has a cold start. Subsequent requests ~1-2s. Set to 0 to eliminate idle costs at the expense of cold-start latency.
 
 ---
 
