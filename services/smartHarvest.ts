@@ -57,72 +57,24 @@ export async function classifyImage(req: ClassifyRequest): Promise<ClassifyRespo
             logger.error('SmartHarvest.classifyImage', 'Classification request failed', {
                 status: response.status,
                 errorBody: errorText,
-
-                logger.info('SmartHarvest.identifyCrop', 'Identifying crop', {
-                    numCrops: crops.length,
-                    confidenceThreshold: CONFIDENCE_THRESHOLD,
-                    crops,
-                });
-
-                try {
-                    const { predictions } = await classifyImage({ imageUri, labels });
-
-                    if(predictions.length === 0) {
-                logger.warn('SmartHarvest.identifyCrop', 'No predictions returned');
-                return null;
-            }
-
-            const topPrediction = predictions[0];
-            logger.info('SmartHarvest.identifyCrop', 'Top prediction', {
-                label: topPrediction.label,
-                confidence: topPrediction.confidence,
-                thresholdMet: topPrediction.confidence >= CONFIDENCE_THRESHOLD,
             });
+            throw new Error(`Smart Harvest classification failed (${response.status})`);
+        }
 
-            if (topPrediction.confidence < CONFIDENCE_THRESHOLD) {
-                logger.warn('SmartHarvest.identifyCrop', 'Confidence below threshold', {
-                    label: topPrediction.label,
-                    confidence: topPrediction.confidence,
-                    threshold: CONFIDENCE_THRESHOLD,
-                    gap: CONFIDENCE_THRESHOLD - topPrediction.confidence,
-                });
-                return null;
-            }
+        const result: ClassifyResponse = await response.json();
 
-            const match = crops.find(c => c.label === topPrediction.label);
-            if (!match) {
-                logger.warn('SmartHarvest.identifyCrop', 'Top prediction label not in crops list', {
-                    topLabel: topPrediction.label,
-                    availableCrops: crops.map(c => c.label),
-                });
-                return null;
-            }
-
-            logger.info('SmartHarvest.identifyCrop', 'Crop identified successfully', {
-                cropValue: match.value,
-                cropLabel: match.label,
-                confidence: topPrediction.confidence,
-            });
-
-            return match.value;
-        } catch (error) {
-            logger.error('SmartHarvest.identifyCrop', 'Error during crop identification', {
-                error: error instanceof Error ? error.message : String(error),
-            });
-            throw error;
-        } t.classifyImage', 'Classification successful', {
-        numPredictions: result.predictions.length,
+        logger.info('SmartHarvest.classifyImage', 'Classification successful', {
+            numPredictions: result.predictions.length,
             predictions: result.predictions,
         });
 
-    return result;
-} catch (error) {
-    logger.error('SmartHarvest.classifyImage', 'Classification request error', {
-        error: error instanceof Error ? error.message : String(error),
-    });
-    throw error;
-}
-return response.json();
+        return result;
+    } catch (error) {
+        logger.error('SmartHarvest.classifyImage', 'Classification request error', {
+            error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+    }
 }
 
 export async function identifyCrop(

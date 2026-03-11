@@ -249,7 +249,7 @@ describe('identifyCrop', () => {
 
     it('propagates classifyImage errors', async () => {
         mockManipulateAsync.mockResolvedValue({ uri: 'file:///resized.jpg' });
-        mockFetch.mockResolvedValue({ ok: false, status: 500 });
+        mockFetch.mockResolvedValue({ ok: false, status: 500, text: async () => 'Internal Server Error' });
 
         await expect(
             identifyCrop('file:///photo.jpg', crops),
