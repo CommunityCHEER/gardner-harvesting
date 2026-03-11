@@ -103,7 +103,6 @@ export default function HarvestForm({
   const [image, setImage] = useState<ImagePickerAsset>();
   const [note, setNote] = useState<string>('');
   const [noteModalVisible, setNoteModalVisible] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [phase, setPhase] = useState<'idle' | 'analyzing' | 'matched' | 'failed'>('idle');
   const [pendingCropValue, setPendingCropValue] = useState<string | null>(null);
   const [pendingCropLabel, setPendingCropLabel] = useState<string | null>(null);
@@ -175,20 +174,6 @@ export default function HarvestForm({
     activeUnitMetadata?.status === 'ready' ? activeUnitMetadata.requiredUnit : null;
   const optionalUnits =
     activeUnitMetadata?.status === 'ready' ? activeUnitMetadata.optionalUnits : [];
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-    });
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
 
   useEffect(() => {
     const effect = async () => {
@@ -480,7 +465,7 @@ export default function HarvestForm({
           contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}
           keyboardShouldPersistTaps='handled'
         >
-          {!keyboardVisible && gardens.length > 0 && (
+          {gardens.length > 0 && (
             <Dropdown
               placeholder={t('selectGarden')}
               open={gardenListOpen}
@@ -493,7 +478,7 @@ export default function HarvestForm({
               onPress={Keyboard.dismiss}
             />
           )}
-          {(!keyboardVisible || cropListOpen) && crops.length > 0 && (
+          {crops.length > 0 && (
             <Dropdown
               placeholder={t('selectCrop')}
               open={cropListOpen}
