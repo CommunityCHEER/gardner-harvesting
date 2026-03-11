@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  Keyboard,
   StyleSheet,
   StyleProp,
   ViewStyle,
@@ -64,6 +65,7 @@ export default function Dropdown({
   };
 
   const handleSelect = (itemValue: string) => {
+    Keyboard.dismiss();
     setValue(itemValue);
     setOpen(false);
     setSearch('');
@@ -108,6 +110,7 @@ export default function Dropdown({
 
             <FlatList
               data={filteredItems}
+              keyboardShouldPersistTaps="handled"
               keyExtractor={item => item.value}
               renderItem={({ item }) => (
                 <TouchableOpacity

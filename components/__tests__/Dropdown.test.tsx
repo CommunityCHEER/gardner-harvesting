@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import { FlatList } from 'react-native';
 import Dropdown from '../Dropdown';
 
 describe('Dropdown', () => {
@@ -100,6 +101,41 @@ describe('Dropdown', () => {
                 <Dropdown {...defaultProps} open={true} searchable={false} />
             );
             expect(queryByPlaceholderText('Search...')).toBeNull();
+        });
+
+        test('selects filtered item and closes on single tap', () => {
+            const setValue = jest.fn();
+            const setOpen = jest.fn();
+            const { getByPlaceholderText, getByText } = render(
+                <Dropdown
+                    {...defaultProps}
+                    open={true}
+                    searchable={true}
+                    searchPlaceholder="Search..."
+                    setValue={setValue}
+                    setOpen={setOpen}
+                />
+            );
+
+            fireEvent.changeText(getByPlaceholderText('Search...'), 'ban');
+            fireEvent.press(getByText('Banana'));
+
+            expect(setValue).toHaveBeenCalledWith('banana');
+            expect(setOpen).toHaveBeenCalledWith(false);
+        });
+
+        test('keeps item taps active while search input keyboard is open', () => {
+            const { UNSAFE_getByType } = render(
+                <Dropdown
+                    {...defaultProps}
+                    open={true}
+                    searchable={true}
+                    searchPlaceholder="Search..."
+                />
+            );
+
+            const list = UNSAFE_getByType(FlatList);
+            expect(list.props.keyboardShouldPersistTaps).toBe('handled');
         });
     });
 
