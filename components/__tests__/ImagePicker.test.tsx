@@ -147,37 +147,4 @@ describe('ImagePicker', () => {
     });
   });
 
-  describe('loading state', () => {
-    it('should show ActivityIndicator when identifying is true', () => {
-      const { getByTestId } = render(
-        <ImagePicker
-          onImageSelected={mockOnImageSelected}
-          buttonTitle="Take Photo"
-          identifying={true}
-        />
-      );
-      expect(getByTestId('smart-harvest-loading')).toBeTruthy();
-    });
-
-    it('should not show ActivityIndicator when identifying is false', () => {
-      const { queryByTestId } = render(
-        <ImagePicker
-          onImageSelected={mockOnImageSelected}
-          buttonTitle="Take Photo"
-          identifying={false}
-        />
-      );
-      expect(queryByTestId('smart-harvest-loading')).toBeNull();
-    });
-
-    it('should not show ActivityIndicator by default', () => {
-      const { queryByTestId } = render(
-        <ImagePicker
-          onImageSelected={mockOnImageSelected}
-          buttonTitle="Take Photo"
-        />
-      );
-      expect(queryByTestId('smart-harvest-loading')).toBeNull();
-    });
-  });
 });

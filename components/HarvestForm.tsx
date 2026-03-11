@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, Dispatch, SetStateAction } from 'react';
+import React, { useState, useEffect, useContext, useRef, Dispatch, SetStateAction } from 'react';
 import {
   View,
   Text,
@@ -41,6 +41,7 @@ import { ImagePickerAsset } from 'expo-image-picker';
 import { ref, uploadBytes } from 'firebase/storage';
 import NoteModal from './NoteModal';
 import ImagePicker from './ImagePicker';
+import SmartHarvestOverlay from './SmartHarvestOverlay';
 import { identifyCrop } from '@/services/smartHarvest';
 import { logger } from '@/utility/logger';
 
@@ -49,6 +50,15 @@ export interface DisplayUnit {
   name: string;
   fractional: boolean;
 }
+
+interface UnitMetadataCacheEntry {
+  status: 'loading' | 'ready' | 'error';
+  requiredUnit: DisplayUnit | null;
+  optionalUnits: DisplayUnit[];
+  errorMessage: string | null;
+}
+
+const getUnitMetadataKey = (cropId: string, locale: string) => `${locale}:${cropId}`;
 
 export interface HarvestFormProps {
   garden: string | null;
@@ -80,8 +90,9 @@ export default function HarvestForm({
   const [crops, setCrops] = useState<DropdownItem[]>([]);
   const [cropListOpen, setCropListOpen] = useState(false);
   const [crop, setCrop] = useState<string | null>(null);
-  const [requiredUnit, setRequiredUnit] = useState<DisplayUnit | null>(null);
-  const [optionalUnits, setOptionalUnits] = useState<DisplayUnit[]>([]);
+  const [unitMetadataCache, setUnitMetadataCache] = useState<
+    Record<string, UnitMetadataCacheEntry>
+  >({});
 
   // Measure state
   const [requiredMeasure, setRequiredMeasure] = useState<string>('');
@@ -93,7 +104,23 @@ export default function HarvestForm({
   const [note, setNote] = useState<string>('');
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [identifying, setIdentifying] = useState(false);
+  const [phase, setPhase] = useState<'idle' | 'analyzing' | 'matched' | 'failed'>('idle');
+  const [pendingCropValue, setPendingCropValue] = useState<string | null>(null);
+  const [pendingCropLabel, setPendingCropLabel] = useState<string | null>(null);
+  const [smartHarvestError, setSmartHarvestError] = useState<string | null>(null);
+  const smartHarvestRequestRef = useRef(0);
+
+  const resetSmartHarvestState = () => {
+    setPhase('idle');
+    setPendingCropValue(null);
+    setPendingCropLabel(null);
+    setSmartHarvestError(null);
+  };
+
+  const cancelSmartHarvest = () => {
+    smartHarvestRequestRef.current += 1;
+    resetSmartHarvestState();
+  };
 
   const handleSmartHarvest = async (asset: ImagePickerAsset) => {
     if (crops.length < 2) {
@@ -102,39 +129,52 @@ export default function HarvestForm({
       });
       return;
     }
-    setIdentifying(true);
+    const requestId = smartHarvestRequestRef.current + 1;
+    smartHarvestRequestRef.current = requestId;
+    setPendingCropValue(null);
+    setPendingCropLabel(null);
+    setSmartHarvestError(null);
+    setPhase('analyzing');
     try {
       logger.info('HarvestForm.handleSmartHarvest', 'Starting smart harvest', {
         numCrops: crops.length,
       });
       const matchedCrop = await identifyCrop(asset.uri, crops);
+      if (smartHarvestRequestRef.current !== requestId) return;
       if (matchedCrop) {
         logger.info('HarvestForm.handleSmartHarvest', 'Crop identified successfully', {
           matchedCrop,
         });
-        setCrop(matchedCrop);
+        // Look up the crop label from crops array
+        const matchedCropItem = crops.find(c => c.value === matchedCrop);
+        setPendingCropValue(matchedCrop);
+        setPendingCropLabel(matchedCropItem?.label || null);
+        setPhase('matched');
       } else {
         logger.warn('HarvestForm.handleSmartHarvest', 'No crop matched', {
           numCrops: crops.length,
         });
-        Toast.show({
-          type: 'error',
-          text1: t('smartHarvestFailed'),
-        });
+        setSmartHarvestError(t('noMatchFound'));
+        setPhase('failed');
       }
     } catch (error) {
+      if (smartHarvestRequestRef.current !== requestId) return;
       logger.error('HarvestForm.handleSmartHarvest', 'Crop identification failed', {
         error: error instanceof Error ? error.message : String(error),
         numCrops: crops.length,
       });
-      Toast.show({
-        type: 'error',
-        text1: t('smartHarvestFailed'),
-      });
-    } finally {
-      setIdentifying(false);
+      setSmartHarvestError(error instanceof Error ? error.message : String(error));
+      setPhase('failed');
     }
   };
+
+  const unitMetadataKey = crop ? getUnitMetadataKey(crop, locale) : null;
+  const activeUnitMetadata = unitMetadataKey ? unitMetadataCache[unitMetadataKey] : null;
+  const activeUnitStatus = activeUnitMetadata?.status;
+  const requiredUnit =
+    activeUnitMetadata?.status === 'ready' ? activeUnitMetadata.requiredUnit : null;
+  const optionalUnits =
+    activeUnitMetadata?.status === 'ready' ? activeUnitMetadata.optionalUnits : [];
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -168,39 +208,111 @@ export default function HarvestForm({
   }, [locale]);
 
   useEffect(() => {
-    const effect = async () => {
-      setRequiredMeasure('');
-      setOptionalMeasures([]);
-      if (!crop) {
-        setRequiredUnit(null);
-        setOptionalUnits([]);
-      } else {
-        (await getDocs(collection(db, 'crops', crop, 'units'))).forEach(
-          async document => {
+    setRequiredMeasure('');
+    setOptionalMeasures([]);
+  }, [crop]);
+
+  useEffect(() => {
+    if (!crop) return;
+
+    const cacheKey = getUnitMetadataKey(crop, locale);
+    const cachedEntry = unitMetadataCache[cacheKey];
+
+    if (cachedEntry) {
+      return;
+    }
+
+    let active = true;
+
+    const loadUnits = async () => {
+      setUnitMetadataCache(previous => ({
+        ...previous,
+        [cacheKey]: {
+          status: 'loading',
+          requiredUnit: null,
+          optionalUnits: [],
+          errorMessage: null,
+        },
+      }));
+
+      try {
+        const unitsSnapshot = await getDocs(collection(db, 'crops', crop, 'units'));
+        const resolvedUnits = await Promise.all(
+          unitsSnapshot.docs.map(async unitDocument => {
             const unitDoc = await getDoc(
-              document.data()?.value as DocumentReference
+              unitDocument.data()?.value as DocumentReference
             );
             const unitData = unitDoc.data() as Unit;
-            const displayUnit: DisplayUnit = {
-              id: unitDoc.id,
-              name: (
-                await getDoc(doc(db, 'cropUnits', unitDoc.id, 'name', locale))
-              ).data()?.value,
-              fractional: unitData?.fractional,
-            };
+            const localizedName = (
+              await getDoc(doc(db, 'cropUnits', unitDoc.id, 'name', locale))
+            ).data()?.value;
 
-            if (document.id === 'required') setRequiredUnit(displayUnit);
-            else setOptionalUnits([displayUnit]);
-          }
+            return {
+              kind: unitDocument.id,
+              displayUnit: {
+                id: unitDoc.id,
+                name: localizedName,
+                fractional: unitData?.fractional,
+              } as DisplayUnit,
+            };
+          })
         );
+
+        if (!active) return;
+
+        const requiredUnitEntry =
+          resolvedUnits.find(unit => unit.kind === 'required')?.displayUnit ?? null;
+        const optionalUnitById = new Map<string, DisplayUnit>();
+        resolvedUnits
+          .filter(unit => unit.kind !== 'required')
+          .forEach(unit => {
+            optionalUnitById.set(unit.displayUnit.id, unit.displayUnit);
+          });
+
+        const optionalUnitEntry = Array.from(optionalUnitById.values()).pop() ?? null;
+        const optionalUnitEntries = optionalUnitEntry ? [optionalUnitEntry] : [];
+
+        setUnitMetadataCache(previous => ({
+          ...previous,
+          [cacheKey]: {
+            status: 'ready',
+            requiredUnit: requiredUnitEntry,
+            optionalUnits: optionalUnitEntries,
+            errorMessage: null,
+          },
+        }));
+      } catch (error) {
+        if (!active) return;
+
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error('HarvestForm.loadUnits', 'Failed to load unit metadata', {
+          crop,
+          locale,
+          error: errorMessage,
+        });
+
+        setUnitMetadataCache(previous => ({
+          ...previous,
+          [cacheKey]: {
+            status: 'error',
+            requiredUnit: null,
+            optionalUnits: [],
+            errorMessage,
+          },
+        }));
       }
     };
 
-    effect();
-  }, [crop, locale]);
+    loadUnits();
+
+    return () => {
+      active = false;
+    };
+  }, [crop, db, locale]);
 
   useEffect(() => {
     setCrop(null);
+    cancelSmartHarvest();
   }, [garden]);
 
   const [participationLogged, setParticipationLogged] =
@@ -313,41 +425,26 @@ export default function HarvestForm({
     setNote('');
   };
 
-  const [totalToday, setTotalToday] = useState(0);
+  const totalToday =
+    crop && garden
+      ? (harvestsData?.map(harvest => harvest.val() as RealtimeHarvest) ?? []).reduce(
+        (acc, harvest) => acc + harvest.measures[0].measure,
+        0
+      )
+      : 0;
 
-  useEffect(() => {
-    if (!crop || !garden) return;
-    const harvests =
-      harvestsData?.map(harvest => harvest.val() as RealtimeHarvest) ?? [];
-    setTotalToday(
-      harvests.reduce((acc, harvest) => acc + harvest.measures[0].measure, 0)
-    );
-  }, [crop, garden, harvestsData]);
-
-  const [optionalInputs, setOptionalInputs] = useState<React.JSX.Element[]>([]);
-
-  useEffect(() => {
-    if (!crop) return;
-    let inputs: React.JSX.Element[] = [];
-
-    optionalUnits.forEach(unit => {
-      const key = inputs.length;
-      inputs.push(
-        <MeasureInput
-          key={key}
-          measure={optionalMeasures[key]}
-          setMeasure={measure => {
-            optionalMeasures[key] = measure;
-            setOptionalMeasures([...optionalMeasures]);
-          }}
-          unit={unit}
-          optional
-        />
-      );
-    });
-
-    setOptionalInputs(inputs);
-  }, [optionalUnits, optionalMeasures]);
+  const optionalInputs = optionalUnits.map((unit, index) => (
+    <MeasureInput
+      key={unit.id}
+      measure={optionalMeasures[index]}
+      setMeasure={measure => {
+        optionalMeasures[index] = measure;
+        setOptionalMeasures([...optionalMeasures]);
+      }}
+      unit={unit}
+      optional
+    />
+  ));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -360,6 +457,18 @@ export default function HarvestForm({
           setNoteModalVisible(false);
         }}
         saveButtonTitle={t('saveNote')}
+      />
+      <SmartHarvestOverlay
+        phase={phase}
+        cropName={pendingCropLabel}
+        errorMessage={smartHarvestError}
+        onAccept={() => {
+          setCrop(pendingCropValue);
+          resetSmartHarvestState();
+        }}
+        onRetakePhoto={resetSmartHarvestState}
+        onChooseManually={resetSmartHarvestState}
+        onCancel={cancelSmartHarvest}
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -405,7 +514,6 @@ export default function HarvestForm({
               <ImagePicker
                 onImageSelected={setImage}
                 onSmartHarvest={handleSmartHarvest}
-                identifying={identifying}
                 buttonTitle={t('takePhoto')}
               />
               <Text style={[styles.text, { textAlign: 'center' }]}>{t('smartHarvestHelp')}</Text>
@@ -425,7 +533,12 @@ export default function HarvestForm({
               />
             </View>
           )}
-          {crop && !requiredUnit && <ActivityIndicator />}
+          {crop && (!activeUnitMetadata || activeUnitMetadata.status === 'loading') && (
+            <View style={{ alignItems: 'center', gap: 8 }}>
+              <ActivityIndicator />
+              <Text style={styles.text}>{t('loadingUnitOptions')}</Text>
+            </View>
+          )}
           {requiredUnit && (
             <>
               <MeasureInput
@@ -447,6 +560,9 @@ export default function HarvestForm({
                 </Text>
               )}
             </>
+          )}
+          {crop && activeUnitMetadata?.status === 'error' && activeUnitMetadata.errorMessage && (
+            <Text style={styles.text}>{activeUnitMetadata.errorMessage}</Text>
           )}
           {requiredMeasure &&
             requiredMeasure !== '.' &&

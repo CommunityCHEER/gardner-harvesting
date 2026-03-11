@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, Keyboard, ActivityIndicator } from 'react-native';
+import { View, Image, Keyboard } from 'react-native';
 import Button from '@/components/Button';
 import {
   ImagePickerAsset,
@@ -11,14 +11,12 @@ interface ImagePickerProps {
   onImageSelected: (image: ImagePickerAsset) => void;
   onSmartHarvest?: (image: ImagePickerAsset) => void;
   buttonTitle: string;
-  identifying?: boolean;
 }
 
 export default function ImagePicker({
   onImageSelected,
   onSmartHarvest,
   buttonTitle,
-  identifying,
 }: ImagePickerProps) {
   const [image, setImage] = useState<ImagePickerAsset>();
 
@@ -36,9 +34,6 @@ export default function ImagePicker({
   return (
     <View style={{ alignItems: 'center' }}>
       <Button title={buttonTitle} onPress={takePhoto} />
-      {identifying && (
-        <ActivityIndicator testID="smart-harvest-loading" />
-      )}
       {image && (
         <Image
           src={image.uri}
