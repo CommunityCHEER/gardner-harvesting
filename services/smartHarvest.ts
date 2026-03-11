@@ -36,7 +36,7 @@ export async function classifyImage(req: ClassifyRequest): Promise<ClassifyRespo
         name: 'photo.jpg',
         type: 'image/jpeg',
     } as any);
-    form.append('labels', req.labels.join(','));
+    form.append('labels', req.labels.join('|'));
     if (req.topK !== undefined) {
         form.append('top_k', String(req.topK));
     }

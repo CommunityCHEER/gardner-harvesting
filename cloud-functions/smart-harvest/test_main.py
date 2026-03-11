@@ -90,6 +90,15 @@ class TestClassifyValidation:
         )
         assert resp.status_code == 422
 
+    def test_single_pipe_label_returns_422(self, client, sample_image_bytes):
+        """A single label (even with commas in it) is rejected."""
+        resp = client.post(
+            "/classify",
+            files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
+            data={"labels": "Tomatoes, cherry"},
+        )
+        assert resp.status_code == 422
+
 
 # ---------------------------------------------------------------------------
 # POST /classify – successful classification
@@ -158,7 +167,7 @@ class TestClassifySuccess:
         resp = client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(crop_labels)},
+            data={"labels": "|".join(crop_labels)},
         )
 
         assert resp.status_code == 200
@@ -179,7 +188,7 @@ class TestClassifySuccess:
         resp = client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(crop_labels)},
+            data={"labels": "|".join(crop_labels)},
         )
 
         body = resp.json()
@@ -195,7 +204,7 @@ class TestClassifySuccess:
         resp = client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(crop_labels)},
+            data={"labels": "|".join(crop_labels)},
         )
 
         for pred in resp.json()["predictions"]:
@@ -211,7 +220,7 @@ class TestClassifySuccess:
         resp = client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(crop_labels), "top_k": "3"},
+            data={"labels": "|".join(crop_labels), "top_k": "3"},
         )
 
         assert resp.status_code == 200
@@ -291,7 +300,7 @@ class TestBatchedInference:
         client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(crop_labels)},
+            data={"labels": "|".join(crop_labels)},
         )
 
         mock_model.get_image_features.assert_called_once()
@@ -304,7 +313,7 @@ class TestBatchedInference:
         client.post(
             "/classify",
             files={"image": ("crop.jpg", sample_image_bytes, "image/jpeg")},
-            data={"labels": ",".join(many_labels)},
+            data={"labels": "|".join(many_labels)},
         )
 
         # 60 labels × 4 templates = 240 prompts, should need multiple batches

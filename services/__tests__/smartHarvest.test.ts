@@ -140,7 +140,7 @@ describe('classifyImage', () => {
             topK: 3,
         });
 
-        expect(appendSpy).toHaveBeenCalledWith('labels', 'tomato,pepper');
+        expect(appendSpy).toHaveBeenCalledWith('labels', 'tomato|pepper');
         expect(appendSpy).toHaveBeenCalledWith('top_k', '3');
         // image part: { uri, name, type }
         const imageCall = appendSpy.mock.calls.find((c) => c[0] === 'image');
@@ -239,6 +239,48 @@ describe('identifyCrop', () => {
 
         const result = await identifyCrop('file:///photo.jpg', crops);
         expect(result).toBe('crop-tomato');
+    });
+
+    it('handles crop labels containing commas', async () => {
+        const cropsWithCommas = [
+            { value: 'crop-cherry-tomato', label: 'Tomatoes, cherry' },
+            { value: 'crop-pepper', label: 'Pepper - Hot, Small' },
+            { value: 'crop-basil', label: 'Basil' },
+        ];
+        arrangeClassify([
+            { label: 'Tomatoes, cherry', confidence: 0.8 },
+            { label: 'Pepper - Hot, Small', confidence: 0.15 },
+        ]);
+
+        const result = await identifyCrop('file:///photo.jpg', cropsWithCommas);
+        expect(result).toBe('crop-cherry-tomato');
+
+        // Verify labels were sent with pipe delimiter, not comma
+        const body: FormData = mockFetch.mock.calls[0][1].body;
+        const appendSpy = jest.spyOn(FormData.prototype, 'append');
+        // Re-run to capture append calls
+        arrangeClassify([{ label: 'Basil', confidence: 0.9 }]);
+        await identifyCrop('file:///photo.jpg', cropsWithCommas);
+        expect(appendSpy).toHaveBeenCalledWith(
+            'labels',
+            'Tomatoes, cherry|Pepper - Hot, Small|Basil',
+        );
+        appendSpy.mockRestore();
+    });
+
+    it('handles crop labels containing hyphens', async () => {
+        const cropsWithHyphens = [
+            { value: 'crop-bush-bean', label: 'Bean - bush' },
+            { value: 'crop-pole-bean', label: 'Bean - pole' },
+            { value: 'crop-basil', label: 'Basil' },
+        ];
+        arrangeClassify([
+            { label: 'Bean - bush', confidence: 0.7 },
+            { label: 'Bean - pole', confidence: 0.2 },
+        ]);
+
+        const result = await identifyCrop('file:///photo.jpg', cropsWithHyphens);
+        expect(result).toBe('crop-bush-bean');
     });
 
     it('requires at least 2 crops', async () => {

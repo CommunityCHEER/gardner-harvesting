@@ -71,7 +71,7 @@ async def classify(
     model_pair: tuple = Depends(get_model),
 ):
     # Validate labels
-    label_list = [l.strip() for l in labels.split(",") if l.strip()]
+    label_list = [l.strip() for l in labels.split("|") if l.strip()]
     if len(label_list) < 2:
         logger.warning(
             "Classification request rejected: fewer than 2 labels (count=%d)",
