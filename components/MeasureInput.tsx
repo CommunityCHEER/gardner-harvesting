@@ -1,5 +1,5 @@
-import { View, Text, TextInput, Keyboard } from 'react-native';
-import { useRef, useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput } from 'react-native';
+import { useContext, useEffect, useState } from 'react';
 import { DisplayUnit } from './HarvestForm';
 import { styles } from '@/constants/style';
 import { i18nContext } from '@/i18n';
@@ -59,17 +59,6 @@ export default function MeasureInput({
     setPO(parsePoundsOunces(measure));
   }, [measure]);
 
-  // Refs for blurring
-  const measureInputRef = useRef<TextInput>(null);
-  const subUnitInputRef = useRef<TextInput>(null);
-  useEffect(() => {
-    const sub = Keyboard.addListener('keyboardDidHide', () => {
-      measureInputRef.current?.blur();
-      subUnitInputRef.current?.blur();
-    });
-    return () => sub.remove();
-  }, []);
-
   // Handlers
   const handlePoundsChange = (text: string) => {
     if (hasSubUnit) {
@@ -82,8 +71,7 @@ export default function MeasureInput({
       if (!(text.startsWith('.') && (text.match(/\./g) ?? []).length > 1)) {
         const formatted = text.replace(/,|-| /g, '').replace(
           /(\.?)\.*([0-9]{0,2})([0-9]*)(\.?)\.*([0-9]{0,2})(?:\.|[0-9])*/g,
-          `${unit.fractional ? '$1' : ''}${
-            unit.fractional && text.startsWith('.') ? '$2' : '$2$3'
+          `${unit.fractional ? '$1' : ''}${unit.fractional && text.startsWith('.') ? '$2' : '$2$3'
           }${unit.fractional ? '$4$5' : ''}`
         );
         setMeasure(formatted);
@@ -108,7 +96,6 @@ export default function MeasureInput({
       }}
     >
       <TextInput
-        ref={measureInputRef}
         inputMode={hasSubUnit || !unit.fractional ? "numeric" : "decimal"}
         value={pounds}
         onChangeText={handlePoundsChange}
@@ -120,7 +107,6 @@ export default function MeasureInput({
       {hasSubUnit && (
         <>
           <TextInput
-            ref={subUnitInputRef}
             inputMode="numeric"
             value={ounces}
             onChangeText={handleOuncesChange}
