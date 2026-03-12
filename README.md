@@ -430,7 +430,7 @@ Only for projects that stay within Expo Go's supported native runtime. This repo
 
 **Local dev build fails with `INSTALL_FAILED_VERSION_DOWNGRADE`:**
 
-The production EAS build auto-increments `versionCode` remotely. If the dev build's `versionCode` is lower than the production build installed on the device, Android will reject the install. Fix: bump `versionCode` in [app.json](app.json) (`android.versionCode`) to be higher than the currently installed production build's version code. **Important:** changes to `app.json` only take effect in `android/` after a prebuild — you must also edit the value directly in `android/app/build.gradle` if you want to avoid a full clean rebuild. The EAS production profile manages its own counter independently of this value, so bumping it here won't affect production builds.
+The production EAS build auto-increments `versionCode` remotely. If the dev build's `versionCode` is lower than the production build installed on the device, Android will reject the install. Fix: bump `versionCode` in [app.json](app.json) (`android.versionCode`) to be higher than the currently installed production build's version code. **Important:** changes to `app.json` only take effect in `android/` after a prebuild — you must also edit the value directly in `android/app/build.gradle` if you want to avoid a full clean rebuild (`./gradlew clean`). The EAS production profile manages its own counter independently of this value, so bumping it here won't affect production builds.
 
 **Regenerate the native project from scratch:**
 
