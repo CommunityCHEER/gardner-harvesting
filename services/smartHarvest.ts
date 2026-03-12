@@ -1,4 +1,5 @@
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { Platform } from 'react-native';
 import { ClassifyRequest, ClassifyResponse } from '@/types/smartHarvest';
 import { logger } from '@/utility/logger';
 
@@ -7,6 +8,44 @@ export const SMART_HARVEST_URL =
 
 const MAX_WIDTH = 1024;
 const COMPRESS_QUALITY = 0.8;
+
+const ANDROID_LOCAL_HOSTS = new Set(['10.0.2.2', 'localhost', '127.0.0.1']);
+
+export function isAndroidLocalSmartHarvestUrl(
+    baseUrl: string,
+    platform: string = Platform.OS,
+): boolean {
+    if (platform !== 'android') return false;
+
+    try {
+        const host = new URL(baseUrl).hostname;
+        return ANDROID_LOCAL_HOSTS.has(host);
+    } catch {
+        return false;
+    }
+}
+
+async function runLocalAndroidPreflight(baseUrl: string): Promise<void> {
+    if (!isAndroidLocalSmartHarvestUrl(baseUrl)) return;
+
+    const healthUrl = `${baseUrl}/health`;
+
+    try {
+        const healthResponse = await fetch(healthUrl, { method: 'GET' });
+        if (!healthResponse.ok) {
+            throw new Error(`Health check failed (${healthResponse.status})`);
+        }
+    } catch (error) {
+        logger.error('SmartHarvest.classifyImage', 'Local Android preflight failed', {
+            baseUrl,
+            healthUrl,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        throw new Error(
+            'Smart Harvest local backend unreachable on Android. Emulator: use http://10.0.2.2:8080. Physical device via adb: run "adb reverse tcp:8080 tcp:8080" and use http://127.0.0.1:8080.',
+        );
+    }
+}
 
 export async function resizeForUpload(uri: string): Promise<string> {
     const result = await manipulateAsync(
@@ -27,6 +66,8 @@ export async function classifyImage(req: ClassifyRequest): Promise<ClassifyRespo
         labels: req.labels,
         topK: req.topK,
     });
+
+    await runLocalAndroidPreflight(SMART_HARVEST_URL);
 
     const resizedUri = await resizeForUpload(req.imageUri);
 

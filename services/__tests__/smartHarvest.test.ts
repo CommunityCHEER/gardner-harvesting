@@ -1,4 +1,10 @@
-import { classifyImage, identifyCrop, resizeForUpload, SMART_HARVEST_URL } from '@/services/smartHarvest';
+import {
+    classifyImage,
+    identifyCrop,
+    isAndroidLocalSmartHarvestUrl,
+    resizeForUpload,
+    SMART_HARVEST_URL,
+} from '@/services/smartHarvest';
 import { ClassifyResponse } from '@/types/smartHarvest';
 
 // ---------------------------------------------------------------------------
@@ -13,6 +19,25 @@ jest.mock('expo-image-manipulator', () => ({
 
 const mockFetch = jest.fn();
 (global as any).fetch = mockFetch;
+
+describe('isAndroidLocalSmartHarvestUrl', () => {
+    it('returns true for emulator host on android', () => {
+        expect(isAndroidLocalSmartHarvestUrl('http://10.0.2.2:8080', 'android')).toBe(true);
+    });
+
+    it('returns true for localhost on android', () => {
+        expect(isAndroidLocalSmartHarvestUrl('http://localhost:8080', 'android')).toBe(true);
+        expect(isAndroidLocalSmartHarvestUrl('http://127.0.0.1:8080', 'android')).toBe(true);
+    });
+
+    it('returns false for non-android platforms', () => {
+        expect(isAndroidLocalSmartHarvestUrl('http://10.0.2.2:8080', 'ios')).toBe(false);
+    });
+
+    it('returns false for non-local hosts', () => {
+        expect(isAndroidLocalSmartHarvestUrl('https://smart-harvest.run.app', 'android')).toBe(false);
+    });
+});
 
 // ---------------------------------------------------------------------------
 // resizeForUpload

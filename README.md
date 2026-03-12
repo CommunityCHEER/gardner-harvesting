@@ -748,6 +748,34 @@ curl -X POST http://localhost:8080/classify \
   -F "labels=tomato,pepper,basil"
 ```
 
+### Android Local Networking (Smart Harvest)
+
+When testing the mobile app against a local Docker container, endpoint host differs by Android target:
+
+- Android emulator: use `http://10.0.2.2:8080`
+- Physical Android device via ADB: use `http://127.0.0.1:8080` with port reverse
+
+Set in your app env:
+
+```env
+EXPO_PUBLIC_SMART_HARVEST_URL=http://10.0.2.2:8080
+```
+
+or for physical device:
+
+```env
+EXPO_PUBLIC_SMART_HARVEST_URL=http://127.0.0.1:8080
+```
+
+For physical device, run:
+
+```bash
+adb reverse tcp:8080 tcp:8080
+adb reverse --list
+```
+
+Then restart Expo so env vars rebundle into the app.
+
 ### Debugging Classification Failures
 
 If the app shows "unable to identify crop":
