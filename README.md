@@ -428,9 +428,19 @@ Only for projects that stay within Expo Go's supported native runtime. This repo
    ```
 4. The app may not be on the home screen — swipe up to open the **app drawer** and look for **"Gardener Harvesting"**.
 
+**Local dev build fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE` (signature mismatch):**
+
+The production/EAS build is signed with the EAS-managed keystore; local dev builds are signed with the local debug keystore. Android will not allow one to update over the other. You must uninstall the existing app from the device first:
+
+```bash
+adb uninstall com.communitycheer.gardner_harvesting
+```
+
+Then run `npx expo run:android --device` again. Note: this removes the production app from the device — reinstall it from the Play Store internal track when needed.
+
 **Local dev build fails with `INSTALL_FAILED_VERSION_DOWNGRADE`:**
 
-The production EAS build auto-increments `versionCode` remotely. If the dev build's `versionCode` is lower than the production build installed on the device, Android will reject the install. Fix: bump `versionCode` in [app.json](app.json) (`android.versionCode`) to be higher than the currently installed production build's version code. **Important:** changes to `app.json` only take effect in `android/` after a prebuild — you must also edit the value directly in `android/app/build.gradle` if you want to avoid a full clean rebuild (`./gradlew clean`). The EAS production profile manages its own counter independently of this value, so bumping it here won't affect production builds.
+The production EAS build auto-increments `versionCode` remotely. If the dev build's `versionCode` is lower than the production build installed on the device, Android will reject the install. Fix: bump `versionCode` in [app.json](app.json) (`android.versionCode`) and also directly in `android/app/build.gradle` (changes to `app.json` only propagate to `android/` after a full prebuild). The EAS production profile manages its own counter independently, so bumping it here won't affect production builds.
 
 **Regenerate the native project from scratch:**
 
