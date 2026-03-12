@@ -111,6 +111,10 @@ describe('User tab keyboard and tap behavior', () => {
     test('triggers sign-in action on first tap while password input is focused', async () => {
         const { getAllByPlaceholderText, getByPlaceholderText, getByText } = renderUser();
 
+        mockSignInWithEmailAndPassword.mockRejectedValueOnce(
+            new Error('invalid-credential')
+        );
+
         const emailInputs = getAllByPlaceholderText('Email');
 
         fireEvent.changeText(emailInputs[0], 'test@example.com');

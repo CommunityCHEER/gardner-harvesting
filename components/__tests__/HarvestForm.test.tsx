@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import { KeyboardAvoidingView } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, ScrollView } from 'react-native';
 import HarvestForm from '../HarvestForm';
 import { i18nContext } from '@/i18n';
 import { firebaseContext, participationContext } from '@/context';
@@ -249,6 +249,32 @@ const renderHarvestForm = (garden: string | null = 'test-garden') => {
 describe('HarvestForm Note Feature', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('Keyboard behavior', () => {
+    test('should keep taps active with keyboardShouldPersistTaps on the form ScrollView', () => {
+      const { UNSAFE_getByType } = renderHarvestForm();
+      const scrollView = UNSAFE_getByType(ScrollView);
+
+      expect(scrollView.props.keyboardShouldPersistTaps).toBe('handled');
+    });
+
+    test('should dismiss keyboard when Add Note is pressed while crop is selected', async () => {
+      const dismissSpy = jest.spyOn(Keyboard, 'dismiss').mockImplementation(jest.fn());
+      const { findAllByText, getByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      fireEvent.press(cropButtons[0]);
+
+      await waitFor(() => {
+        expect(getByText('Add Note')).toBeTruthy();
+      });
+
+      fireEvent.press(getByText('Add Note'));
+
+      expect(dismissSpy).toHaveBeenCalledTimes(1);
+      dismissSpy.mockRestore();
+    });
   });
 
   describe('Add Note Button', () => {
