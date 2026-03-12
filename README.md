@@ -774,6 +774,16 @@ adb reverse tcp:8080 tcp:8080
 adb reverse --list
 ```
 
+Config location for local dev is `.env.local` (loaded by Expo). Set exactly one value there when switching targets:
+
+```env
+# Android emulator
+EXPO_PUBLIC_SMART_HARVEST_URL=http://10.0.2.2:8080
+
+# Physical Android device via adb reverse
+EXPO_PUBLIC_SMART_HARVEST_URL=http://127.0.0.1:8080
+```
+
 Then restart Expo so env vars rebundle into the app.
 
 ### Debugging Classification Failures

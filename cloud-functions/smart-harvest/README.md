@@ -287,6 +287,26 @@ curl -X POST http://localhost:8080/classify \
   -F "labels=tomato,pepper,basil"
 ```
 
+### Android Client Networking (Local Docker)
+
+When the mobile app calls this local container, endpoint host depends on Android target:
+
+- Android emulator: `http://10.0.2.2:8080`
+- Physical Android device via adb reverse: `http://127.0.0.1:8080`
+
+For physical device, run:
+
+```bash
+adb reverse tcp:8080 tcp:8080
+adb reverse --list
+```
+
+Set `EXPO_PUBLIC_SMART_HARVEST_URL` in `.env.local` accordingly, then restart Expo with cache clear:
+
+```bash
+npx expo start --clear
+```
+
 ### Run Tests Locally
 
 Install dev dependencies:
