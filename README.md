@@ -428,6 +428,10 @@ Only for projects that stay within Expo Go's supported native runtime. This repo
    ```
 4. The app may not be on the home screen — swipe up to open the **app drawer** and look for **"Gardener Harvesting"**.
 
+**Local dev build fails with `INSTALL_FAILED_VERSION_DOWNGRADE`:**
+
+The production EAS build auto-increments `versionCode` remotely. If the dev build's `versionCode` is lower than the production build installed on the device, Android will reject the install. Fix: bump `versionCode` in [app.json](app.json) (`android.versionCode`) to be higher than the currently installed production build's version code, then rebuild. The EAS production profile manages its own counter independently of this value, so bumping it here won't affect production builds.
+
 **Regenerate the native project from scratch:**
 
 ```bash

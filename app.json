@@ -56,6 +56,7 @@
   },
   "android": {
     "package": "com.communitycheer.gardner_harvesting",
+    "versionCode": 44,
     "minSdkVersion": 24,
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/adaptive_icon.png",
