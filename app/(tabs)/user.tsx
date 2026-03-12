@@ -178,8 +178,8 @@ export default function User() {
       )
         ? translate('emailAlreadyRegistered')
         : (error.message as string).includes('invalid-credential')
-        ? translate('invalidCredential')
-        : error.message;
+          ? translate('invalidCredential')
+          : error.message;
       Toast.show({ type: 'error', text1: errorMessage });
     }
   };
@@ -234,13 +234,15 @@ export default function User() {
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
       >
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          keyboardShouldPersistTaps="handled"
+        >
           {userInfo && fireUser && (
             <>
               <Text style={styles.text}>
-                {`${translate('hello')} ${userInfo.firstName} ${
-                  userInfo.lastName
-                }`}
+                {`${translate('hello')} ${userInfo.firstName} ${userInfo.lastName
+                  }`}
               </Text>
               <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
               <Text style={styles.text}>{`${getUserRoleText(userInfo)}`}</Text>
