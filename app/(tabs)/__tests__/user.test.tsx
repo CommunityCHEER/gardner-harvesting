@@ -1,6 +1,12 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import {
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import User from '../user';
 import { firebaseContext } from '@/context';
 
@@ -106,6 +112,26 @@ describe('User tab keyboard and tap behavior', () => {
         const scrollView = UNSAFE_getByType(ScrollView);
 
         expect(scrollView.props.keyboardShouldPersistTaps).toBe('handled');
+    });
+
+    test('uses top-aligned ScrollView content for auth controls', () => {
+        const { UNSAFE_getByType } = renderUser();
+
+        const scrollView = UNSAFE_getByType(ScrollView);
+        const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
+
+        expect(contentStyle.justifyContent).toBe('flex-start');
+    });
+
+    test('does not vertically center the keyboard-avoiding layout container', () => {
+        const { UNSAFE_getByType } = renderUser();
+
+        const safeAreaView = UNSAFE_getByType(SafeAreaView);
+        const safeAreaStyle = StyleSheet.flatten(safeAreaView.props.style);
+
+        expect(safeAreaStyle.flex).toBe(1);
+        expect(safeAreaStyle.justifyContent).toBeUndefined();
+        expect(safeAreaStyle.alignItems).toBeUndefined();
     });
 
     test('triggers sign-in action on first tap while password input is focused', async () => {

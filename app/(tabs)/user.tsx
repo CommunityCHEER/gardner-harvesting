@@ -228,14 +228,14 @@ export default function User() {
   };
 
   return (
-    <SafeAreaView style={styles.centeredView}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64} // Adjust the offset as needed
       >
         <ScrollView
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={styles.userScrollViewContent}
           keyboardShouldPersistTaps="handled"
         >
           {userInfo && fireUser && (
