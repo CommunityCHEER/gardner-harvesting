@@ -9,12 +9,12 @@ App for tracking/logging participation in CHEER's Long Branch Gardener Program a
 
 | Layer | Technology | Version |
 |---|---|---|
-| Framework | Expo (SDK 53) | ~53.0.0 |
-| React Native | react-native | 0.79.6 |
-| React | react | 19.0.0 |
-| TypeScript | typescript | ~5.8.3 |
+| Framework | Expo (SDK 55) | ^55.0.4 |
+| React Native | react-native | 0.83.2 |
+| React | react | 19.2.0 |
+| TypeScript | typescript | ~5.9.2 |
 | JS Engine | Hermes | default |
-| Router | expo-router | ~5.1.11 |
+| Router | expo-router | ~55.0.3 |
 | Backend | Firebase (Auth, Firestore, RTDB, Storage, Hosting) | ^11.2.0 |
 | i18n | i18n-js | ^4.4.3 |
 
@@ -303,7 +303,9 @@ npx expo run:ios
 
 ### Quick start
 
-The `android/` directory is intentionally **gitignored** — it is generated on demand during the first build.
+This project uses Expo development builds for native Android device testing. For a physical phone, install a development build of the app itself, not Expo Go.
+
+The native `android/` directory is CNG output. Treat it as generated code: regenerate with `npx expo prebuild --clean --platform android` when needed, and do not hand-edit it.
 
 **Before running**, verify an emulator is running or a device is connected:
 
@@ -321,7 +323,7 @@ npx expo run:android
 This single command:
 1. Generates the `android/` native project (equivalent to `npx expo prebuild --platform android`).
 2. Compiles the Gradle project.
-3. Installs and launches the app on the connected emulator or device.
+3. Installs and launches a local development build on the connected emulator or device.
 
 Alternatively:
 
@@ -365,11 +367,41 @@ adb devices
 # should list your device
 ```
 
-5. Run:
+5. Install the local development build:
 
 ```bash
-npx expo run:android
+npx expo run:android --device
 ```
+
+6. In a separate terminal, start Metro:
+
+```bash
+npm start
+```
+
+7. Open the installed app on the phone. It will connect to the Metro server as a development build.
+
+If USB install is not practical, use the cloud-built development client instead:
+
+```bash
+npm run devbuild
+```
+
+That creates an EAS development build artifact you can sideload onto the phone, then connect to the same Metro session.
+
+### FAQ: Expo Go vs development build
+
+**Can I use Expo Go for this app on Android?**
+
+Not for the native-device workflow documented here. Expo Go installs Expo's runtime, not this app's own native shell.
+
+**What should I install on my phone instead?**
+
+Install a development build of this app with `npx expo run:android --device` for a local native build, or `npm run devbuild` for an EAS-built artifact.
+
+**When would I still use Expo Go?**
+
+Only for projects that stay within Expo Go's supported native runtime. This repo documents development builds as the default Android phone path.
 
 ### Debugging
 
@@ -515,7 +547,7 @@ Defined in [eas.json](eas.json):
 
 | Profile | Purpose | Distribution |
 |---|---|---|
-| `development` | Development client with live reload. For testing on physical devices during development. | Internal (ad hoc) |
+| `development` | Development build for installing the app on physical devices during development. | Internal |
 | `preview` | Internal testing build with OTA update channel `"preview"`. | Internal |
 | `production` | App Store build. Auto-increments build number. Pins CocoaPods to 1.15.2. | Store |
 
@@ -785,8 +817,8 @@ Items below represent opportunities to improve security, developer experience, a
 | Issue | Details | Relevant Section |
 |---|---|---|
 | No `.nvmrc` file | The project requires Node 18+ but has no `.nvmrc` or `.node-version` file to pin the version automatically for developers using nvm/fnm. | [Prerequisites](#prerequisites) |
-| Inconsistent native directory strategy | `ios/` is committed to git but `android/` is gitignored. This is a hybrid of managed and bare workflows. Consider either committing both or gitignoring both (fully managed). | [Running Android](#running-locally--android) |
-| ~~iOS minimum version mismatch~~ | ~~`ios/GardenerHarvesting/Info.plist` declares `MinimumOSVersion` as 12.0, but `ios/Podfile` sets the deployment target to 15.1.~~ **Resolved** — native code regenerated via `expo prebuild --clean` for Expo 53. | [Running iOS](#running-locally--ios) |
+| Stale native directory docs | Workspace guardrails require both `ios/` and `android/` to be treated as generated CNG output, but older sections of this README previously described a mixed strategy. Keep docs aligned with the current Expo/CNG workflow. | [Running Android](#running-locally--android) |
+| ~~iOS minimum version mismatch~~ | ~~`ios/GardenerHarvesting/Info.plist` declares `MinimumOSVersion` as 12.0, but `ios/Podfile` sets the deployment target to 15.1.~~ **Resolved** — native code regenerated via `expo prebuild --clean` for Expo 55. | [Running iOS](#running-locally--ios) |
 | Contradictory Android permissions | [app.json](app.json) lists `RECORD_AUDIO` in both `blockedPermissions` and `permissions` under the `android` key. The intent is likely to block it — remove it from `permissions`. | [Deploy Android](#building--deploying--android-via-eas) |
 | `web` missing from `platforms` | [app.json](app.json) `platforms` array lists only `["ios", "android"]` despite active web support and a deploy script. Add `"web"` for clarity. | [Running Web](#running-locally--web) |
 

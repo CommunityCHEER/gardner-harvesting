@@ -49,18 +49,28 @@ NOTE: For EAS cloud builds, these variables must also be set in the EAS environm
 
 === Running the App
 
-To start the development server, run:
+To start the Metro development server, run:
 
 [source,bash]
 ----
 npm start
 ----
 
-This will open the Expo developer tools in your browser. From there, you can:
+This opens the Expo dev server. Use one of these paths:
 
-- Run on an Android device/emulator: `npm run android`
+- Install a local Android development build on a device/emulator: `npm run android`
 - Run on an iOS device/emulator: `npm run ios`
 - Run in a web browser: `npm run web`
+
+For Android phone testing, use a development build of this app, not Expo Go. Typical physical-device flow:
+
+1. Enable USB debugging on the phone and connect it.
+2. Verify the device is visible with `adb devices`.
+3. Install the app with `npx expo run:android --device`.
+4. Keep Metro running via `npm start`.
+5. Open the installed app on the phone and connect it to Metro.
+
+If you need a cloud-built installer instead of a local native build, use `npm run devbuild` to create an EAS development build, then sideload that artifact onto the phone.
 
 == Purpose
 
@@ -76,14 +86,23 @@ This app also uses Firebase for user authentication. Presently, the only means o
 
 == Building
 
-I (Devin) develop on a NixOS machine, so locally building the app is a headache. Thus, I went for a simpler approach: EAS, Expo's cloud build service. It's surprisingly simple. You have to make your own account and sign into the EAS CLI, but then you just pick a target and profile and it'll build it for you. You can build locally with the same CLI, too, with one extra flag. 
+Use EAS for cloud-built installable artifacts and store submissions.
 
-In app.json I (David) deleted the `extra -> eas` node, then, when I did `eas build...` it first prompted me to log into EAS which added the new/replacemnt entry back to app.json so that I could use my own EAS account instead of Devin's.
+Current Android build paths:
 
-Use `eas build -e development -p android` to create a new EAS build. This creates a build artifact that can be installed on the Android phone and used to debug the app via the local/dev eas session.
+* Local device install: `npx expo run:android --device`
+* Cloud-built development artifact: `npm run devbuild`
+* Production Play build: `npm run build:android`
 
-EAS Credentials (in the web app console) has the Firebase app ID and that also has a SHA key that needs to be copied over from EAS to FireBase (Project Settings, Your Apps, Android Apps, Gardener Harvesting, SHA certificate fingerprints)
+The development profile is configured in `eas.json` with `developmentClient: true`, so the resulting Android artifact is meant to be installed on a device and connected back to Metro during development.
+
+After the first Android EAS build, sync the generated signing fingerprints back to Firebase:
+
+1. Open the project credentials in Expo/EAS and copy the Android SHA-1 and SHA-256 fingerprints.
+2. In Firebase Console, open Project Settings -> Your Apps -> Android -> `com.communitycheer.gardner_harvesting`.
+3. Add the fingerprints there.
+4. Download the refreshed `google-services.json` and replace the repo copy.
 
 === Expo development builds
 
-For rapid development, Expo provides development builds, which compile any native code provided by libraries and provides a hot-reloading wrapper. You will need to run this package's `start` script to launch a server for the UI code and then connect to the server on the mobile app. https://docs.expo.dev/develop/development-builds/use-development-builds/[Read more here].
+For rapid development, Expo development builds compile the app's native dependencies and wrap them in a debug-friendly runtime. In this repo, that is the correct path for Android device testing when native modules matter. Run `npm start` for Metro, then connect from the installed development build on the phone. Use `npx expo run:android --device` for a local install or `npm run devbuild` for an EAS-built installable artifact. https://docs.expo.dev/develop/development-builds/use-development-builds/[Read more here].
