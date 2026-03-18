@@ -157,7 +157,7 @@ describe('User tab keyboard and tap behavior', () => {
         expect(UNSAFE_queryAllByType(TextInput)).toHaveLength(0);
     });
 
-    test('tapping Login shows email + password fields, Submit, Go Back, and Forgot button', () => {
+    test('tapping Login shows email + password fields, Submit, Go Back, and forgot password button', () => {
         const { getByText, getByPlaceholderText, queryByText } = renderUser();
 
         fireEvent.press(getByText('Login'));
@@ -166,7 +166,7 @@ describe('User tab keyboard and tap behavior', () => {
         expect(getByPlaceholderText('Password')).toBeTruthy();
         expect(getByText('Submit')).toBeTruthy();
         expect(getByText('Go Back')).toBeTruthy();
-        expect(getByText('Forgot your password?')).toBeTruthy();
+        expect(getByText('...Request a Password Reset')).toBeTruthy();
         expect(queryByText('or')).toBeNull();
         expect(queryByText('Register')).toBeNull();
     });
@@ -216,7 +216,7 @@ describe('User tab keyboard and tap behavior', () => {
         const { getByText, getByPlaceholderText, queryByPlaceholderText, queryByText } = renderUser();
 
         fireEvent.press(getByText('Login'));
-        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.press(getByText('...Request a Password Reset'));
 
         expect(getByPlaceholderText('Email')).toBeTruthy();
         expect(queryByPlaceholderText('Password')).toBeNull();
@@ -230,13 +230,13 @@ describe('User tab keyboard and tap behavior', () => {
         const { getByText, getByPlaceholderText, queryByText } = renderUser();
 
         fireEvent.press(getByText('Login'));
-        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.press(getByText('...Request a Password Reset'));
         fireEvent.press(getByText('Go Back'));
 
         expect(getByPlaceholderText('Email')).toBeTruthy();
         expect(getByPlaceholderText('Password')).toBeTruthy();
         expect(getByText('Submit')).toBeTruthy();
-        expect(getByText('Forgot your password?')).toBeTruthy();
+        expect(getByText('...Request a Password Reset')).toBeTruthy();
         expect(queryByText('Register')).toBeNull();
     });
 
@@ -245,7 +245,7 @@ describe('User tab keyboard and tap behavior', () => {
 
         fireEvent.press(getByText('Login'));
         fireEvent.changeText(getByPlaceholderText('Email'), 'kept@example.com');
-        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.press(getByText('...Request a Password Reset'));
 
         expect(getByPlaceholderText('Email').props.value).toBe('kept@example.com');
     });
@@ -302,7 +302,7 @@ describe('User tab keyboard and tap behavior', () => {
         const { getByText, getByPlaceholderText } = renderUser();
 
         fireEvent.press(getByText('Login'));
-        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.press(getByText('...Request a Password Reset'));
         fireEvent.changeText(getByPlaceholderText('Email'), 'reset@example.com');
         fireEvent.press(getByText('Request password reset'));
 
@@ -369,6 +369,40 @@ describe('User tab keyboard and tap behavior', () => {
         fireEvent.changeText(getByPlaceholderText('Password'), 'weak');
 
         expect(queryByText(/12 and 50 characters/)).toBeTruthy();
+    });
+
+    // --- Screen titles and prompts ---
+
+    test('login mode displays title "Login To Your Account"', () => {
+        const { getByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+
+        expect(getByText('Login To Your Account')).toBeTruthy();
+    });
+
+    test('register mode displays title "Register A New Account"', () => {
+        const { getByText } = renderUser();
+
+        fireEvent.press(getByText('Register'));
+
+        expect(getByText('Register A New Account')).toBeTruthy();
+    });
+
+    test('login mode displays forgot password prompt text', () => {
+        const { getByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+
+        expect(getByText(/Forgot your password\? Click the button below to\.\.\./)).toBeTruthy();
+    });
+
+    test('forgot password button shows "...Request a Password Reset" label', () => {
+        const { getByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+
+        expect(getByText('...Request a Password Reset')).toBeTruthy();
     });
 });
 

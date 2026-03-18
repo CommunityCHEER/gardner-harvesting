@@ -269,6 +269,9 @@ export default function User() {
               )}
               {mode === 'login' && (
                 <>
+                  <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+                    {translate('loginTitle')}
+                  </Text>
                   <TextInput
                     placeholder={translate('email')}
                     value={email}
@@ -290,8 +293,11 @@ export default function User() {
                     title={translate('authSubmit')}
                     onPress={handleEmailPasswordAuth}
                   />
+                  <Text style={{ fontSize: 14, color: '#666', textAlign: 'center', marginHorizontal: 16, marginTop: 12, marginBottom: 8 }}>
+                    {translate('forgotPasswordPrompt')}
+                  </Text>
                   <Button
-                    title={translate('qForgotPassword')}
+                    title={translate('resetPasswordButton')}
                     variant="secondary"
                     onPress={() => setMode('forgot')}
                   />
@@ -321,6 +327,9 @@ export default function User() {
               )}
               {mode === 'register' && (
                 <>
+                  <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+                    {translate('registerTitle')}
+                  </Text>
                   <TextInput
                     placeholder={translate('firstName')}
                     value={firstName}
