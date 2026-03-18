@@ -42,7 +42,7 @@ export const styles = StyleSheet.create({
     fontSize: 20,
   },
   text: {
-    fontSize: 20,
+    fontSize: 20, alignContent: 'center', textAlign: 'center'
   },
   image: { width: 280, height: 200 },
 });

@@ -241,11 +241,11 @@ export default function User() {
           {userInfo && fireUser && (
             <>
               <Text style={styles.text}>
-                {`${translate('hello')} ${userInfo.firstName} ${userInfo.lastName
+                {`${translate('hello')}, ${userInfo.firstName} ${userInfo.lastName
                   }`}
               </Text>
-              <Text style={styles.text}>{`<${fireUser.email}>`}</Text>
-              <Text style={styles.text}>{`${getUserRoleText(userInfo)}`}</Text>
+              {/* <Text style={styles.text}>{`<${fireUser.email}>`}</Text> */}
+              {/* <Text style={styles.text}>{`${getUserRoleText(userInfo)}`}</Text> */}
               <Button title={translate('signOut')} onPress={signOut} />
               <Button
                 title={translate('deleteAccount')}

@@ -504,9 +504,9 @@ export default function HarvestForm({
               <Text style={[styles.text, { textAlign: 'center' }]}>{t('smartHarvestHelp')}</Text>
             </>
           )}
-          {!crop && (
+          {/* {!crop && (
             <Button title={t('back')} onPress={onBack} />
-          )}
+          )} */}
           {crop && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
               <Button
@@ -555,13 +555,13 @@ export default function HarvestForm({
               <ActivityIndicator />
             ) : (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
-                <Button title={t('back')} onPress={onBack} />
+                {/* <Button title={t('back')} onPress={onBack} /> */}
                 <Button title={t('submit')} onPress={submit} />
               </View>
             ))}
-          {crop && (!requiredMeasure || requiredMeasure === '.') && (
+          {/* {crop && (!requiredMeasure || requiredMeasure === '.') && (
             <Button title={t('back')} onPress={onBack} />
-          )}
+          )} */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
