@@ -145,7 +145,6 @@ export default function User() {
       return;
     }
     if (!validatePassword(password)) {
-      Toast.show({ type: 'error', text1: translate('invalidPassword') });
       return;
     }
 
@@ -282,6 +281,11 @@ export default function User() {
                     onChangeText={setPassword}
                     style={styles.loginInput}
                   />
+                  {password.length > 0 && !validatePassword(password) && (
+                    <Text style={{ fontSize: 13, color: '#666', textAlign: 'center', marginHorizontal: 16, marginTop: 4 }}>
+                      {translate('invalidPassword')}
+                    </Text>
+                  )}
                   <Button
                     title={translate('authSubmit')}
                     onPress={handleEmailPasswordAuth}
@@ -341,6 +345,11 @@ export default function User() {
                     onChangeText={setPassword}
                     style={styles.loginInput}
                   />
+                  {password.length > 0 && !validatePassword(password) && (
+                    <Text style={{ fontSize: 13, color: '#666', textAlign: 'center', marginHorizontal: 16, marginTop: 4 }}>
+                      {translate('invalidPassword')}
+                    </Text>
+                  )}
                   <Button
                     title={translate('authSubmit')}
                     onPress={handleEmailPasswordAuth}

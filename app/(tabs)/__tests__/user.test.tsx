@@ -314,5 +314,61 @@ describe('User tab keyboard and tap behavior', () => {
             );
         });
     });
+
+    // --- Inline password requirements hint tests ---
+
+    test('password requirements hint is not shown when password field is empty in login mode', () => {
+        const { getByText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+
+        expect(queryByText(/12 and 50 characters/)).toBeNull();
+    });
+
+    test('password requirements hint appears inline when password is non-empty and invalid in login mode', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.changeText(getByPlaceholderText('Password'), 'weak');
+
+        expect(queryByText(/12 and 50 characters/)).toBeTruthy();
+    });
+
+    test('password requirements hint disappears when password becomes valid in login mode', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.changeText(getByPlaceholderText('Password'), 'weak');
+        expect(queryByText(/12 and 50 characters/)).toBeTruthy();
+
+        fireEvent.changeText(getByPlaceholderText('Password'), 'Validpass123!');
+        expect(queryByText(/12 and 50 characters/)).toBeNull();
+    });
+
+    test('invalid password does not trigger a toast in login mode', async () => {
+        const MockToast = require('react-native-toast-message').default;
+        const { getByText, getByPlaceholderText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+        fireEvent.changeText(getByPlaceholderText('Password'), 'weak');
+        fireEvent.press(getByText('Submit'));
+
+        await waitFor(() => {
+            expect(mockSignInWithEmailAndPassword).not.toHaveBeenCalled();
+            expect(MockToast.show).not.toHaveBeenCalledWith(
+                expect.objectContaining({ text1: expect.stringContaining('12 and 50') })
+            );
+        });
+    });
+
+    test('password requirements hint appears inline when password is non-empty and invalid in register mode', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Register'));
+        fireEvent.changeText(getByPlaceholderText('Password'), 'weak');
+
+        expect(queryByText(/12 and 50 characters/)).toBeTruthy();
+    });
 });
 
