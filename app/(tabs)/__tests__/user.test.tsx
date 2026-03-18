@@ -5,6 +5,7 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
+    TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import User from '../user';
@@ -134,20 +135,130 @@ describe('User tab keyboard and tap behavior', () => {
         expect(safeAreaStyle.alignItems).toBeUndefined();
     });
 
-    test('triggers sign-in action on first tap while password input is focused', async () => {
-        const { getAllByPlaceholderText, getByPlaceholderText, getByText } = renderUser();
+    test('preserves keyboard avoiding layout contract', () => {
+        const { UNSAFE_getByType } = renderUser();
 
-        mockSignInWithEmailAndPassword.mockRejectedValueOnce(
-            new Error('invalid-credential')
+        const keyboardAvoidingView = UNSAFE_getByType(KeyboardAvoidingView);
+
+        expect(keyboardAvoidingView.props.behavior).toBe(
+            Platform.OS === 'ios' ? 'padding' : 'height'
         );
+        expect(keyboardAvoidingView.props.keyboardVerticalOffset).toBe(64);
+    });
 
-        const emailInputs = getAllByPlaceholderText('Email');
+    // --- Auth flow state machine tests ---
 
-        fireEvent.changeText(emailInputs[0], 'test@example.com');
-        fireEvent.changeText(getByPlaceholderText('Password'), 'Validpass123!');
-        fireEvent(getByPlaceholderText('Password'), 'focus');
+    test('initial state shows Login and Register buttons with no input fields', () => {
+        const { getByText, UNSAFE_queryAllByType } = renderUser();
+
+        expect(getByText('Login')).toBeTruthy();
+        expect(getByText('Register')).toBeTruthy();
+        expect(getByText('or')).toBeTruthy();
+        expect(UNSAFE_queryAllByType(TextInput)).toHaveLength(0);
+    });
+
+    test('tapping Login shows email + password fields, Submit, Go Back, and Forgot button', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
 
         fireEvent.press(getByText('Login'));
+
+        expect(getByPlaceholderText('Email')).toBeTruthy();
+        expect(getByPlaceholderText('Password')).toBeTruthy();
+        expect(getByText('Submit')).toBeTruthy();
+        expect(getByText('Go Back')).toBeTruthy();
+        expect(getByText('Forgot your password?')).toBeTruthy();
+        expect(queryByText('or')).toBeNull();
+        expect(queryByText('Register')).toBeNull();
+    });
+
+    test('tapping Register shows all four fields, Submit, and Go Back', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Register'));
+
+        expect(getByPlaceholderText('First Name')).toBeTruthy();
+        expect(getByPlaceholderText('Last Name')).toBeTruthy();
+        expect(getByPlaceholderText('Email')).toBeTruthy();
+        expect(getByPlaceholderText('Password')).toBeTruthy();
+        expect(getByText('Submit')).toBeTruthy();
+        expect(getByText('Go Back')).toBeTruthy();
+        expect(queryByText('or')).toBeNull();
+        expect(queryByText('Login')).toBeNull();
+    });
+
+    test('Go Back from login returns to initial state', () => {
+        const { getByText, UNSAFE_queryAllByType, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.press(getByText('Go Back'));
+
+        expect(getByText('Login')).toBeTruthy();
+        expect(getByText('Register')).toBeTruthy();
+        expect(getByText('or')).toBeTruthy();
+        expect(UNSAFE_queryAllByType(TextInput)).toHaveLength(0);
+        expect(queryByText('Submit')).toBeNull();
+    });
+
+    test('Go Back from register returns to initial state', () => {
+        const { getByText, UNSAFE_queryAllByType, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Register'));
+        fireEvent.press(getByText('Go Back'));
+
+        expect(getByText('Login')).toBeTruthy();
+        expect(getByText('Register')).toBeTruthy();
+        expect(getByText('or')).toBeTruthy();
+        expect(UNSAFE_queryAllByType(TextInput)).toHaveLength(0);
+        expect(queryByText('Submit')).toBeNull();
+    });
+
+    test('tapping Forgot from login shows only email field plus Request reset and Go Back', () => {
+        const { getByText, getByPlaceholderText, queryByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.press(getByText('Forgot your password?'));
+
+        expect(getByPlaceholderText('Email')).toBeTruthy();
+        expect(queryByPlaceholderText('Password')).toBeNull();
+        expect(getByText('Request password reset')).toBeTruthy();
+        expect(getByText('Go Back')).toBeTruthy();
+        expect(queryByText('Submit')).toBeNull();
+        expect(queryByText('or')).toBeNull();
+    });
+
+    test('Go Back from forgot returns to login mode (email and password fields visible)', () => {
+        const { getByText, getByPlaceholderText, queryByText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.press(getByText('Go Back'));
+
+        expect(getByPlaceholderText('Email')).toBeTruthy();
+        expect(getByPlaceholderText('Password')).toBeTruthy();
+        expect(getByText('Submit')).toBeTruthy();
+        expect(getByText('Forgot your password?')).toBeTruthy();
+        expect(queryByText('Register')).toBeNull();
+    });
+
+    test('email is retained when switching from login to forgot mode', () => {
+        const { getByText, getByPlaceholderText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.changeText(getByPlaceholderText('Email'), 'kept@example.com');
+        fireEvent.press(getByText('Forgot your password?'));
+
+        expect(getByPlaceholderText('Email').props.value).toBe('kept@example.com');
+    });
+
+    test('Submit in login mode calls signInWithEmailAndPassword', async () => {
+        const { getByText, getByPlaceholderText } = renderUser();
+
+        mockSignInWithEmailAndPassword.mockRejectedValueOnce(new Error('invalid-credential'));
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
+        fireEvent.changeText(getByPlaceholderText('Password'), 'Validpass123!');
+        fireEvent.press(getByText('Submit'));
 
         await waitFor(() => {
             expect(mockSignInWithEmailAndPassword).toHaveBeenCalledTimes(1);
@@ -159,13 +270,40 @@ describe('User tab keyboard and tap behavior', () => {
         });
     });
 
-    test('triggers reset-password action on first tap while reset email input is focused', async () => {
-        const { getAllByPlaceholderText, getByText } = renderUser();
+    test('Submit in register mode calls createUserWithEmailAndPassword', async () => {
+        const { getByText, getByPlaceholderText } = renderUser();
 
-        const emailInputs = getAllByPlaceholderText('Email');
-        fireEvent.changeText(emailInputs[1], 'reset@example.com');
-        fireEvent(emailInputs[1], 'focus');
+        mockCreateUserWithEmailAndPassword.mockResolvedValueOnce({
+            user: {
+                uid: 'new-uid',
+                email: 'new@example.com',
+                getIdTokenResult: jest.fn().mockResolvedValue({ claims: {} }),
+            },
+        });
 
+        fireEvent.press(getByText('Register'));
+        fireEvent.changeText(getByPlaceholderText('First Name'), 'Jane');
+        fireEvent.changeText(getByPlaceholderText('Last Name'), 'Smith');
+        fireEvent.changeText(getByPlaceholderText('Email'), 'new@example.com');
+        fireEvent.changeText(getByPlaceholderText('Password'), 'Validpass123!');
+        fireEvent.press(getByText('Submit'));
+
+        await waitFor(() => {
+            expect(mockCreateUserWithEmailAndPassword).toHaveBeenCalledTimes(1);
+            expect(mockCreateUserWithEmailAndPassword).toHaveBeenCalledWith(
+                mockAuth,
+                'new@example.com',
+                'Validpass123!'
+            );
+        });
+    });
+
+    test('Request password reset calls sendPasswordResetEmail', async () => {
+        const { getByText, getByPlaceholderText } = renderUser();
+
+        fireEvent.press(getByText('Login'));
+        fireEvent.press(getByText('Forgot your password?'));
+        fireEvent.changeText(getByPlaceholderText('Email'), 'reset@example.com');
         fireEvent.press(getByText('Request password reset'));
 
         await waitFor(() => {
@@ -176,15 +314,5 @@ describe('User tab keyboard and tap behavior', () => {
             );
         });
     });
-
-    test('preserves keyboard avoiding layout contract', () => {
-        const { UNSAFE_getByType } = renderUser();
-
-        const keyboardAvoidingView = UNSAFE_getByType(KeyboardAvoidingView);
-
-        expect(keyboardAvoidingView.props.behavior).toBe(
-            Platform.OS === 'ios' ? 'padding' : 'height'
-        );
-        expect(keyboardAvoidingView.props.keyboardVerticalOffset).toBe(64);
-    });
 });
+

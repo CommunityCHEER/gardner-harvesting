@@ -43,8 +43,7 @@ export default function User() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
+  const [mode, setMode] = useState<'initial' | 'login' | 'register' | 'forgot'>('initial');
 
   const i18n = useContext(i18nContext);
   const translate = i18n.t.bind(i18n);
@@ -131,7 +130,7 @@ export default function User() {
     return passwordPattern.test(password);
   };
   const handleEmailPasswordAuth = async () => {
-    if (isSignUp) {
+    if (mode === 'register') {
       if (firstName.length < 2 || firstName.length > 50) {
         Toast.show({ type: 'error', text1: translate('firstNameLength') });
         return;
@@ -151,7 +150,7 @@ export default function User() {
     }
 
     try {
-      if (isSignUp) {
+      if (mode === 'register') {
         const res = await createUserWithEmailAndPassword(auth, email, password);
         const userInfo = {
           firstName,
@@ -184,13 +183,13 @@ export default function User() {
     }
   };
   const handlePasswordReset = async () => {
-    if (!validateEmail(resetEmail)) {
+    if (!validateEmail(email)) {
       Toast.show({ type: 'error', text1: translate('invalidEmail') });
       return;
     }
     try {
       auth.languageCode = i18n.locale; // Set the language code
-      await sendPasswordResetEmail(auth, resetEmail);
+      await sendPasswordResetEmail(auth, email);
       Toast.show({ type: 'success', text1: translate('resetEmailSent') });
     } catch (error: any) {
       console.error(error);
@@ -256,7 +255,67 @@ export default function User() {
           {!userInfo && fireUser && <ActivityIndicator />}
           {!fireUser && (
             <>
-              {isSignUp && (
+              {mode === 'initial' && (
+                <>
+                  <Button
+                    title={translate('signIn')}
+                    onPress={() => setMode('login')}
+                  />
+                  <Text style={styles.text}>{translate('or')}</Text>
+                  <Button
+                    title={translate('switchToSignUp')}
+                    onPress={() => setMode('register')}
+                  />
+                </>
+              )}
+              {mode === 'login' && (
+                <>
+                  <TextInput
+                    placeholder={translate('email')}
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.loginInput}
+                  />
+                  <PasswordInput
+                    placeholder={translate('password')}
+                    value={password}
+                    onChangeText={setPassword}
+                    style={styles.loginInput}
+                  />
+                  <Button
+                    title={translate('authSubmit')}
+                    onPress={handleEmailPasswordAuth}
+                  />
+                  <Button
+                    title={translate('qForgotPassword')}
+                    variant="secondary"
+                    onPress={() => setMode('forgot')}
+                  />
+                  <Button
+                    title={translate('goBack')}
+                    onPress={() => setMode('initial')}
+                  />
+                </>
+              )}
+              {mode === 'forgot' && (
+                <>
+                  <TextInput
+                    placeholder={translate('email')}
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.loginInput}
+                  />
+                  <Button
+                    title={translate('resetPassword')}
+                    onPress={handlePasswordReset}
+                  />
+                  <Button
+                    title={translate('goBack')}
+                    onPress={() => setMode('login')}
+                  />
+                </>
+              )}
+              {mode === 'register' && (
                 <>
                   <TextInput
                     placeholder={translate('firstName')}
@@ -270,47 +329,28 @@ export default function User() {
                     onChangeText={setLastName}
                     style={styles.loginInput}
                   />
+                  <TextInput
+                    placeholder={translate('email')}
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.loginInput}
+                  />
+                  <PasswordInput
+                    placeholder={translate('password')}
+                    value={password}
+                    onChangeText={setPassword}
+                    style={styles.loginInput}
+                  />
+                  <Button
+                    title={translate('authSubmit')}
+                    onPress={handleEmailPasswordAuth}
+                  />
+                  <Button
+                    title={translate('goBack')}
+                    onPress={() => setMode('initial')}
+                  />
                 </>
               )}
-              <TextInput
-                placeholder={translate('email')}
-                value={email}
-                onChangeText={setEmail}
-                style={styles.loginInput}
-              />
-              <PasswordInput
-                placeholder={translate('password')}
-                value={password}
-                onChangeText={setPassword}
-                style={styles.loginInput}
-              />
-              <Button
-                title={isSignUp ? translate('signUp') : translate('signIn')}
-                onPress={handleEmailPasswordAuth}
-              />
-              <Text style={styles.text}>{`${translate('or')}`}</Text>
-              <Button
-                title={
-                  isSignUp
-                    ? translate('switchToSignIn')
-                    : translate('switchToSignUp')
-                }
-                onPress={() => setIsSignUp(!isSignUp)}
-              />
-              <Text style={styles.text}>{`${translate('or')}`}</Text>
-              <Text style={styles.text}>{`${translate(
-                'qForgotPassword'
-              )}`}</Text>
-              <TextInput
-                placeholder={translate('email')}
-                value={resetEmail}
-                onChangeText={setResetEmail}
-                style={styles.loginInput}
-              />
-              <Button
-                title={translate('resetPassword')}
-                onPress={handlePasswordReset}
-              />
             </>
           )}
           <Toast config={toastConfig} />

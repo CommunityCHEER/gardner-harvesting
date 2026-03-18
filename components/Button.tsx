@@ -15,24 +15,28 @@ export default function Button({
   onPress,
   textSize = 20,
   disabled,
+  variant = 'primary',
 }: {
   title: string;
   onPress?: () => void | Promise<void>;
   textSize?: number;
   disabled?: boolean;
+  variant?: 'primary' | 'secondary';
 }) {
+  const isSecondary = variant === 'secondary';
   return (
     <Pressable
       onPress={onPress}
       style={{
-        backgroundColor: disabled ? '#CCCCCC' : '#5bb974',
+        backgroundColor: disabled ? '#CCCCCC' : isSecondary ? 'transparent' : '#5bb974',
         borderRadius: 4,
         padding: 8,
         margin: 4,
+        ...(isSecondary && { borderColor: '#5bb974', borderWidth: 1 }),
       }}
       disabled={disabled}
     >
-      <Text style={{ fontSize: textSize, color: 'white' }}>{title}</Text>
+      <Text style={{ fontSize: textSize, color: isSecondary ? '#5bb974' : 'white' }}>{title}</Text>
     </Pressable>
   );
 }
