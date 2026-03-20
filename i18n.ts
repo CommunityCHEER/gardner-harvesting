@@ -71,6 +71,8 @@ const translations = {
     orDivider: 'Or',
     smartHarvestHelp: 'Take a photo and try the new smart-crop-selection feature!',
     smartHarvestFailed: 'Unable to identify crop. Please try again or select manually.',
+    recordAHarvest: 'Record a harvest',
+    recordYourParticipation: 'Record your participation',
   },
   es: {
     takePhoto: 'TOMAR FOTO',
@@ -141,6 +143,8 @@ const translations = {
     cancel: 'Cancelar',
     noMatchFound: 'No se encontró coincidencia. Intenta otra foto o elige manualmente.',
     loadingUnitOptions: 'Cargando opciones de medida...',
+    recordAHarvest: 'Registrar una cosecha',
+    recordYourParticipation: 'Registrar tu participación',
   },
 };
 

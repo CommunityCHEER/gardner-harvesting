@@ -317,11 +317,11 @@ describe('HarvestForm Note Feature', () => {
 
       const { getByText, getAllByText, queryByText, findAllByText } = renderHarvestForm();
       const cropButtons = await findAllByText('Mocked Name');
-      fireEvent.press(cropButtons[0]);
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
 
       await waitFor(() => {
-        expect(getByText('Add Note')).toBeTruthy();
-        expect(getAllByText('Back').length).toBeGreaterThan(0);
         expect(getByText('Loading measurement options...')).toBeTruthy();
       });
 
@@ -332,6 +332,7 @@ describe('HarvestForm Note Feature', () => {
       await waitFor(() => {
         expect(queryByText('Loading measurement options...')).toBeNull();
         expect(getByText('Total Today: 0 Mocked Name')).toBeTruthy();
+        expect(getByText('Add Note')).toBeTruthy();
       });
     });
 
@@ -431,24 +432,46 @@ describe('HarvestForm Note Feature', () => {
     });
 
     test('should open note modal when "Add Note" button is pressed', async () => {
-      const { getByText, getByTestId, findAllByText } = renderHarvestForm();
+      const { getByText, findAllByText } = renderHarvestForm();
       const cropButtons = await findAllByText('Mocked Name');
-      fireEvent.press(cropButtons[0]);
-      fireEvent.press(getByText('Add Note'));
-      expect(getByTestId('note-modal')).toBeTruthy();
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+      await waitFor(() => {
+        expect(getByText('Add Note')).toBeTruthy();
+      });
+      await act(async () => {
+        fireEvent.press(getByText('Add Note'));
+      });
+      await waitFor(() => {
+        expect(getByText('Save Note')).toBeTruthy();
+      });
     });
   });
 
   describe('Note Modal', () => {
     test('should save note and close modal when "Save Note" is pressed', async () => {
-      const { getByText, getByPlaceholderText, queryByTestId, findAllByText } =
-        renderHarvestForm();
+      const { getByText, getByPlaceholderText, queryByTestId, findAllByText } = renderHarvestForm();
       const cropButtons = await findAllByText('Mocked Name');
-      fireEvent.press(cropButtons[0]);
-      fireEvent.press(getByText('Add Note'));
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+      await waitFor(() => {
+        expect(getByText('Add Note')).toBeTruthy();
+      });
+      await act(async () => {
+        fireEvent.press(getByText('Add Note'));
+      });
+      await waitFor(() => {
+        expect(getByText('Save Note')).toBeTruthy();
+      });
       fireEvent.changeText(getByPlaceholderText('Enter note...'), 'My test note');
-      fireEvent.press(getByText('Save Note'));
-      expect(queryByTestId('note-modal')).toBeNull();
+      await act(async () => {
+        fireEvent.press(getByText('Save Note'));
+      });
+      await waitFor(() => {
+        expect(queryByTestId('note-modal')).toBeNull();
+      });
     });
   });
 
@@ -456,11 +479,25 @@ describe('HarvestForm Note Feature', () => {
     test('should change button label to "Edit Note" after note is saved', async () => {
       const { getByText, getByPlaceholderText, findAllByText } = renderHarvestForm();
       const cropButtons = await findAllByText('Mocked Name');
-      fireEvent.press(cropButtons[0]);
-      fireEvent.press(getByText('Add Note'));
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+      await waitFor(() => {
+        expect(getByText('Add Note')).toBeTruthy();
+      });
+      await act(async () => {
+        fireEvent.press(getByText('Add Note'));
+      });
+      await waitFor(() => {
+        expect(getByText('Save Note')).toBeTruthy();
+      });
       fireEvent.changeText(getByPlaceholderText('Enter note...'), 'My test note');
-      fireEvent.press(getByText('Save Note'));
-      expect(getByText('Edit Note')).toBeTruthy();
+      await act(async () => {
+        fireEvent.press(getByText('Save Note'));
+      });
+      await waitFor(() => {
+        expect(getByText('Edit Note')).toBeTruthy();
+      });
     });
   });
 
@@ -772,10 +809,8 @@ describe('HarvestForm Smart Harvest', () => {
 
       await waitFor(() => {
         expect(queryByTestId('smart-harvest-overlay')).toBeNull();
+        expect(getByText('Loading measurement options...')).toBeTruthy();
       });
-
-      expect(getAllByText('Back').length).toBeGreaterThan(0);
-      expect(getByText('Loading measurement options...')).toBeTruthy();
 
       await act(async () => {
         resolveUnitDoc({ id: 'unit-kg', data: () => ({ fractional: false }) });

@@ -460,6 +460,9 @@ export default function HarvestForm({
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64}
       >
+        <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+          {t('recordAHarvest')}
+        </Text>
         <ScrollView
           style={styles.container}
           contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}
@@ -507,17 +510,6 @@ export default function HarvestForm({
           {/* {!crop && (
             <Button title={t('back')} onPress={onBack} />
           )} */}
-          {crop && (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
-              <Button
-                title={note ? t('editNote') : t('addNote')}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setNoteModalVisible(true);
-                }}
-              />
-            </View>
-          )}
           {crop && (!activeUnitMetadata || activeUnitMetadata.status === 'loading') && (
             <View style={{ alignItems: 'center', gap: 8 }}>
               <ActivityIndicator />
@@ -531,18 +523,31 @@ export default function HarvestForm({
                 setMeasure={setRequiredMeasure}
                 unit={requiredUnit}
               />
+              {crop && (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+                  <Button
+                    title={note ? t('editNote') : t('addNote')}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setNoteModalVisible(true);
+                    }}
+                  />
+                </View>
+              )}
               {optionalInputs}
               {harvestsLoading ? (
                 <ActivityIndicator />
               ) : (
-                <Text style={styles.text}>
-                  {t('totalToday')}:{' '}
-                  {totalToday.toLocaleString(undefined, {
-                    minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
-                    maximumFractionDigits: requiredUnit.fractional ? 2 : 0,
-                  })}{' '}
-                  {requiredUnit.name}
-                </Text>
+                <View style={{ alignItems: 'center', marginTop: 35 }}>
+                  <Text style={styles.text}>
+                    {t('totalToday')}:{' '}
+                    {totalToday.toLocaleString(undefined, {
+                      minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
+                      maximumFractionDigits: requiredUnit.fractional ? 2 : 0,
+                    })}{' '}
+                    {requiredUnit.name}
+                  </Text>
+                </View>
               )}
             </>
           )}

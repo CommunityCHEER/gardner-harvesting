@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { DisplayUnit } from './HarvestForm';
 import { styles } from '@/constants/style';
 import { i18nContext } from '@/i18n';
+import { spacing } from '@/constants/spacing';
 
 
 /**
@@ -91,21 +92,49 @@ export default function MeasureInput({
     <View
       style={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: hasSubUnit ? 'column' : 'row',
         alignItems: 'center',
       }}
     >
-      <TextInput
-        inputMode={hasSubUnit || !unit.fractional ? "numeric" : "decimal"}
-        value={pounds}
-        onChangeText={handlePoundsChange}
-        style={styles.input}
-      />
-      <Text style={styles.text}>
-        {unit?.name} {optional && !hasSubUnit && `(${t('optional')})`}
-      </Text>
+      {optional && (
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: spacing.xxxl,
+          }}
+        >
+          <Text style={styles.text}>({t('optional')})</Text>
+        </View>
+      )}
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
+        <TextInput
+          inputMode={hasSubUnit || !unit.fractional ? "numeric" : "decimal"}
+          value={pounds}
+          onChangeText={handlePoundsChange}
+          style={styles.input}
+        />
+        <Text style={styles.text}>
+          {unit?.name}
+        </Text>
+      </View>
+
       {hasSubUnit && (
-        <>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={styles.text}>and</Text>
           <TextInput
             inputMode="numeric"
             value={ounces}
@@ -113,9 +142,9 @@ export default function MeasureInput({
             style={styles.input}
           />
           <Text style={styles.text}>
-            {subUnitName} {optional && `(${t('optional')})`}
+            {subUnitName}
           </Text>
-        </>
+        </View>
       )}
     </View>
   );

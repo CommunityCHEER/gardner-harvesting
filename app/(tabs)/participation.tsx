@@ -102,6 +102,9 @@ export default function Participation() {
     <SafeAreaView style={styles.centeredView}>
       {loggedIn ? (
         <>
+          <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+            {t('recordYourParticipation')}
+          </Text>
           <Calendar
             markedDates={markedDates}
             theme={{
