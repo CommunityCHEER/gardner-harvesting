@@ -37,7 +37,8 @@
           "targetSdkVersion": 35
         }
       }
-    ]
+    ],
+    "expo-web-browser"
   ],
   "splash": {
     "image": "./assets/images/splash.png",
