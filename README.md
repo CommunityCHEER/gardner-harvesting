@@ -283,18 +283,72 @@ npx expo run:ios --device "Your Device Name"
 
 ### Troubleshooting
 
-If the build fails due to stale pods or cache:
+If `npx expo run:ios` fails with destination/runtime errors, use this sequence.
+
+1. Verify Xcode developer path:
 
 ```bash
-cd ios && pod install --repo-update && cd ..
-npx expo run:ios
+xcode-select -p
+# expected: /Applications/Xcode.app/Contents/Developer
 ```
 
-To do a clean build:
+2. Verify iOS runtimes and devices:
 
 ```bash
-cd ios && xcodebuild clean && cd ..
-npx expo run:ios
+xcrun simctl list runtimes
+xcrun simctl list devices
+```
+
+3. Clear any pinned Expo simulator UDID (note exact variable name):
+
+```bash
+echo "$EXPO_IOS_SIMULATOR_UDID"
+unset EXPO_IOS_SIMULATOR_UDID
+```
+
+4. Clean artifacts safely from repo root:
+
+```bash
+cd /Volumes/ExtremeSSD/dev/gardner-harvesting
+rm -rf ios/build
+rm -rf ~/Library/Developer/Xcode/DerivedData/GardenerHarvesting-*(N)
+cd ios && pod install --repo-update && cd ..
+```
+
+`zsh: no matches found` for the DerivedData glob is harmless and just means there was nothing to remove.
+
+5. Re-run with explicit simulator selection:
+
+```bash
+npx expo run:ios --device
+```
+
+If you still get `Unable to find a destination matching the provided destination specifier`, inspect valid destinations directly:
+
+```bash
+xcodebuild -workspace ios/GardenerHarvesting.xcworkspace -scheme GardenerHarvesting -showdestinations
+```
+
+If the error says a specific platform version is missing (example: `iOS 26.5 is not installed`), install that runtime in Xcode: **Settings → Components** (or **Platforms**), then retry.
+
+If the build fails later in pod script phases such as `[RNDeps] Replace React Native Dependencies` or `[Hermes] Replace Hermes` with `No such file or directory` for `node`, inspect `ios/.xcode.env.local`. A stale absolute Homebrew Cellar path can break Xcode builds after `brew upgrade node`.
+
+Prefer:
+
+```bash
+export NODE_BINARY=/opt/homebrew/bin/node
+```
+
+Avoid versioned Cellar paths such as:
+
+```bash
+export NODE_BINARY=/opt/homebrew/Cellar/node/25.6.1/bin/node
+```
+
+6. Optional production-like local validation:
+
+```bash
+npx expo run:ios --configuration Release --device
 ```
 
 ---
