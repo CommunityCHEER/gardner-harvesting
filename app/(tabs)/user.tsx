@@ -27,6 +27,7 @@ import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { deleteUser } from 'firebase/auth';
+import ScreenLogo from '@/components/ScreenLogo';
 
 /**
  * A screen for user authentication, including sign-up, sign-in, and password reset.
@@ -227,6 +228,7 @@ export default function User() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenLogo />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -238,7 +240,7 @@ export default function User() {
         >
           {userInfo && fireUser && (
             <>
-              <Text style={styles.text}>
+              <Text style={[styles.text, { fontSize: 20 }]}>
                 {`${translate('hello')}, ${userInfo.firstName} ${userInfo.lastName
                   }`}
               </Text>
@@ -269,7 +271,7 @@ export default function User() {
               )}
               {mode === 'login' && (
                 <>
-                  <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+                  <Text style={[styles.text, { fontSize: 12, fontWeight: 'bold', marginBottom: 20 }]}>
                     {translate('loginTitle')}
                   </Text>
                   <TextInput
@@ -327,7 +329,7 @@ export default function User() {
               )}
               {mode === 'register' && (
                 <>
-                  <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+                  <Text style={[styles.text, { fontSize: 12, fontWeight: 'bold', marginBottom: 20 }]}>
                     {translate('registerTitle')}
                   </Text>
                   <TextInput

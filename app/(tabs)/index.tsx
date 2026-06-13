@@ -13,6 +13,7 @@ import { addDoc, collection, getDocs, doc } from 'firebase/firestore';
 import { Participation, Garden } from '@/types/firestore';
 import { getDateString } from '@/utility/functions';
 import Dropdown, { DropdownItem } from '@/components/Dropdown';
+import ScreenLogo from '@/components/ScreenLogo';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthState } from '@/hooks/useAuthState';
 
@@ -97,6 +98,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenLogo />
       {loggedIn && !!auth.currentUser ? (
         <>
           {!harvesting && !garden && <Welcome />}

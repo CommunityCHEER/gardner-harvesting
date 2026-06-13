@@ -146,6 +146,12 @@ describe('User tab keyboard and tap behavior', () => {
         expect(keyboardAvoidingView.props.keyboardVerticalOffset).toBe(64);
     });
 
+    test('renders the screen logo in the user tab', () => {
+        const { getByTestId } = renderUser();
+
+        expect(getByTestId('screen-logo')).toBeTruthy();
+    });
+
     // --- Auth flow state machine tests ---
 
     test('initial state shows Login and Register buttons with no input fields', () => {

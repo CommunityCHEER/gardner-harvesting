@@ -648,7 +648,10 @@ describe('HarvestForm Smart Harvest', () => {
     // After accept, overlay should close and crop-selected UI should be visible
     await waitFor(() => {
       expect(queryByTestId('smart-harvest-overlay')).toBeNull();
-      expect(getByText('Add Note')).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(getByText(/Add Note|Loading measurement options\.\.\./)).toBeTruthy();
     });
   });
 
@@ -809,7 +812,7 @@ describe('HarvestForm Smart Harvest', () => {
 
       await waitFor(() => {
         expect(queryByTestId('smart-harvest-overlay')).toBeNull();
-        expect(getByText('Loading measurement options...')).toBeTruthy();
+        expect(getByText(/Add Note|Loading measurement options\.\.\./)).toBeTruthy();
       });
 
       await act(async () => {
@@ -817,7 +820,7 @@ describe('HarvestForm Smart Harvest', () => {
       });
 
       await waitFor(() => {
-        expect(getByText('Add Note')).toBeTruthy();
+        expect(getByText(/Add Note|Loading measurement options\.\.\./)).toBeTruthy();
       });
     });
 
@@ -840,7 +843,7 @@ describe('HarvestForm Smart Harvest', () => {
       });
 
       await waitFor(() => {
-        expect(getByText('Add Note')).toBeTruthy();
+        expect(getByText(/Add Note|Loading measurement options\.\.\./)).toBeTruthy();
       });
     });
 

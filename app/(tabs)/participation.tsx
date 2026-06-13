@@ -7,6 +7,7 @@ import { styles } from '@/constants/style';
 import { participationContext, firebaseContext } from '@/context';
 import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
 import Dropdown, { DropdownItem } from '@/components/Dropdown';
+import ScreenLogo from '@/components/ScreenLogo';
 import {
   Participation as ParticipationInterface,
   Garden,
@@ -100,9 +101,10 @@ export default function Participation() {
 
   return (
     <SafeAreaView style={styles.centeredView}>
+      <ScreenLogo />
       {loggedIn ? (
         <>
-          <Text style={[styles.text, { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }]}>
+          <Text style={[styles.text, { fontSize: 12, fontWeight: 'bold', marginBottom: 20 }]}>
             {t('recordYourParticipation')}
           </Text>
           <Calendar
