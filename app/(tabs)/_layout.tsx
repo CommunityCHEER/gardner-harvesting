@@ -2,6 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import { useContext } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { i18nContext } from '@/i18n';
 import { useAuthState } from '@/hooks/useAuthState';
 import { firebaseContext } from '@/context';
@@ -14,6 +15,10 @@ export default function TabLayout() {
   const i18n = useContext(i18nContext);
   const t = i18n.t.bind(i18n);
   const isAndroid = Platform.OS === 'android';
+  const insets = useSafeAreaInsets();
+
+  const androidBottomPadding = Math.max(insets.bottom + 4, 10);
+  const androidTabBarHeight = 62 + androidBottomPadding;
 
   const { auth } = useContext(firebaseContext);
 
@@ -24,9 +29,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#5bb974',
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: isAndroid ? 72 : 60,
-          paddingBottom: isAndroid ? 10 : 0,
+          height: isAndroid ? androidTabBarHeight : 60,
+          paddingBottom: isAndroid ? androidBottomPadding : 0,
           paddingTop: isAndroid ? 6 : 0,
         },
         tabBarItemStyle: { paddingHorizontal: 4 },
