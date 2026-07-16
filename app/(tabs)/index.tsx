@@ -50,7 +50,7 @@ export default function Index() {
     };
 
     fetchClaims();
-  }, [claimsChecks]);
+  }, [claimsChecks, loggedIn, auth.currentUser]);
 
   useEffect(() => {
     const fetchGardens = async () => {
@@ -71,7 +71,7 @@ export default function Index() {
     };
 
     fetchGardens();
-  }, [claims]);
+  }, [claims, loggedIn, auth.currentUser]);
 
   const [harvesting, setHarvesting] = useState(false);
   const [participationLogged, setParticipationLogged] = useContext(participationContext);

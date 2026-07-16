@@ -1,13 +1,44 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, waitFor } from '@testing-library/react-native';
 import Index from '../index';
+import { firebaseContext } from '@/context';
+
+const mockAuth = {
+  currentUser: null as
+    | null
+    | { uid: string; getIdTokenResult: (forceRefresh?: boolean) => Promise<any> },
+};
+
+let mockAuthStateUser: null | { uid: string } = null;
+
+const mockCollection = jest.fn((...args: unknown[]) => ({
+  path: args.slice(1).join('/'),
+}));
+
+const mockGetDocs = jest.fn((ref: { path?: string }) => {
+  if (ref?.path === 'gardens') {
+    const docs = [
+      {
+        id: 'garden-1',
+        data: () => ({ streetName: 'Main', houseNumber: '1', nickname: 'North' }),
+      },
+    ];
+
+    return Promise.resolve({
+      docs,
+      forEach: (callback: (doc: any) => void) => docs.forEach(callback),
+    });
+  }
+
+  return Promise.resolve({ docs: [], forEach: () => undefined });
+});
 
 jest.mock('@/context', () => {
   const React = require('react');
 
   return {
     firebaseContext: React.createContext({
-      auth: { currentUser: null },
+      auth: mockAuth,
       db: {},
       storage: {},
       realtime: {},
@@ -17,14 +48,14 @@ jest.mock('@/context', () => {
 });
 
 jest.mock('@/hooks/useAuthState', () => ({
-  useAuthState: () => [null],
+  useAuthState: () => [mockAuthStateUser],
 }));
 
 jest.mock('firebase/firestore', () => ({
   addDoc: jest.fn(),
-  collection: jest.fn(),
+  collection: (...args: unknown[]) => mockCollection(...args),
   doc: jest.fn(),
-  getDocs: jest.fn(() => Promise.resolve({ docs: [], forEach: () => undefined })),
+  getDocs: (...args: unknown[]) => mockGetDocs(...args),
 }));
 
 jest.mock('expo-router', () => ({
@@ -57,9 +88,55 @@ jest.mock('@/components/HarvestForm', () => ({
 }));
 
 describe('Index tab', () => {
+  const firebaseValue = {
+    auth: mockAuth,
+    db: {},
+    storage: {},
+    realtime: {},
+  };
+
+  beforeEach(() => {
+    mockAuthStateUser = null;
+    mockAuth.currentUser = null;
+    jest.clearAllMocks();
+  });
+
   test('renders the screen logo on the main screen', () => {
-    const { getByTestId } = render(<Index />);
+    const { getByTestId } = render(
+      <firebaseContext.Provider value={firebaseValue as any}>
+        <Index />
+      </firebaseContext.Provider>
+    );
 
     expect(getByTestId('screen-logo')).toBeTruthy();
+  });
+
+  test('fetches gardens after auth state resolves from logged out to logged in', async () => {
+    const getIdTokenResult = jest
+      .fn()
+      .mockResolvedValue({ claims: { gardener: true } });
+
+    const { rerender } = render(
+      <firebaseContext.Provider value={firebaseValue as any}>
+        <Index />
+      </firebaseContext.Provider>
+    );
+
+    mockAuthStateUser = { uid: 'user-1' };
+    mockAuth.currentUser = {
+      uid: 'user-1',
+      getIdTokenResult,
+    };
+
+    rerender(
+      <firebaseContext.Provider value={firebaseValue as any}>
+        <Index />
+      </firebaseContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockCollection).toHaveBeenCalledWith(firebaseValue.db, 'gardens');
+      expect(mockGetDocs).toHaveBeenCalledWith({ path: 'gardens' });
+    });
   });
 });
