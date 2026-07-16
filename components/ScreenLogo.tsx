@@ -13,11 +13,12 @@ interface ScreenLogoProps {
 
 export default function ScreenLogo({
   size = 66,
-  top = -6,
+  top = 0,
   left = 8,
   style,
 }: ScreenLogoProps) {
   const insets = React.useContext(SafeAreaInsetsContext);
+  const logoTop = Math.max((insets?.top ?? 0) + top, 0);
 
   return (
     <View
@@ -33,7 +34,7 @@ export default function ScreenLogo({
           {
             width: size,
             height: size,
-            top: (insets?.top ?? 0) + top,
+            top: logoTop,
             left,
           },
           style,

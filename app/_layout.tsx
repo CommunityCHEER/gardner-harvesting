@@ -11,6 +11,7 @@ import { getDocs, collection } from 'firebase/firestore';
 import { getDateString } from '@/utility/functions';
 import { Participation } from '@/types/firestore';
 import { useAuthState } from '@/hooks/useAuthState';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 /**
  * The root layout component for the application.
@@ -48,16 +49,18 @@ export default function Layout() {
   }, [auth]);
 
   return (
-    <participationContext.Provider
-      value={[participationLogged, setParticipationLogged]}
-    >
-      <i18nContext.Provider value={i18n}>
-        <firebaseContext.Provider value={firebaseState}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-        </firebaseContext.Provider>
-      </i18nContext.Provider>
-    </participationContext.Provider>
+    <SafeAreaProvider>
+      <participationContext.Provider
+        value={[participationLogged, setParticipationLogged]}
+      >
+        <i18nContext.Provider value={i18n}>
+          <firebaseContext.Provider value={firebaseState}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </firebaseContext.Provider>
+        </i18nContext.Provider>
+      </participationContext.Provider>
+    </SafeAreaProvider>
   );
 }
