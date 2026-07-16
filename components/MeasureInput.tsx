@@ -36,6 +36,8 @@ export default function MeasureInput({
   // Helper: Convert float pounds string to {pounds, ounces}
   function parsePoundsOunces(measureStr: string): { pounds: string; ounces: string } {
     if (!hasSubUnit) return { pounds: measureStr, ounces: '0' };
+    if (measureStr === '' || measureStr === undefined || measureStr === null)
+      return optional ? { pounds: '0', ounces: '0' } : { pounds: '', ounces: '' };
     const floatVal = parseFloat(measureStr || '0');
     const pounds = Math.floor(floatVal);
     const ounces = Math.round((floatVal - pounds) * 16);

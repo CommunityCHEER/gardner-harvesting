@@ -118,7 +118,23 @@ jest.mock('@/components/Dropdown', () => {
   };
   return { __esModule: true, default: MockDropdown, DropdownItem: {} };
 });
-jest.mock('../MeasureInput', () => () => <></>);
+jest.mock('../MeasureInput', () => {
+  const React = require('react');
+  const { View, TextInput } = require('react-native');
+
+  return {
+    __esModule: true,
+    default: (props: any) => (
+      <View>
+        <TextInput
+          testID={`measure-input-${props.unit?.id}-${props.optional ? 'optional' : 'required'}`}
+          value={props.measure ?? ''}
+          onChangeText={props.setMeasure}
+        />
+      </View>
+    ),
+  };
+});
 
 let capturedOnSmartHarvest: ((image: any) => void) | undefined;
 jest.mock('../ImagePicker', () => {
@@ -213,7 +229,10 @@ const mockParticipationContext: [boolean, React.Dispatch<React.SetStateAction<bo
   jest.fn(),
 ];
 
-const renderHarvestForm = (garden: string | null = 'test-garden') => {
+const renderHarvestForm = (
+  garden: string | null = 'test-garden',
+  options: { isAdmin?: boolean } = {}
+) => {
   const mockSetGarden = jest.fn();
   const mockSetGardenListOpen = jest.fn();
   const mockOnBack = jest.fn();
@@ -232,6 +251,7 @@ const renderHarvestForm = (garden: string | null = 'test-garden') => {
           gardenListOpen={false}
           setGardenListOpen={mockSetGardenListOpen}
           onBack={mockOnBack}
+          isAdmin={options.isAdmin ?? true}
           {...mockFirebase}
         />
       </participationContext.Provider>
@@ -278,6 +298,21 @@ describe('HarvestForm Note Feature', () => {
   });
 
   describe('Add Note Button', () => {
+    test('should hide smart image controls for non-admin users', async () => {
+      const { queryByText, findAllByText } = renderHarvestForm('test-garden', {
+        isAdmin: false,
+      });
+
+      await findAllByText('Mocked Name');
+      await waitFor(() => {
+        expect(queryByText('Take Photo')).toBeNull();
+        expect(
+          queryByText('Take a photo and try the new smart-crop-selection feature!')
+        ).toBeNull();
+        expect(queryByText('Or')).toBeNull();
+      });
+    });
+
     test('should not render "Add Note" button when no crop is selected', () => {
       const { queryByText } = renderHarvestForm();
       expect(queryByText('Add Note')).toBeNull();
@@ -515,15 +550,297 @@ describe('HarvestForm Note Feature', () => {
   });
 
   describe('Note Reset After Submission', () => {
-    test('should clear note after successful harvest submission', async () => {
-      // This test will need proper Firebase mocking
-      // Expected: note state resets, button shows "Add Note" again
-      expect(true).toBe(true); // Placeholder
+    test('clears required quantity input after successful submit for pounds required unit', async () => {
+      const { getDocs, getDoc } = require('firebase/firestore');
+
+      getDocs.mockImplementation((collectionRef: any) => {
+        if (collectionRef?.path === 'crops') {
+          return Promise.resolve({
+            docs: [
+              { id: 'crop-1', data: () => ({}) },
+              { id: 'crop-2', data: () => ({}) },
+            ],
+          });
+        }
+
+        if (collectionRef?.path === 'crops/crop-1/units') {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'pounds', path: 'cropUnits/pounds' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        if (collectionRef?.path?.startsWith('crops/') && collectionRef.path.endsWith('/units')) {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'unit-kg', path: 'cropUnits/unit-kg' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        return Promise.resolve({ docs: [], forEach: () => undefined });
+      });
+
+      getDoc.mockImplementation((docRef: any) => {
+        const path = docRef.path;
+
+        if (path === 'cropUnits/pounds') {
+          return Promise.resolve({ id: 'pounds', data: () => ({ fractional: false }) });
+        }
+        if (path === 'cropUnits/unit-kg') {
+          return Promise.resolve({ id: 'unit-kg', data: () => ({ fractional: false }) });
+        }
+        if (path?.includes('/name/')) {
+          return Promise.resolve({ data: () => ({ value: 'Mocked Name' }) });
+        }
+
+        return Promise.resolve({ data: () => ({}) });
+      });
+
+      const { findAllByText, getByTestId, getByText, queryByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-pounds-required')).toBeTruthy();
+      });
+
+      await act(async () => {
+        fireEvent.changeText(getByTestId('measure-input-pounds-required'), '2.5');
+      });
+
+      await waitFor(() => {
+        expect(getByText('Submit')).toBeTruthy();
+      });
+
+      await act(async () => {
+        fireEvent.press(getByText('Submit'));
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-pounds-required').props.value).toBe('');
+      });
+
+      await waitFor(() => {
+        expect(queryByText('Submit')).toBeNull();
+      });
     });
 
-    test('should change button label back to "Add Note" after submission', async () => {
-      // This test will need proper Firebase mocking
-      expect(true).toBe(true); // Placeholder
+    test('clears required quantity input after successful submit for singular required unit (bunches)', async () => {
+      const { getDocs, getDoc } = require('firebase/firestore');
+
+      getDocs.mockImplementation((collectionRef: any) => {
+        if (collectionRef?.path === 'crops') {
+          return Promise.resolve({
+            docs: [
+              { id: 'crop-1', data: () => ({}) },
+              { id: 'crop-2', data: () => ({}) },
+            ],
+          });
+        }
+
+        if (collectionRef?.path === 'crops/crop-1/units') {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'bunches', path: 'cropUnits/bunches' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        if (collectionRef?.path?.startsWith('crops/') && collectionRef.path.endsWith('/units')) {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'unit-kg', path: 'cropUnits/unit-kg' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        return Promise.resolve({ docs: [], forEach: () => undefined });
+      });
+
+      getDoc.mockImplementation((docRef: any) => {
+        const path = docRef.path;
+
+        if (path === 'cropUnits/bunches') {
+          return Promise.resolve({ id: 'bunches', data: () => ({ fractional: false }) });
+        }
+        if (path === 'cropUnits/unit-kg') {
+          return Promise.resolve({ id: 'unit-kg', data: () => ({ fractional: false }) });
+        }
+        if (path?.includes('/name/')) {
+          return Promise.resolve({ data: () => ({ value: 'Mocked Name' }) });
+        }
+
+        return Promise.resolve({ data: () => ({}) });
+      });
+
+      const { findAllByText, getByTestId, getByText, queryByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      await act(async () => {
+        fireEvent.changeText(getByTestId('measure-input-bunches-required'), '4');
+      });
+
+      await waitFor(() => {
+        expect(getByText('Submit')).toBeTruthy();
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-bunches-required').props.value).toBe('4');
+      });
+
+      await act(async () => {
+        fireEvent.press(getByText('Submit'));
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-bunches-required').props.value).toBe('');
+      });
+
+      await waitFor(() => {
+        expect(queryByText('Submit')).toBeNull();
+      });
+    });
+
+    test('clears singular required quantity even when image upload fails after successful submit', async () => {
+      const { getDocs, getDoc } = require('firebase/firestore');
+      const { uploadBytes } = require('firebase/storage');
+
+      uploadBytes.mockRejectedValue(new Error('upload failed'));
+
+      getDocs.mockImplementation((collectionRef: any) => {
+        if (collectionRef?.path === 'crops') {
+          return Promise.resolve({
+            docs: [
+              { id: 'crop-1', data: () => ({}) },
+              { id: 'crop-2', data: () => ({}) },
+            ],
+          });
+        }
+
+        if (collectionRef?.path === 'crops/crop-1/units') {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'bunches', path: 'cropUnits/bunches' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        if (collectionRef?.path?.startsWith('crops/') && collectionRef.path.endsWith('/units')) {
+          const units = [
+            {
+              id: 'required',
+              data: () => ({ value: { id: 'unit-kg', path: 'cropUnits/unit-kg' } }),
+            },
+          ];
+
+          return Promise.resolve({
+            docs: units,
+            forEach: (callback: (value: any) => void) => {
+              units.forEach(callback);
+            },
+          });
+        }
+
+        return Promise.resolve({ docs: [], forEach: () => undefined });
+      });
+
+      getDoc.mockImplementation((docRef: any) => {
+        const path = docRef.path;
+
+        if (path === 'cropUnits/bunches') {
+          return Promise.resolve({ id: 'bunches', data: () => ({ fractional: false }) });
+        }
+        if (path === 'cropUnits/unit-kg') {
+          return Promise.resolve({ id: 'unit-kg', data: () => ({ fractional: false }) });
+        }
+        if (path?.includes('/name/')) {
+          return Promise.resolve({ data: () => ({ value: 'Mocked Name' }) });
+        }
+
+        return Promise.resolve({ data: () => ({}) });
+      });
+
+      const { findAllByText, findByText, getByTestId, getByText, queryByText } = renderHarvestForm();
+      await findByText('Take Photo');
+      fireEvent.press(getByText('Take Photo'));
+
+      const cropButtons = await findAllByText('Mocked Name');
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-bunches-required')).toBeTruthy();
+      });
+
+      await act(async () => {
+        fireEvent.changeText(getByTestId('measure-input-bunches-required'), '5');
+      });
+
+      await waitFor(() => {
+        expect(getByText('Submit')).toBeTruthy();
+      });
+
+      await act(async () => {
+        fireEvent.press(getByText('Submit'));
+      });
+
+      await waitFor(() => {
+        expect(getByTestId('measure-input-bunches-required').props.value).toBe('');
+      });
+
+      await waitFor(() => {
+        expect(queryByText('Submit')).toBeNull();
+      });
     });
   });
 });

@@ -330,7 +330,7 @@ xcodebuild -workspace ios/GardenerHarvesting.xcworkspace -scheme GardenerHarvest
 ```
 
 If the error says a specific platform version is missing (example: `iOS 26.5 is not installed`), install that runtime in Xcode: **Settings → Components** (or **Platforms**), then retry.
-
+****
 If the build fails later in pod script phases such as `[RNDeps] Replace React Native Dependencies` or `[Hermes] Replace Hermes` with `No such file or directory` for `node`, inspect `ios/.xcode.env.local`. A stale absolute Homebrew Cellar path can break Xcode builds after `brew upgrade node`.
 
 Prefer:

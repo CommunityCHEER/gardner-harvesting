@@ -67,6 +67,7 @@ export interface HarvestFormProps {
   gardenListOpen: boolean;
   setGardenListOpen: Dispatch<SetStateAction<boolean>>;
   onBack: () => void;
+  isAdmin?: boolean;
 }
 export default function HarvestForm({
   garden,
@@ -75,6 +76,7 @@ export default function HarvestForm({
   gardenListOpen,
   setGardenListOpen,
   onBack,
+  isAdmin = false,
   db,
   auth,
   realtime,
@@ -372,25 +374,26 @@ export default function HarvestForm({
 
       if (!participationLogged) logParticipation();
 
-      if (!image) {
-        finishSubmitting();
+      const selectedImage = image;
+      finishSubmitting();
+
+      if (!selectedImage) {
         return;
       }
 
       const imageRef = ref(storage, `harvests/${newHarvest.id}`);
-      const res = await fetch(image?.uri as string);
-      const blob = await res.blob();
-      uploadBytes(imageRef, blob)
-        .then(() => finishSubmitting())
-        .catch(error => {
-          setSubmitting(false);
-          console.warn(error);
-          Toast.show({
-            type: 'error',
-            text1: 'Error uploading image',
-            text2: error.message,
-          });
+      try {
+        const res = await fetch(selectedImage?.uri as string);
+        const blob = await res.blob();
+        await uploadBytes(imageRef, blob);
+      } catch (error: any) {
+        console.warn(error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error uploading image',
+          text2: error.message,
         });
+      }
     } catch (e: any) {
       setSubmitting(false);
       console.warn(e);
@@ -496,7 +499,7 @@ export default function HarvestForm({
               onPress={Keyboard.dismiss}
             />
           )}
-          {!crop && crops.length > 0 && (
+          {!crop && crops.length > 0 && isAdmin && (
             <>
               <Text style={styles.text}>{t('orDivider')}</Text>
               <ImagePicker

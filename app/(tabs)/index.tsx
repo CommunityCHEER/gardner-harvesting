@@ -133,6 +133,7 @@ export default function Index() {
               gardenListOpen={gardenListOpen}
               setGardenListOpen={setGardenListOpen}
               onBack={() => setHarvesting(false)}
+              isAdmin={!!claims?.admin}
               db={db}
               auth={auth}
               realtime={firebase.realtime}
