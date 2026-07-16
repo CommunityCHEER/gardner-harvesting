@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef, Dispatch, SetStateActio
 import {
   View,
   Text,
+  Animated,
   ActivityIndicator,
   Keyboard,
   Image,
@@ -110,6 +111,33 @@ export default function HarvestForm({
   const [pendingCropLabel, setPendingCropLabel] = useState<string | null>(null);
   const [smartHarvestError, setSmartHarvestError] = useState<string | null>(null);
   const smartHarvestRequestRef = useRef(0);
+  const totalPulseScale = useRef(new Animated.Value(1)).current;
+  const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pendingTotalBaseline, setPendingTotalBaseline] = useState<number | null>(null);
+
+  const clearPulseTimeout = () => {
+    if (pulseTimeoutRef.current) {
+      clearTimeout(pulseTimeoutRef.current);
+      pulseTimeoutRef.current = null;
+    }
+  };
+
+  const triggerTotalPulse = () => {
+    totalPulseScale.setValue(1);
+    Animated.sequence([
+      Animated.timing(totalPulseScale, {
+        toValue: 1.18,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(totalPulseScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 70,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const resetSmartHarvestState = () => {
     setPhase('idle');
@@ -376,6 +404,7 @@ export default function HarvestForm({
 
       const selectedImage = image;
       finishSubmitting();
+      setPendingTotalBaseline(totalToday);
 
       if (!selectedImage) {
         return;
@@ -420,6 +449,32 @@ export default function HarvestForm({
         0
       )
       : 0;
+
+  useEffect(() => {
+    if (pendingTotalBaseline === null) return;
+
+    if (totalToday > pendingTotalBaseline) {
+      triggerTotalPulse();
+      setPendingTotalBaseline(null);
+      clearPulseTimeout();
+    }
+  }, [pendingTotalBaseline, totalToday]);
+
+  useEffect(() => {
+    if (pendingTotalBaseline === null) return;
+
+    clearPulseTimeout();
+    pulseTimeoutRef.current = setTimeout(() => {
+      setPendingTotalBaseline(null);
+      pulseTimeoutRef.current = null;
+    }, 2000);
+
+    return clearPulseTimeout;
+  }, [pendingTotalBaseline]);
+
+  useEffect(() => {
+    return clearPulseTimeout;
+  }, []);
 
   const optionalInputs = optionalUnits.map((unit, index) => (
     <MeasureInput
@@ -541,8 +596,13 @@ export default function HarvestForm({
               {harvestsLoading ? (
                 <ActivityIndicator />
               ) : (
-                <View style={{ alignItems: 'center', marginTop: 35 }}>
-                  <Text style={styles.text}>
+                <Animated.View
+                  style={{ alignItems: 'center', marginTop: 35, transform: [{ scale: totalPulseScale }] }}
+                >
+                  <Text
+                    testID='total-today-text'
+                    style={[styles.text, { fontSize: 22, fontWeight: '700', color: '#2b0000' }]}
+                  >
                     {t('totalToday')}:{' '}
                     {totalToday.toLocaleString(undefined, {
                       minimumFractionDigits: requiredUnit.fractional ? 2 : 0,
@@ -550,7 +610,7 @@ export default function HarvestForm({
                     })}{' '}
                     {requiredUnit.name}
                   </Text>
-                </View>
+                </Animated.View>
               )}
             </>
           )}

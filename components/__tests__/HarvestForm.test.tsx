@@ -75,8 +75,9 @@ jest.mock('firebase/storage', () => ({
   ref: jest.fn(),
   uploadBytes: jest.fn(),
 }));
+let mockUseListReturn: [any[], boolean, unknown] = [[], false, undefined];
 jest.mock('@/hooks/useList', () => ({
-  useList: jest.fn(() => [[], false, undefined]),
+  useList: jest.fn(() => mockUseListReturn),
 }));
 jest.mock('expo-image-picker', () => ({
   launchCameraAsync: jest.fn(),
@@ -269,6 +270,59 @@ const renderHarvestForm = (
 describe('HarvestForm Note Feature', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseListReturn = [[], false, undefined];
+
+    const { getDocs, getDoc } = require('firebase/firestore');
+    getDocs.mockImplementation((collectionRef: any) => {
+      if (collectionRef?.path === 'crops') {
+        return Promise.resolve({
+          docs: [
+            { id: 'crop-1', data: () => ({}) },
+            { id: 'crop-2', data: () => ({}) },
+          ],
+        });
+      }
+
+      if (collectionRef?.path?.startsWith('crops/') && collectionRef.path.endsWith('/units')) {
+        const units = [
+          {
+            id: 'required',
+            data: () => ({
+              value: { id: 'unit-kg', path: 'cropUnits/unit-kg' },
+            }),
+          },
+        ];
+
+        return Promise.resolve({
+          docs: units,
+          forEach: (callback: (value: any) => void) => {
+            units.forEach(callback);
+          },
+        });
+      }
+
+      return Promise.resolve({
+        docs: [],
+        forEach: () => undefined,
+      });
+    });
+
+    getDoc.mockImplementation((docRef: any) => {
+      const path = docRef.path;
+      if (path.includes('/name/')) {
+        return Promise.resolve({ data: () => ({ value: 'Mocked Name' }) });
+      }
+      if (path.startsWith('cropUnits/')) {
+        return Promise.resolve({
+          id: 'unit-kg',
+          data: () => ({ fractional: false }),
+        });
+      }
+      return Promise.resolve({ data: () => ({}) });
+    });
+
+    const { set } = require('firebase/database');
+    set.mockResolvedValue(undefined);
   });
 
   describe('Keyboard behavior', () => {
@@ -481,6 +535,110 @@ describe('HarvestForm Note Feature', () => {
       await waitFor(() => {
         expect(getByText('Save Note')).toBeTruthy();
       });
+    });
+
+    test('renders total today with larger and bolder styling', async () => {
+      const { findAllByText, getByTestId } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      const totalText = await waitFor(() => getByTestId('total-today-text'));
+      const style = Array.isArray(totalText.props.style)
+        ? Object.assign({}, ...totalText.props.style)
+        : totalText.props.style;
+
+      expect(style.fontSize).toBeGreaterThanOrEqual(22);
+      expect(style.fontWeight).toBe('700');
+    });
+
+    test('triggers a pulse when successful submit increases total today', async () => {
+      const { set } = require('firebase/database');
+      const { Animated } = require('react-native');
+      const sequenceSpy = jest.spyOn(Animated, 'sequence');
+
+      const initialHarvests = [
+        {
+          person: 'someone',
+          measures: [{ unit: 'cropUnits/unit-kg', measure: 2 }],
+        },
+      ];
+      mockUseListReturn = [initialHarvests.map(h => ({ val: () => h })), false, undefined];
+
+      set.mockImplementation(async (_path: unknown, value: any[]) => {
+        mockUseListReturn = [value.map(item => ({ val: () => item })), false, undefined];
+      });
+
+      const { findAllByText, getByTestId, getByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      await act(async () => {
+        fireEvent.changeText(getByTestId('measure-input-unit-kg-required'), '3');
+      });
+
+      await waitFor(() => {
+        expect(getByText('Submit')).toBeTruthy();
+      });
+
+      sequenceSpy.mockClear();
+
+      await act(async () => {
+        fireEvent.press(getByText('Submit'));
+      });
+
+      await waitFor(() => {
+        expect(sequenceSpy).toHaveBeenCalled();
+      });
+
+      sequenceSpy.mockRestore();
+    });
+
+    test('does not trigger pulse when submit does not increase total today', async () => {
+      const { set } = require('firebase/database');
+      const { Animated } = require('react-native');
+      const sequenceSpy = jest.spyOn(Animated, 'sequence');
+
+      const unchangedHarvests = [
+        {
+          person: 'someone',
+          measures: [{ unit: 'cropUnits/unit-kg', measure: 1 }],
+        },
+      ];
+      mockUseListReturn = [unchangedHarvests.map(h => ({ val: () => h })), false, undefined];
+
+      set.mockImplementation(async () => {
+        mockUseListReturn = [unchangedHarvests.map(h => ({ val: () => h })), false, undefined];
+      });
+
+      const { findAllByText, getByTestId, getByText } = renderHarvestForm();
+      const cropButtons = await findAllByText('Mocked Name');
+
+      await act(async () => {
+        fireEvent.press(cropButtons[0]);
+      });
+
+      await act(async () => {
+        fireEvent.changeText(getByTestId('measure-input-unit-kg-required'), '1');
+      });
+
+      await waitFor(() => {
+        expect(getByText('Submit')).toBeTruthy();
+      });
+
+      sequenceSpy.mockClear();
+
+      await act(async () => {
+        fireEvent.press(getByText('Submit'));
+      });
+
+      expect(sequenceSpy).not.toHaveBeenCalled();
+      sequenceSpy.mockRestore();
     });
   });
 
