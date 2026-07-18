@@ -6,8 +6,12 @@ import {
   ScrollView,
   Text,
   View,
+  Platform,
 } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import DateTimePicker, {
+  DateTimePickerAndroid,
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import Button from '@/components/Button';
 import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import { styles } from '@/constants/style';
@@ -27,7 +31,6 @@ interface AdminParticipationModalProps {
   title: string;
   selectDateLabel: string;
   selectGardenLabel: string;
-  swipeHintLabel: string;
   loadingLabel: string;
   noUsersLabel: string;
   refreshLabel: string;
@@ -50,7 +53,6 @@ export default function AdminParticipationModal({
   title,
   selectDateLabel,
   selectGardenLabel,
-  swipeHintLabel,
   loadingLabel,
   noUsersLabel,
   refreshLabel,
@@ -69,11 +71,58 @@ export default function AdminParticipationModal({
   const [pendingToggles, setPendingToggles] = useState<Record<string, boolean>>(
     {}
   );
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const selectedDateValue = new Date(`${selectedDate}T00:00:00Z`);
+  const maximumDate = new Date(`${today}T23:59:59Z`);
 
   const addDays = (dateString: string, days: number): string => {
     const date = new Date(`${dateString}T00:00:00Z`);
     date.setUTCDate(date.getUTCDate() + days);
     return date.toISOString().slice(0, 10);
+  };
+
+  const toLocalDateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleDateChange = (date?: Date) => {
+    if (!date) return;
+
+    const nextDate = toLocalDateString(date);
+    if (nextDate <= today) {
+      setSelectedDate(nextDate);
+    }
+  };
+
+  const openDatePicker = () => {
+    if (Platform.OS === 'android') {
+      DateTimePickerAndroid.open({
+        value: selectedDateValue,
+        mode: 'date',
+        maximumDate,
+        onChange: (_event: DateTimePickerEvent, date?: Date) => {
+          handleDateChange(date);
+        },
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
+  };
+
+  const previousDay = () => {
+    setSelectedDate(value => addDays(value, -1));
+  };
+
+  const nextDay = () => {
+    setSelectedDate(value => {
+      const candidate = addDays(value, 1);
+      return candidate > today ? value : candidate;
+    });
   };
 
   useEffect(() => {
@@ -151,13 +200,6 @@ export default function AdminParticipationModal({
     }
   };
 
-  const previousDay = () => setSelectedDate(value => addDays(value, -1));
-  const nextDay = () =>
-    setSelectedDate(value => {
-      const candidate = addDays(value, 1);
-      return candidate > today ? value : candidate;
-    });
-
   return (
     <Modal visible={visible} transparent animationType='slide' onRequestClose={onClose}>
       <View
@@ -175,41 +217,61 @@ export default function AdminParticipationModal({
           >
             <Text style={[styles.text, { fontWeight: '700', marginBottom: 12 }]}>{title}</Text>
             <Text style={[styles.text, { fontSize: 14, marginBottom: 6 }]}>{selectDateLabel}</Text>
-            <Calendar
-              maxDate={today}
-              current={selectedDate}
-              hideExtraDays
-              markedDates={{
-                [selectedDate]: {
-                  selected: true,
-                  selectedColor: '#5bb974',
-                },
+            <Pressable
+              onPress={openDatePicker}
+              style={{
+                borderWidth: 1,
+                borderColor: '#CFCFCF',
+                borderRadius: 8,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                marginBottom: 8,
+                backgroundColor: '#FAFAFA',
+                alignItems: 'center',
               }}
-              onDayPress={(day) => {
-                if (day.dateString <= today) {
-                  setSelectedDate(day.dateString);
-                }
-              }}
-              theme={{
-                arrowColor: '#0101FF',
-                todayTextColor: '#0101FF',
-                textDayFontSize: 14,
-                textMonthFontSize: 15,
-                textDayHeaderFontSize: 11,
-              }}
-              style={{ width: 208, marginBottom: 6, alignSelf: 'center' }}
-            />
-            <Text style={[styles.text, { fontSize: 14 }]}>{swipeHintLabel}</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 8 }}>
+            >
+              <Text style={[styles.text, { fontSize: 16, fontWeight: '600' }]}>
+                {selectedDate}
+              </Text>
+            </Pressable>
+            <Text style={[styles.text, { fontSize: 12, marginBottom: 8, color: '#666' }]}>
+              Tap to change the date
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
               <Button title='<' onPress={previousDay} />
               <Text style={[styles.text, { fontSize: 14, marginHorizontal: 8, alignSelf: 'center' }]}>
                 {selectedDate}
               </Text>
               <Button title='>' onPress={nextDay} disabled={selectedDate >= today} />
             </View>
+            {Platform.OS === 'ios' && showDatePicker ? (
+              <View
+                style={{
+                  marginBottom: 8,
+                  borderWidth: 1,
+                  borderColor: '#E5E5E5',
+                  borderRadius: 10,
+                  paddingHorizontal: 8,
+                  paddingTop: 4,
+                }}
+              >
+                <DateTimePicker
+                  value={selectedDateValue}
+                  mode='date'
+                  display='compact'
+                  maximumDate={maximumDate}
+                  onChange={(_event: DateTimePickerEvent, date?: Date) => {
+                    handleDateChange(date);
+                    setShowDatePicker(false);
+                  }}
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'center', paddingBottom: 8 }}>
+                  <Button title={closeLabel} onPress={() => setShowDatePicker(false)} variant='secondary' />
+                </View>
+              </View>
+            ) : null}
 
             <View style={{ marginBottom: 8 }}>
-              <Text style={[styles.text, { fontSize: 14, marginBottom: 6 }]}>{selectGardenLabel}</Text>
               <Dropdown
                 placeholder={selectGardenLabel}
                 open={gardenListOpen}
@@ -218,7 +280,7 @@ export default function AdminParticipationModal({
                 setValue={setGardenId}
                 items={gardens}
                 style={styles.dropdown}
-                textStyle={styles.text}
+                textStyle={{ fontSize: 15 }}
               />
             </View>
 
@@ -230,11 +292,7 @@ export default function AdminParticipationModal({
                 </View>
               ) : (
                 <View style={{ gap: 8 }}>
-                  {!gardenId ? (
-                    <Text style={[styles.text, { fontSize: 14 }]}>
-                      {selectGardenLabel}
-                    </Text>
-                  ) : users.length === 0 ? (
+                  {!gardenId ? null : users.length === 0 ? (
                     <Text style={[styles.text, { fontSize: 14 }]}>{noUsersLabel}</Text>
                   ) : null}
                   {users.map(user => {
