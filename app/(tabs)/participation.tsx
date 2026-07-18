@@ -137,26 +137,24 @@ export default function Participation() {
             disableAllTouchEventsForDisabledDays
             style={{ width: 250 }}
           />
-          {!participationLogged && (
-            <>
-              <Dropdown
-                placeholder={t('selectGarden')}
-                open={gardenListOpen}
-                setOpen={setGardenListOpen}
-                value={garden}
-                setValue={setGarden}
-                items={gardens}
-                style={styles.dropdown}
-                textStyle={styles.text}
-              />
-              {garden && (
-                <Button
-                  title={t('logParticipation')}
-                  onPress={logParticipation}
-                />
-              )}
-            </>
+          <Dropdown
+            placeholder={t('selectGarden')}
+            open={gardenListOpen}
+            setOpen={setGardenListOpen}
+            value={garden}
+            setValue={setGarden}
+            items={gardens}
+            style={styles.dropdown}
+            textStyle={styles.text}
+          />
+          {garden && !participationLogged && (
+            <Button title={t('logParticipation')} onPress={logParticipation} />
           )}
+          {participationLogged ? (
+            <Text style={[styles.text, { marginTop: 8 }]}>
+              {t('participationLogged')}
+            </Text>
+          ) : null}
           {canManageParticipation && (
             <Button
               title={t('manageParticipationAsAdmin')}
@@ -179,7 +177,6 @@ export default function Participation() {
           title={t('adminParticipationTitle')}
           selectDateLabel={t('adminSelectDate')}
           selectGardenLabel={t('adminSelectGarden')}
-          swipeHintLabel={t('adminSwipeHint')}
           loadingLabel={t('adminLoadingRoster')}
           noUsersLabel={t('adminNoUsers')}
           refreshLabel={t('adminRefresh')}

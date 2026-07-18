@@ -6,6 +6,7 @@ import {
 
 type GetParticipationRosterPayload = {
     date: string;
+    gardenId: string;
 };
 
 type ToggleParticipationPayload = {

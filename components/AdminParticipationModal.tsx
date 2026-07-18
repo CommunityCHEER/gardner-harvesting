@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
-  PanResponder,
   Pressable,
   ScrollView,
   Text,
@@ -38,12 +37,6 @@ interface AdminParticipationModalProps {
   gardens: DropdownItem[];
 }
 
-const addDays = (dateString: string, days: number): string => {
-  const date = new Date(`${dateString}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-};
-
 const getDisplayName = (user: ParticipationRosterUser): string => {
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   if (fullName) return fullName;
@@ -77,19 +70,36 @@ export default function AdminParticipationModal({
     {}
   );
 
+  const addDays = (dateString: string, days: number): string => {
+    const date = new Date(`${dateString}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  };
+
   useEffect(() => {
     if (!visible) return;
     setSelectedDate(getDateString());
+    setGardenId(null);
+    setGardenListOpen(false);
+    setUsers([]);
+    setErrorMessage('');
+    setPendingToggles({});
   }, [visible]);
 
   const loadRoster = async () => {
-    if (!visible) return;
+    if (!visible || !gardenId) {
+      setUsers([]);
+      return;
+    }
 
     setLoading(true);
     setErrorMessage('');
 
     try {
-      const response = await getParticipationRoster({ date: selectedDate });
+      const response = await getParticipationRoster({
+        date: selectedDate,
+        gardenId,
+      });
       const sortedUsers = [...response.users].sort((a, b) =>
         getDisplayName(a).localeCompare(getDisplayName(b), undefined, {
           sensitivity: 'base',
@@ -105,7 +115,7 @@ export default function AdminParticipationModal({
 
   useEffect(() => {
     loadRoster();
-  }, [visible, selectedDate]);
+  }, [visible, selectedDate, gardenId]);
 
   const setPending = (uid: string, pending: boolean) => {
     setPendingToggles(previous => ({
@@ -148,24 +158,6 @@ export default function AdminParticipationModal({
       return candidate > today ? value : candidate;
     });
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gestureState) =>
-          Math.abs(gestureState.dx) > 18 && Math.abs(gestureState.dy) < 20,
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureState.dx <= -40) {
-            previousDay();
-            return;
-          }
-          if (gestureState.dx >= 40) {
-            nextDay();
-          }
-        },
-      }),
-    [today]
-  );
-
   return (
     <Modal visible={visible} transparent animationType='slide' onRequestClose={onClose}>
       <View
@@ -182,10 +174,11 @@ export default function AdminParticipationModal({
             keyboardShouldPersistTaps='handled'
           >
             <Text style={[styles.text, { fontWeight: '700', marginBottom: 12 }]}>{title}</Text>
-            <Text style={[styles.text, { fontSize: 14, marginBottom: 8 }]}>{selectDateLabel}</Text>
+            <Text style={[styles.text, { fontSize: 14, marginBottom: 6 }]}>{selectDateLabel}</Text>
             <Calendar
               maxDate={today}
               current={selectedDate}
+              hideExtraDays
               markedDates={{
                 [selectedDate]: {
                   selected: true,
@@ -197,30 +190,39 @@ export default function AdminParticipationModal({
                   setSelectedDate(day.dateString);
                 }
               }}
-              style={{ marginBottom: 12 }}
+              theme={{
+                arrowColor: '#0101FF',
+                todayTextColor: '#0101FF',
+                textDayFontSize: 14,
+                textMonthFontSize: 15,
+                textDayHeaderFontSize: 11,
+              }}
+              style={{ width: 208, marginBottom: 6, alignSelf: 'center' }}
             />
             <Text style={[styles.text, { fontSize: 14 }]}>{swipeHintLabel}</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 8 }}>
               <Button title='<' onPress={previousDay} />
-              <Text style={[styles.text, { fontSize: 16, marginHorizontal: 8, alignSelf: 'center' }]}>
+              <Text style={[styles.text, { fontSize: 14, marginHorizontal: 8, alignSelf: 'center' }]}>
                 {selectedDate}
               </Text>
               <Button title='>' onPress={nextDay} disabled={selectedDate >= today} />
             </View>
 
-            <Text style={[styles.text, { fontSize: 14, marginBottom: 6 }]}>{selectGardenLabel}</Text>
-            <Dropdown
-              placeholder={selectGardenLabel}
-              open={gardenListOpen}
-              setOpen={setGardenListOpen}
-              value={gardenId}
-              setValue={setGardenId}
-              items={gardens}
-              style={styles.dropdown}
-              textStyle={styles.text}
-            />
+            <View style={{ marginBottom: 8 }}>
+              <Text style={[styles.text, { fontSize: 14, marginBottom: 6 }]}>{selectGardenLabel}</Text>
+              <Dropdown
+                placeholder={selectGardenLabel}
+                open={gardenListOpen}
+                setOpen={setGardenListOpen}
+                value={gardenId}
+                setValue={setGardenId}
+                items={gardens}
+                style={styles.dropdown}
+                textStyle={styles.text}
+              />
+            </View>
 
-            <View {...panResponder.panHandlers} style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 8 }}>
               {loading ? (
                 <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                   <ActivityIndicator />
@@ -228,9 +230,13 @@ export default function AdminParticipationModal({
                 </View>
               ) : (
                 <View style={{ gap: 8 }}>
-                  {users.length === 0 && (
+                  {!gardenId ? (
+                    <Text style={[styles.text, { fontSize: 14 }]}>
+                      {selectGardenLabel}
+                    </Text>
+                  ) : users.length === 0 ? (
                     <Text style={[styles.text, { fontSize: 14 }]}>{noUsersLabel}</Text>
-                  )}
+                  ) : null}
                   {users.map(user => {
                     const checked = user.hasParticipation;
                     const pending = !!pendingToggles[user.uid];
