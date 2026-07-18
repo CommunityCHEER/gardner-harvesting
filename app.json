@@ -12,6 +12,7 @@
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/icon.png",
   "scheme": "gardner-harvesting",
+  "newArchEnabled": false,
   "extra": {
     "router": {
       "origin": false

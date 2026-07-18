@@ -30,7 +30,6 @@ import {
   Harvest,
   HarvestMeasure,
   RealtimeHarvest,
-  Participation,
   Unit,
 } from '@/types/firestore';
 import Toast from 'react-native-toast-message';
@@ -45,6 +44,7 @@ import ImagePicker from './ImagePicker';
 import SmartHarvestOverlay from './SmartHarvestOverlay';
 import { identifyCrop } from '@/services/smartHarvest';
 import { logger } from '@/utility/logger';
+import { logParticipationForUser } from '@/services/participation';
 
 export interface DisplayUnit {
   id: string;
@@ -334,16 +334,9 @@ export default function HarvestForm({
     useContext(participationContext);
 
   const logParticipation = async () => {
-    if (!garden) return;
+    if (!garden || !auth.currentUser?.uid) return;
     setParticipationLogged(true);
-    const participation: Participation = {
-      date: getDateString(),
-      garden: doc(db, 'gardens', garden),
-    };
-    addDoc(
-      collection(db, 'people', auth.currentUser?.uid ?? '', 'participation'),
-      participation
-    );
+    await logParticipationForUser(db, auth.currentUser.uid, garden);
 
     Toast.show({ type: 'info', text1: t('participationLogged') });
   };

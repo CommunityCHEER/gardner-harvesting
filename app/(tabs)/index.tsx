@@ -9,13 +9,13 @@ import Welcome from '@/components/Welcome';
 import VersionDisplay from '@/components/VersionDisplay';
 import Toast from 'react-native-toast-message';
 import { participationContext, firebaseContext } from '@/context';
-import { addDoc, collection, getDocs, doc } from 'firebase/firestore';
-import { Participation, Garden } from '@/types/firestore';
-import { getDateString } from '@/utility/functions';
+import { getDocs, collection } from 'firebase/firestore';
+import { Garden } from '@/types/firestore';
 import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import ScreenLogo from '@/components/ScreenLogo';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthState } from '@/hooks/useAuthState';
+import { logParticipationForUser } from '@/services/participation';
 
 /**
  * The main screen of the app, where users can select a garden and start harvesting.
@@ -82,15 +82,7 @@ export default function Index() {
       return;
     }
 
-    const participation: Participation = {
-      date: getDateString(),
-      garden: doc(db, 'gardens', garden),
-    };
-
-    addDoc(
-      collection(db, 'people', auth.currentUser.uid, 'participation'),
-      participation
-    ).then(() => {
+    logParticipationForUser(db, auth.currentUser.uid, garden).then(() => {
       Toast.show({ type: 'info', text1: translate('participationLogged') });
       setParticipationLogged(true);
     });

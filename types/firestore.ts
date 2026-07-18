@@ -77,6 +77,44 @@ export interface Participation {
 }
 
 /**
+ * Role flags sourced from Firebase Auth custom claims.
+ */
+export interface ParticipationRosterRoles {
+  admin: boolean;
+  gardener: boolean;
+  developer: boolean;
+}
+
+/**
+ * A backend-provided roster entry for admin participation management.
+ */
+export interface ParticipationRosterUser {
+  uid: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  roles: ParticipationRosterRoles;
+  hasParticipation: boolean;
+}
+
+/**
+ * Callable response for `getParticipationRoster`.
+ */
+export interface AdminParticipationRosterResponse {
+  date: string;
+  users: ParticipationRosterUser[];
+}
+
+/**
+ * Callable response for `toggleParticipationForUser`.
+ */
+export interface ToggleParticipationResponse {
+  uid: string;
+  date: string;
+  hasParticipation: boolean;
+}
+
+/**
  * Represents a unit of measurement.
  */
 export interface Unit {

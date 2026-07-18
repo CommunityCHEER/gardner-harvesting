@@ -5,7 +5,7 @@ import { useContext, useState, useEffect } from 'react';
 import { i18nContext } from '@/i18n';
 import { styles } from '@/constants/style';
 import { participationContext, firebaseContext } from '@/context';
-import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import Dropdown, { DropdownItem } from '@/components/Dropdown';
 import ScreenLogo from '@/components/ScreenLogo';
 import {
@@ -29,6 +29,8 @@ export default function Participation() {
   const [gardens, setGardens] = useState<DropdownItem[]>([]);
   const [gardenListOpen, setGardenListOpen] = useState(false);
   const [garden, setGarden] = useState<string | null>(null);
+  const [adminModalVisible, setAdminModalVisible] = useState(false);
+  const [canManageParticipation, setCanManageParticipation] = useState(false);
 
   useEffect(() => {
     const effect = async () => {
@@ -54,19 +56,34 @@ export default function Participation() {
   const { db, auth } = useContext(firebaseContext);
   const loggedIn = !!useAuthState(auth)[0];
 
-  const logParticipation = async () => {
-    setParticipationLogged(true);
-    const Participation: ParticipationInterface = {
-      date: getDateString(),
-      garden: doc(db, 'gardens', garden ?? ''),
+  useEffect(() => {
+    const loadClaims = async () => {
+      if (!loggedIn || !auth.currentUser) {
+        setCanManageParticipation(false);
+        return;
+      }
+
+      const token = await auth.currentUser.getIdTokenResult();
+      setCanManageParticipation(
+        token.claims.admin === true || token.claims.developer === true
+      );
     };
-    addDoc(
-      collection(db, 'people', auth.currentUser?.uid ?? '', 'participation'),
-      Participation
-    );
+
+    loadClaims();
+  }, [loggedIn, auth.currentUser]);
+
+  const logParticipation = async () => {
+    if (!auth.currentUser?.uid || !garden) return;
+    setParticipationLogged(true);
+    const { logParticipationForUser } = require('@/services/participation');
+    await logParticipationForUser(db, auth.currentUser.uid, garden);
   };
 
   const [markedDates, setMarkedDates] = useState<MarkedDates>({});
+
+  const AdminParticipationModal = adminModalVisible
+    ? require('@/components/AdminParticipationModal').default
+    : null;
 
   useEffect(() => {
     const effect = async () => {
@@ -140,6 +157,12 @@ export default function Participation() {
               )}
             </>
           )}
+          {canManageParticipation && (
+            <Button
+              title={t('manageParticipationAsAdmin')}
+              onPress={() => setAdminModalVisible(true)}
+            />
+          )}
         </>
       ) : (
         <>
@@ -149,6 +172,23 @@ export default function Participation() {
           </Link>
         </>
       )}
+      {AdminParticipationModal ? (
+        <AdminParticipationModal
+          visible={adminModalVisible}
+          onClose={() => setAdminModalVisible(false)}
+          title={t('adminParticipationTitle')}
+          selectDateLabel={t('adminSelectDate')}
+          selectGardenLabel={t('adminSelectGarden')}
+          swipeHintLabel={t('adminSwipeHint')}
+          loadingLabel={t('adminLoadingRoster')}
+          noUsersLabel={t('adminNoUsers')}
+          refreshLabel={t('adminRefresh')}
+          closeLabel={t('adminClose')}
+          checkedLabel={t('adminChecked')}
+          uncheckedLabel={t('adminUnchecked')}
+          gardens={gardens}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }
