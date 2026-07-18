@@ -115,6 +115,33 @@ export interface ToggleParticipationResponse {
 }
 
 /**
+ * A backend-provided user row for claims management.
+ */
+export interface ManageUsersRow {
+  uid: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  roles: ParticipationRosterRoles;
+}
+
+/**
+ * Callable response for listing users in role management.
+ */
+export interface ManageUsersListResponse {
+  users: ManageUsersRow[];
+}
+
+/**
+ * Callable response for updating custom claims.
+ */
+export interface UpdateCustomClaimsResponse {
+  uid: string;
+  email: string;
+  roles: ParticipationRosterRoles;
+}
+
+/**
  * Represents a unit of measurement.
  */
 export interface Unit {

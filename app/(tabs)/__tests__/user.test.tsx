@@ -63,6 +63,15 @@ jest.mock('react-native-toast-message', () => {
     };
 });
 
+jest.mock('@/components/ManageUsersModal', () => {
+    const { Text } = require('react-native');
+    return {
+        __esModule: true,
+        default: ({ visible }: { visible: boolean }) =>
+            visible ? <Text>mock-manage-users-modal</Text> : null,
+    };
+});
+
 describe('User tab keyboard and tap behavior', () => {
     const mockAuth = {
         currentUser: null,
@@ -409,6 +418,54 @@ describe('User tab keyboard and tap behavior', () => {
         fireEvent.press(getByText('Login'));
 
         expect(getByText('...Request a Password Reset')).toBeTruthy();
+    });
+
+    test('shows Manage Users button for admin users and opens modal', async () => {
+        mockAuth.currentUser = {
+            uid: 'admin-uid',
+            email: 'admin@example.com',
+            getIdTokenResult: jest.fn().mockResolvedValue({ claims: { admin: true } }),
+        } as any;
+
+        const { getByText } = renderUser();
+
+        await waitFor(() => {
+            expect(getByText('MANAGE USERS')).toBeTruthy();
+        });
+
+        fireEvent.press(getByText('MANAGE USERS'));
+
+        await waitFor(() => {
+            expect(getByText('mock-manage-users-modal')).toBeTruthy();
+        });
+    });
+
+    test('shows Manage Users button for developer users', async () => {
+        mockAuth.currentUser = {
+            uid: 'developer-uid',
+            email: 'developer@example.com',
+            getIdTokenResult: jest.fn().mockResolvedValue({ claims: { developer: true } }),
+        } as any;
+
+        const { getByText } = renderUser();
+
+        await waitFor(() => {
+            expect(getByText('MANAGE USERS')).toBeTruthy();
+        });
+    });
+
+    test('does not show Manage Users button for users without admin/developer claims', async () => {
+        mockAuth.currentUser = {
+            uid: 'user-uid',
+            email: 'user@example.com',
+            getIdTokenResult: jest.fn().mockResolvedValue({ claims: { gardener: true } }),
+        } as any;
+
+        const { queryByText } = renderUser();
+
+        await waitFor(() => {
+            expect(queryByText('MANAGE USERS')).toBeNull();
+        });
     });
 });
 

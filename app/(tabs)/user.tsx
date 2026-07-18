@@ -45,6 +45,8 @@ export default function User() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [mode, setMode] = useState<'initial' | 'login' | 'register' | 'forgot'>('initial');
+  const [canManageUsers, setCanManageUsers] = useState(false);
+  const [manageUsersModalVisible, setManageUsersModalVisible] = useState(false);
 
   const i18n = useContext(i18nContext);
   const translate = i18n.t.bind(i18n);
@@ -115,7 +117,12 @@ export default function User() {
         if (userInfo && idToken.claims.admin) userInfo.admin = true;
         if (userInfo && idToken.claims.gardener) userInfo.gardener = true;
         if (userInfo && idToken.claims.developer) userInfo.developer = true;
+        setCanManageUsers(
+          idToken.claims.admin === true || idToken.claims.developer === true
+        );
         setUserInfo(userInfo);
+      } else {
+        setCanManageUsers(false);
       }
     };
     effect();
@@ -213,6 +220,8 @@ export default function User() {
     auth.signOut();
     setFireUser(undefined);
     setUserInfo(undefined);
+    setCanManageUsers(false);
+    setManageUsersModalVisible(false);
   };
   const getUserRoleText = (claims: UserInfo) => {
     if (claims.developer) {
@@ -225,6 +234,10 @@ export default function User() {
       return translate('youHaveNoRole');
     }
   };
+
+  const ManageUsersModal = manageUsersModalVisible
+    ? require('@/components/ManageUsersModal').default
+    : null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -251,6 +264,12 @@ export default function User() {
                 title={translate('deleteAccount')}
                 onPress={handleDeleteAccount}
               />
+              {canManageUsers ? (
+                <Button
+                  title={translate('manageUsers')}
+                  onPress={() => setManageUsersModalVisible(true)}
+                />
+              ) : null}
             </>
           )}
           {!userInfo && fireUser && <ActivityIndicator />}
@@ -376,6 +395,22 @@ export default function User() {
           <Toast config={toastConfig} />
         </ScrollView>
       </KeyboardAvoidingView>
+      {ManageUsersModal ? (
+        <ManageUsersModal
+          visible={manageUsersModalVisible}
+          onClose={() => setManageUsersModalVisible(false)}
+          title={translate('manageUsersTitle')}
+          loadingLabel={translate('manageUsersLoading')}
+          noUsersLabel={translate('manageUsersNoUsers')}
+          refreshLabel={translate('adminRefresh')}
+          closeLabel={translate('adminClose')}
+          updateErrorLabel={translate('manageUsersUpdateError')}
+          roleNoneLabel={translate('manageUsersRoleNone')}
+          roleGardLabel={translate('manageUsersRoleGard')}
+          roleAdmLabel={translate('manageUsersRoleAdm')}
+          roleDevLabel={translate('manageUsersRoleDev')}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }
